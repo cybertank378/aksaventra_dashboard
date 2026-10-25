@@ -56,6 +56,9 @@
       "style": {
         "useConst": "error"
       },
+      "complexity": {
+        "noStaticOnlyClass": "off"
+      },
       "a11y": {
         "recommended": true
       }
