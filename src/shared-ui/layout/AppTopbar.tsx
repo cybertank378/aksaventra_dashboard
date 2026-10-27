@@ -65,13 +65,13 @@ export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Pro
           <button
             type="button"
             onClick={onMenuClick}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 md:hidden"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 md:hidden"
             aria-label="Open sidebar menu"
           >
             <Menu size={22} />
           </button>
 
-          <div className="flex items-center gap-2 px-3 h-10 border border-gray-300 rounded-lg bg-white focus-within:border-indigo-500 transition-colors flex-1 min-w-0">
+          <div className="flex items-center gap-2 px-3 h-10 border border-gray-300 rounded-lg bg-white focus-within:border-emerald-500 transition-colors flex-1 min-w-0">
             <Search size={16} className="text-gray-500 shrink-0" />
             <input
               type="text"

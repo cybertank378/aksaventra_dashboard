@@ -156,8 +156,8 @@ export function RecursiveSidebarItem({
   const itemClass = clsx(
     "group flex h-11 w-full items-center justify-between rounded-2xl pr-3 transition-all duration-200",
     isActive
-      ? "bg-indigo-600 text-white shadow-sm"
-      : "text-slate-300 hover:bg-sky-900 hover:text-white",
+      ? "bg-emerald-600 text-white shadow-sm"
+      : "text-slate-300 hover:bg-slate-800 hover:text-white",
   );
 
   ////////////////////////////////////////////////////////////

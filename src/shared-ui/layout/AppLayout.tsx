@@ -27,7 +27,7 @@ export default function AppLayout({ children, role = "ADMIN" }: Props) {
   //////////////////////////////////////////////////////////////
 
   return (
-    <div className="flex h-screen overflow-hidden bg-surface-subtle">
+    <div className="flex h-screen overflow-hidden bg-slate-50">
       {/* SIDEBAR */}
 
       <AppSidebar role={role} mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />

@@ -2,14 +2,14 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, ShieldCheck } from "lucide-react";
 
 import { useState } from "react";
 
 import type { UserRole } from "@/libs/enums";
 
 import { getSidebarMenu, type SidebarGroup } from "@/security/sidebar/getSidebarMenu";
-import { YayasanLogo } from "@/shared-ui/component/Icons";
+
 import {
   RecursiveSidebarItem,
   type SidebarItem,
@@ -39,39 +39,39 @@ export default function AppSidebar({ role = "ADMIN", mobileOpen, onClose }: Prop
   ////////////////////////////////////////////////////////////
   // SIDEBAR CONTENT
   const SidebarContent = (
-    <div className="flex h-screen w-72 flex-col bg-sky-950">
+    <div className="flex h-screen w-72 flex-col bg-slate-900">
       {/* ================================================= */}
       {/* HEADER */}
       {/* ================================================= */}
 
-      <div className="border-b border-slate-700 px-5 py-5">
+      <div className="border-b border-slate-800 px-5 py-5">
         {/* LOGO + TITLE */}
 
-        <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full shadow-sm">
-            <YayasanLogo size={42} className="drop-shadow-xl" />
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
+            <ShieldCheck size={24} />
           </div>
 
           <div>
-            <h1 className="text-sm font-bold text-white">Monitoring Pengawasan</h1>
+            <h1 className="text-sm font-bold text-white">Aksaventra</h1>
 
-            <p className="mt-1 text-xs text-slate-400">Satdik Hang Tuah</p>
+            <p className="mt-0.5 text-xs text-slate-400">Engine Dashboard</p>
           </div>
         </div>
 
         {/* ACTIVE ROLE */}
 
-        <div className="mt-5 flex items-center gap-3 rounded-2xl border border-slate-200 bg-indigo-50 px-4 py-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white">
+        <div className="mt-5 flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-800/60 px-4 py-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white">
             <LayoutDashboard size={18} />
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-400">
               Role Aktif
             </p>
 
-            <p className="text-sm font-semibold text-slate-800">{role.replaceAll("_", " ")}</p>
+            <p className="text-sm font-semibold text-white">{role.replaceAll("_", " ")}</p>
           </div>
         </div>
       </div>
@@ -80,7 +80,7 @@ export default function AppSidebar({ role = "ADMIN", mobileOpen, onClose }: Prop
       {/* NAVIGATION */}
       {/* ================================================= */}
 
-      <nav className="flex-1 overflow-y-auto bg-sky-950 px-3 py-5">
+      <nav className="flex-1 overflow-y-auto bg-slate-900 px-3 py-5">
         <div className="space-y-7">
           {groups.map((group: SidebarGroup, index: number) => (
             <div key={`group-${group.label ?? index}`}>
@@ -117,10 +117,10 @@ export default function AppSidebar({ role = "ADMIN", mobileOpen, onClose }: Prop
       {/* FOOTER */}
       {/* ================================================= */}
 
-      <div className="border-t border-slate-700 bg-sky-950 px-5 py-4">
+      <div className="border-t border-slate-800 bg-slate-900 px-5 py-4">
         <div className="rounded-2xl px-4 py-3">
           <p className="text-xs font-medium text-slate-500">
-            © {new Date().getFullYear()} Yayasan Hang Tuah
+            © {new Date().getFullYear()} Aksaventra Dashboard
           </p>
         </div>
       </div>

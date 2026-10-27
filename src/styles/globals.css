@@ -1,1 +1,42 @@
-@import "@/app/globals.css";
+@import "tailwindcss";
+
+@theme {
+    --color-deep-space-blue-50: #e8f4fc;
+    --color-deep-space-blue-100: #d1eafa;
+    --color-deep-space-blue-200: #a3d4f5;
+    --color-deep-space-blue-300: #75bff0;
+    --color-deep-space-blue-400: #47a9eb;
+    --color-deep-space-blue-500: #1994e6;
+    --color-deep-space-blue-600: #1476b8;
+    --color-deep-space-blue-700: #0f598a;
+    --color-deep-space-blue-800: #0a3b5c;
+    --color-deep-space-blue-900: #051e2e;
+    --color-deep-space-blue-950: #041520;
+}
+
+:root {
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --border-default: #f1f5f9;
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-sans: var(--font-sans);
+    --font-mono: var(--font-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #020617;
+        --foreground: #f8fafc;
+        --border-default: #1e293b;
+    }
+}
+
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), system-ui, sans-serif;
+}

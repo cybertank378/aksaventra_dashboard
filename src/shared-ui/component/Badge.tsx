@@ -33,13 +33,13 @@ interface BadgeProps {
 
 const badgeStyles: Record<BadgeVariant, Record<BadgeColor, string>> = {
   soft: {
-    primary: "bg-sky-100 text-sky-700 border border-sky-200",
+    primary: "bg-emerald-100 text-emerald-700 border border-emerald-200",
 
-    secondary: "bg-gray-100 text-gray-700 border border-gray-200",
+    secondary: "bg-slate-100 text-slate-700 border border-slate-200",
 
     success: "bg-emerald-100 text-emerald-700 border border-emerald-200",
 
-    warning: "bg-amber-100 text-amber-700 border border-amber-200",
+    warning: "bg-orange-100 text-orange-700 border border-orange-200",
 
     error: "bg-red-100 text-red-700 border border-red-200",
 
@@ -47,13 +47,13 @@ const badgeStyles: Record<BadgeVariant, Record<BadgeColor, string>> = {
   },
 
   filled: {
-    primary: "bg-sky-600 text-white border border-sky-600",
+    primary: "bg-emerald-600 text-white border border-emerald-600",
 
-    secondary: "bg-gray-600 text-white border border-gray-600",
+    secondary: "bg-slate-600 text-white border border-slate-600",
 
     success: "bg-emerald-600 text-white border border-emerald-600",
 
-    warning: "bg-amber-500 text-white border border-amber-500",
+    warning: "bg-orange-600 text-white border border-orange-600",
 
     error: "bg-red-600 text-white border border-red-600",
 
@@ -61,13 +61,13 @@ const badgeStyles: Record<BadgeVariant, Record<BadgeColor, string>> = {
   },
 
   outline: {
-    primary: "bg-transparent text-sky-700 border border-sky-300",
+    primary: "bg-transparent text-emerald-700 border border-emerald-300",
 
-    secondary: "bg-transparent text-gray-700 border border-gray-300",
+    secondary: "bg-transparent text-slate-700 border border-slate-300",
 
     success: "bg-transparent text-emerald-700 border border-emerald-300",
 
-    warning: "bg-transparent text-amber-700 border border-amber-300",
+    warning: "bg-transparent text-orange-700 border border-orange-300",
 
     error: "bg-transparent text-red-700 border border-red-300",
 

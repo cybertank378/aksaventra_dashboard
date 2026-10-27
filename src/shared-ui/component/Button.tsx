@@ -106,27 +106,27 @@ const shapeStyles: Record<Shape, string> = {
 const colorMap: Record<Color, Record<Variant, string>> = {
   primary: {
     filled:
-      "bg-indigo-500 text-white hover:bg-indigo-600 active:bg-indigo-700 focus:ring-indigo-400",
+      "bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 focus:ring-emerald-400",
 
-    label: "bg-indigo-100 text-indigo-600 hover:bg-indigo-200 active:bg-indigo-300",
+    label: "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 active:bg-emerald-300",
 
-    outline: "border border-indigo-500 text-indigo-500 hover:bg-indigo-50 active:bg-indigo-100",
+    outline: "border border-emerald-600 text-emerald-600 hover:bg-emerald-50 active:bg-emerald-100",
 
-    text: "text-indigo-500 hover:bg-indigo-50 active:bg-indigo-100",
+    text: "text-emerald-600 hover:bg-emerald-50 active:bg-emerald-100",
 
-    ghost: "text-indigo-500 hover:bg-indigo-50 active:bg-indigo-100",
+    ghost: "text-emerald-600 hover:bg-emerald-50 active:bg-emerald-100",
   },
 
   secondary: {
-    filled: "bg-gray-600 text-white hover:bg-gray-700 active:bg-gray-800 focus:ring-gray-400",
+    filled: "bg-slate-600 text-white hover:bg-slate-700 active:bg-slate-800 focus:ring-slate-400",
 
-    label: "bg-gray-200 text-gray-700 hover:bg-gray-300 active:bg-gray-400",
+    label: "bg-slate-200 text-slate-700 hover:bg-slate-300 active:bg-slate-400",
 
-    outline: "border border-gray-500 text-gray-600 hover:bg-gray-100 active:bg-gray-200",
+    outline: "border border-slate-500 text-slate-600 hover:bg-slate-100 active:bg-slate-200",
 
-    text: "text-gray-600 hover:bg-gray-100 active:bg-gray-200",
+    text: "text-slate-600 hover:bg-slate-100 active:bg-slate-200",
 
-    ghost: "text-gray-600 hover:bg-gray-100 active:bg-gray-200",
+    ghost: "text-slate-600 hover:bg-slate-100 active:bg-slate-200",
   },
 
   error: {
@@ -143,15 +143,15 @@ const colorMap: Record<Color, Record<Variant, string>> = {
 
   warning: {
     filled:
-      "bg-yellow-500 text-white hover:bg-yellow-600 active:bg-yellow-700 focus:ring-yellow-400",
+      "bg-orange-600 text-white hover:bg-orange-700 active:bg-orange-800 focus:ring-orange-400",
 
-    label: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200 active:bg-yellow-300",
+    label: "bg-orange-100 text-orange-700 hover:bg-orange-200 active:bg-orange-300",
 
-    outline: "border border-yellow-500 text-yellow-600 hover:bg-yellow-50 active:bg-yellow-100",
+    outline: "border border-orange-600 text-orange-600 hover:bg-orange-50 active:bg-orange-100",
 
-    text: "text-yellow-600 hover:bg-yellow-50 active:bg-yellow-100",
+    text: "text-orange-600 hover:bg-orange-50 active:bg-orange-100",
 
-    ghost: "text-yellow-600 hover:bg-yellow-50 active:bg-yellow-100",
+    ghost: "text-orange-600 hover:bg-orange-50 active:bg-orange-100",
   },
 
   info: {
