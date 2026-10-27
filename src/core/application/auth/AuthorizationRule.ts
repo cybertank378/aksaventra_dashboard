@@ -1,4 +1,4 @@
-export type UserRole = "ADMIN" | "OPERATOR" | "AUDITOR";
+export type UserRole = "ADMIN";
 
 export interface UserAuthContext {
   userId: string;

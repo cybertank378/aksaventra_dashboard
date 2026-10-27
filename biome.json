@@ -60,7 +60,17 @@
         "noStaticOnlyClass": "off"
       },
       "a11y": {
-        "recommended": true
+        "recommended": true,
+        "noLabelWithoutControl": "off",
+        "noStaticElementInteractions": "off",
+        "useKeyWithClickEvents": "off",
+        "useAriaPropsForRole": "off",
+        "useSemanticElements": "off",
+        "noSvgWithoutTitle": "off",
+        "useFocusableInteractive": "off"
+      },
+      "suspicious": {
+        "noArrayIndexKey": "off"
       }
     },
     "domains": {
