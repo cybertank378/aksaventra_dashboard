@@ -4,6 +4,7 @@ import { Result } from "@/core/domain/Result";
 import type { AuthUserResponseDTO } from "@/modules/auth/domain/dto/AuthResponseDTO";
 import { UserCredentialEntity } from "@/modules/auth/domain/entity/UserCredentialEntity";
 import type { AuthRepositoryInterface } from "@/modules/auth/domain/interfaces/AuthInterfaces";
+import type { MailProviderInterface } from "@/modules/auth/domain/interfaces/MailProviderInterface";
 import type { PasswordHasherInterface } from "@/modules/auth/domain/interfaces/PasswordHasherInterface";
 import { AuthMapper } from "@/modules/auth/domain/mapper/AuthMapper";
 import { PasswordPolicyRule } from "@/modules/auth/domain/rules/PasswordPolicyRule";
@@ -21,6 +22,7 @@ export class RegisterUseCase
   constructor(
     private readonly authRepo: AuthRepositoryInterface,
     private readonly hasher: PasswordHasherInterface,
+    readonly _mailProvider?: MailProviderInterface,
   ) {}
 
   public async execute(input: RegisterUseCaseInput): Promise<Result<AuthUserResponseDTO, string>> {

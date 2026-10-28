@@ -11,6 +11,8 @@ export interface AuthUserResponseDTO {
   createdAt: Date;
 }
 
+export type RegisterResponseDTO = AuthUserResponseDTO;
+
 export interface LoginResponseDTO {
   user: AuthUserResponseDTO;
   tokens: AuthTokens;
@@ -18,6 +20,36 @@ export interface LoginResponseDTO {
 
 export interface TokenResponseDTO {
   tokens: AuthTokens;
+}
+
+export type RefreshTokenResponseDTO = TokenResponseDTO;
+
+export interface LogoutResponseDTO {
+  success: boolean;
+  message?: string;
+}
+
+export interface ForgotPasswordResponseDTO {
+  success: boolean;
+  message?: string;
+}
+
+export interface ChangePasswordResponseDTO {
+  success: boolean;
+  message?: string;
+}
+
+export interface VerifyEmailResponseDTO {
+  success: boolean;
+  message?: string;
+}
+
+export interface CurrentAuthResponseDTO {
+  id: string;
+  email: string;
+  role: UserRole;
+  name?: string | null;
+  isActive: boolean;
 }
 
 export interface MessageResponseDTO {
