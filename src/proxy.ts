@@ -36,7 +36,7 @@ function isStaticAsset(pathname: string): boolean {
 //////////////////////////////////////////////////////////////
 
 function isApiRoute(pathname: string): boolean {
-  return pathname.startsWith("/api");
+  return pathname.startsWith("/api/v1");
 }
 
 //////////////////////////////////////////////////////////////
@@ -50,9 +50,7 @@ function isEngineValidationRoute(pathname: string): boolean {
     pathname.startsWith("/api/v1/validate/") ||
     pathname.startsWith("/api/v1/validate-key/") ||
     pathname.startsWith("/api/v1/engine/validate") ||
-    pathname.startsWith("/api/engine/validate") ||
-    pathname.startsWith("/api/v1/license/validate") ||
-    pathname.startsWith("/api/license/validate")
+    pathname.startsWith("/api/v1/license/validate")
   );
 }
 
@@ -66,7 +64,6 @@ function isPublicRoute(pathname: string): boolean {
     // AUTH API
     ////////////////////////////////////////////////////////////
     pathname.startsWith("/api/v1/auth") ||
-    pathname.startsWith("/api/auth") ||
     ////////////////////////////////////////////////////////////
     // ENGINE VALIDATION API (Validated via License Key)
     ////////////////////////////////////////////////////////////

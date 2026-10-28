@@ -196,7 +196,7 @@ describe("Aksaventra Proxy Gateway (Triple A Pattern)", () => {
 
     it("should return 401 JSON for unauthenticated protected API request", async () => {
       // Arrange
-      const request = new NextRequest("http://localhost:3000/api/admin/engines");
+      const request = new NextRequest("http://localhost:3000/api/v1/admin/engines");
 
       // Act
       const response = await proxy(request);
@@ -218,7 +218,7 @@ describe("Aksaventra Proxy Gateway (Triple A Pattern)", () => {
         }),
       );
 
-      const request = new NextRequest("http://localhost:3000/api/dashboard", {
+      const request = new NextRequest("http://localhost:3000/api/v1/dashboard", {
         headers: {
           cookie: `${AUTH_COOKIE.ACCESS_TOKEN}=expired_token; ${AUTH_COOKIE.REFRESH_TOKEN}=expired_refresh`,
         },

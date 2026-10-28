@@ -70,7 +70,7 @@ describe("fieldGuard (Triple A Pattern)", () => {
         userId: "usr-admin-1",
         role: "ADMIN",
       };
-      const pathname = "/api/users";
+      const pathname = "/api/v1/users";
       const method = "POST";
 
       // Act
@@ -83,7 +83,7 @@ describe("fieldGuard (Triple A Pattern)", () => {
     it("should deny API access when auth is undefined or null", () => {
       // Arrange
       const auth = null as unknown as AuthContext;
-      const pathname = "/api/data";
+      const pathname = "/api/v1/data";
 
       // Act
       const result = canAccessApi(auth, pathname, "GET");
