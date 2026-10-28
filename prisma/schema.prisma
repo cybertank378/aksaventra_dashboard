@@ -24,6 +24,12 @@ enum EngineStatus {
   PENDING
 }
 
+enum LicenseStatus {
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+}
+
 // ----------------------------------------------------
 // USER & AUTHENTICATION MODELS
 // ----------------------------------------------------
@@ -112,4 +118,27 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+// ----------------------------------------------------
+// LICENSE MANAGEMENT & HARDWARE LOCKING (Issue #13)
+// ----------------------------------------------------
+
+model License {
+  id             String        @id @default(uuid())
+  serialKey      String        @unique @map("serial_key")
+  hwid           String?       @map("hwid")
+  clientName     String        @map("client_name")
+  vaultSecret    String        @map("vault_secret")
+  status         LicenseStatus @default(ACTIVE)
+  expiresAt      DateTime?     @map("expires_at")
+  activatedAt    DateTime?     @map("activated_at")
+  lastVerifiedAt DateTime?     @map("last_verified_at")
+  engineVersion  String?       @map("engine_version")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@index([serialKey])
+  @@index([hwid])
+  @@map("licenses")
 }
