@@ -35,6 +35,7 @@ export class LicenseRepository implements LicenseRepositoryInterface {
       data: {
         hwid: data.hwid,
         status: data.status,
+        expiresAt: data.expiresAt,
         activatedAt: data.activatedAt,
         lastVerifiedAt: data.lastVerifiedAt,
         engineVersion: data.engineVersion,

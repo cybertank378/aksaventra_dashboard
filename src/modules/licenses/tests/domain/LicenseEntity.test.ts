@@ -87,6 +87,82 @@ describe("LicenseEntity (Triple A Pattern)", () => {
       // Assert
       expect(expired).toBe(true);
     });
+
+    it("should return true if license age from activatedAt reaches or exceeds 1 year (365 days)", () => {
+      // Arrange
+      const oneYearAndOneDayAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 366);
+      const entity = LicenseEntity.create({
+        id: "lic-4b",
+        serialKey: "AKSA-OLD-ACTIVATED",
+        clientName: "Old Client",
+        vaultSecret: "SECRET",
+        status: "ACTIVE",
+        activatedAt: oneYearAndOneDayAgo,
+      });
+
+      // Act
+      const expired = entity.isExpired();
+
+      // Assert
+      expect(expired).toBe(true);
+    });
+
+    it("should return true if license age from createdAt reaches or exceeds 1 year (365 days)", () => {
+      // Arrange
+      const oneYearAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 365);
+      const entity = LicenseEntity.create({
+        id: "lic-4c",
+        serialKey: "AKSA-OLD-CREATED",
+        clientName: "Old Client",
+        vaultSecret: "SECRET",
+        status: "ACTIVE",
+        createdAt: oneYearAgo,
+      });
+
+      // Act
+      const expired = entity.isExpired();
+
+      // Assert
+      expect(expired).toBe(true);
+    });
+
+    it("should return true if status is already EXPIRED", () => {
+      // Arrange
+      const entity = LicenseEntity.create({
+        id: "lic-4d",
+        serialKey: "AKSA-STATUS-EXPIRED",
+        clientName: "Client",
+        vaultSecret: "SECRET",
+        status: "EXPIRED",
+      });
+
+      // Act
+      const expired = entity.isExpired();
+
+      // Assert
+      expect(expired).toBe(true);
+    });
+  });
+
+  describe("markExpired", () => {
+    it("should transition status to EXPIRED", () => {
+      // Arrange
+      const entity = LicenseEntity.create({
+        id: "lic-4e",
+        serialKey: "AKSA-TO-EXPIRE",
+        clientName: "Client",
+        vaultSecret: "SECRET",
+        status: "ACTIVE",
+      });
+
+      // Act
+      entity.markExpired();
+
+      // Assert
+      expect(entity.status).toBe("EXPIRED");
+      expect(entity.isActive()).toBe(false);
+      expect(entity.isExpired()).toBe(true);
+    });
   });
 
   describe("isActive", () => {
@@ -220,6 +296,7 @@ describe("LicenseEntity (Triple A Pattern)", () => {
       expect(entity.hwid).toBe("DEVICE-HWID-999");
       expect(entity.activatedAt).toBeInstanceOf(Date);
       expect(entity.lastVerifiedAt).toBeInstanceOf(Date);
+      expect(entity.expiresAt).toBeInstanceOf(Date);
       expect(entity.hasHardwareBinding()).toBe(true);
     });
   });

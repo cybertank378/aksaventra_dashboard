@@ -140,7 +140,7 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
       expect(error.message).toContain("Lisensi Tidak Ditemukan");
     });
 
-    it("should reject with HTTP 401 if license has expired", async () => {
+    it("should reject with HTTP 401 and autonomously update status to EXPIRED if license has expired", async () => {
       // Arrange
       const serialKey = "AKSA-EXPIRED-KEY";
       const hwid = "DEVICE-HWID-EXPIRED";
@@ -155,6 +155,7 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
       });
 
       vi.mocked(mockRepo.findBySerialKey).mockResolvedValue(expiredLicense);
+      vi.mocked(mockRepo.update).mockResolvedValue(undefined);
 
       // Act
       const result = await useCase.execute({
@@ -167,6 +168,41 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
       const error = result.getError();
       expect(error.statusCode).toBe(401);
       expect(error.message).toContain("kadaluarsa");
+      expect(expiredLicense.status).toBe("EXPIRED");
+      expect(mockRepo.update).toHaveBeenCalledWith(expiredLicense);
+    });
+
+    it("should autonomously expire license, update repository to EXPIRED status, and reject with HTTP 401 when age reaches 1 year (365 days)", async () => {
+      // Arrange
+      const serialKey = "AKSA-1YEAR-OLD-KEY";
+      const hwid = "DEVICE-HWID-OLD";
+      const oneYearAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 366); // 366 days ago
+      const oldLicense = LicenseEntity.create({
+        id: "lic-old-1",
+        serialKey,
+        clientName: "PT Klien Lama",
+        vaultSecret: "SECRET_OLD",
+        status: "ACTIVE", // Was active
+        hwid,
+        activatedAt: oneYearAgo,
+      });
+
+      vi.mocked(mockRepo.findBySerialKey).mockResolvedValue(oldLicense);
+      vi.mocked(mockRepo.update).mockResolvedValue(undefined);
+
+      // Act
+      const result = await useCase.execute({
+        serial_key: serialKey,
+        hwid,
+      });
+
+      // Assert
+      expect(result.isSuccess).toBe(false);
+      const error = result.getError();
+      expect(error.statusCode).toBe(401);
+      expect(error.message).toContain("kadaluarsa");
+      expect(oldLicense.status).toBe("EXPIRED");
+      expect(mockRepo.update).toHaveBeenCalledWith(oldLicense);
     });
 
     it("should reject with HTTP 401 if license is SUSPENDED", async () => {

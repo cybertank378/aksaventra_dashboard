@@ -66,11 +66,30 @@ export class LicenseEntity extends BaseEntity<string> {
     return this.props.engineVersion;
   }
 
+  public static readonly ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+
   public isExpired(): boolean {
-    if (!this.props.expiresAt) {
-      return false;
+    if (this.props.status === "EXPIRED") {
+      return true;
     }
-    return this.props.expiresAt.getTime() < Date.now();
+
+    const now = Date.now();
+
+    // 1. Cek tanggal kedaluwarsa eksplisit jika ada
+    if (this.props.expiresAt && this.props.expiresAt.getTime() <= now) {
+      return true;
+    }
+
+    // 2. Evaluasi otonom batas umur 1 tahun (365 hari)
+    const baseDate = this.props.activatedAt ?? this.props.createdAt ?? this._createdAt;
+    if (baseDate) {
+      const ageMs = now - baseDate.getTime();
+      if (ageMs >= LicenseEntity.ONE_YEAR_MS) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public isActive(): boolean {
@@ -78,6 +97,11 @@ export class LicenseEntity extends BaseEntity<string> {
       return false;
     }
     return this.props.status === "ACTIVE";
+  }
+
+  public markExpired(): void {
+    this.props.status = "EXPIRED";
+    this._updatedAt = new Date();
   }
 
   public hasHardwareBinding(): boolean {
@@ -93,10 +117,14 @@ export class LicenseEntity extends BaseEntity<string> {
 
   public bindHardwareId(hwid: string): void {
     const trimmedHwid = hwid.trim();
+    const now = new Date();
     this.props.hwid = trimmedHwid;
-    this.props.activatedAt = new Date();
-    this.props.lastVerifiedAt = new Date();
-    this._updatedAt = new Date();
+    this.props.activatedAt = now;
+    this.props.lastVerifiedAt = now;
+    if (!this.props.expiresAt) {
+      this.props.expiresAt = new Date(now.getTime() + LicenseEntity.ONE_YEAR_MS);
+    }
+    this._updatedAt = now;
   }
 
   public markVerified(engineVersion?: string): void {

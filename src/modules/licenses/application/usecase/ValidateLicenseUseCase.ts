@@ -42,12 +42,26 @@ export class ValidateLicenseUseCase
       });
     }
 
-    // Kasus 4: Status ditangguhkan atau telah kadaluarsa
+    // Kasus 4: Lisensi telah kadaluarsa (mencapai batas umur 1 tahun atau tanggal kadaluarsa)
+    if (license.isExpired()) {
+      if (license.status !== "EXPIRED") {
+        license.markExpired();
+        await this.licenseRepo.update(license);
+      }
+
+      return Result.fail({
+        statusCode: 401,
+        message:
+          "Lisensi telah kadaluarsa karena telah mencapai batas umur 1 tahun. Silakan lakukan pembaruan di https://aksaventra.ai.id",
+      });
+    }
+
+    // Kasus 4: Status ditangguhkan atau tidak aktif
     if (!license.isActive()) {
       return Result.fail({
         statusCode: 401,
         message:
-          "Lisensi tidak aktif, ditangguhkan, atau telah kadaluarsa. Silakan periksa kembali di https://aksaventra.ai.id",
+          "Lisensi tidak aktif atau ditangguhkan. Silakan periksa kembali di https://aksaventra.ai.id",
       });
     }
 
