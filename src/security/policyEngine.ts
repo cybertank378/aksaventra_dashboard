@@ -1,4 +1,5 @@
-import type { AuthContext } from "@/security/fieldGuard";
+import { type AuthContext, canAccess } from "@/security/fieldGuard";
+import { roleConfig } from "@/security/rbacConfig";
 
 export interface PolicyEvaluationParams {
   path: string;
@@ -8,21 +9,18 @@ export interface PolicyEvaluationParams {
 
 /**
  * Policy evaluator for Aksaventra Engine Dashboard & Validation System.
- * - Pembuatan dan manajemen lisensi engine HANYA diizinkan untuk ADMIN.
- * - Akses rute engine audit & management memerlukan kredensial valid.
+ * - Pembuatan dan manajemen API lisensi engine HANYA diizinkan untuk ADMIN.
+ * - Evaluasi rute dashboard mengikuti matriks RBAC (ADMIN, OPERATOR, AUDITOR).
  */
-export function evaluatePolicy({ path, method: _method, auth }: PolicyEvaluationParams): boolean {
-  if (!auth || !auth.userId) {
+export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationParams): boolean {
+  if (!auth || !auth.userId || !auth.role || !(auth.role in roleConfig)) {
     return false;
   }
 
-  // Pembuatan dan pengelolaan lisensi engine HANYA boleh dilakukan oleh ADMIN
-  const isLicenseManagementRoute =
-    path.startsWith("/api/licenses") ||
-    path.startsWith("/api/v1/licenses") ||
-    path.startsWith("/dashboard/licenses");
+  const normalizedMethod = method.toUpperCase();
 
-  if (isLicenseManagementRoute) {
+  // API pembuatan dan pengelolaan lisensi engine HANYA boleh dilakukan oleh ADMIN
+  if (path.startsWith("/api/v1/licenses")) {
     return auth.role === "ADMIN";
   }
 
@@ -31,10 +29,63 @@ export function evaluatePolicy({ path, method: _method, auth }: PolicyEvaluation
     return true;
   }
 
-  // Akses rute engine management lainnya
+  // AUDITOR hanya memiliki akses Read-Only (GET)
+  if (auth.role === "AUDITOR" && normalizedMethod !== "GET") {
+    return false;
+  }
+
+  // Rute Administrasi (Pengguna & Pengaturan) hanya untuk pemilik izin terkait (ADMIN)
+  if (path.startsWith("/dashboard/users") || path.startsWith("/api/v1/users")) {
+    return canAccess(auth.role, "USERS_MANAGE");
+  }
+
+  if (path.startsWith("/dashboard/settings") || path.startsWith("/api/v1/settings")) {
+    return canAccess(auth.role, "SETTINGS_MANAGE");
+  }
+
+  // Rute Manajemen Lisensi pada Dashboard berdasarkan izin granular
+  if (path.startsWith("/dashboard/licenses/revocations")) {
+    return canAccess(auth.role, "LICENSES_REVOKE");
+  }
+
+  if (path.startsWith("/dashboard/licenses/create")) {
+    return canAccess(auth.role, "LICENSES_CREATE");
+  }
+
+  if (path.startsWith("/dashboard/licenses/devices")) {
+    return canAccess(auth.role, "LICENSES_MANAGE");
+  }
+
+  if (path.startsWith("/dashboard/licenses")) {
+    return canAccess(auth.role, "LICENSES_VIEW");
+  }
+
+  // Rute Engine & Validasi
+  if (path.startsWith("/dashboard/engine/monitor")) {
+    return auth.role === "OPERATOR" && canAccess(auth.role, "ENGINE_VALIDATE");
+  }
+
+  if (path.startsWith("/dashboard/engine/integrity")) {
+    return auth.role === "AUDITOR" && canAccess(auth.role, "ENGINE_VALIDATE");
+  }
+
+  if (path.startsWith("/dashboard/engine")) {
+    return canAccess(auth.role, "ENGINE_VALIDATE");
+  }
+
+  // Rute Audit & Logs
+  if (path.startsWith("/dashboard/logs/audit")) {
+    return auth.role === "AUDITOR" && canAccess(auth.role, "LOGS_VIEW");
+  }
+
+  if (path.startsWith("/dashboard/logs")) {
+    return canAccess(auth.role, "LOGS_VIEW");
+  }
+
+  // Akses rute API engine management lainnya
   if (path.startsWith("/api/v1/engine") && !auth.engineAccess && !auth.licenseKey) {
     return false;
   }
 
-  return true;
+  return canAccess(auth.role, "DASHBOARD_VIEW");
 }

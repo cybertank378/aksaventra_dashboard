@@ -9,11 +9,11 @@ type Props = {
 export default function ReportToolbar({ reportId }: Props) {
   return (
     <div className="flex gap-2">
-      <Button onClick={() => window.open(`/api/reports/${reportId}/pdf-download`, "_blank")}>
+      <Button onClick={() => window.open(`/api/v1/reports/${reportId}/pdf-download`, "_blank")}>
         Download PDF
       </Button>
 
-      <Button onClick={() => window.open(`/api/reports/${reportId}/excel`, "_blank")}>
+      <Button onClick={() => window.open(`/api/v1/reports/${reportId}/excel`, "_blank")}>
         Download Excel
       </Button>
     </div>

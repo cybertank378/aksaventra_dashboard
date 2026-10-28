@@ -15,6 +15,10 @@ export const roleConfig: Record<UserRole, RoleConfigItem> = {
     badgeColor: "emerald",
     permissions: [
       "DASHBOARD_VIEW",
+      "LICENSES_VIEW",
+      "LICENSES_CREATE",
+      "LICENSES_MANAGE",
+      "LICENSES_REVOKE",
       "ENGINE_VALIDATE",
       "ENGINE_REGISTER",
       "ENGINE_REVOKE",
@@ -22,5 +26,24 @@ export const roleConfig: Record<UserRole, RoleConfigItem> = {
       "USERS_MANAGE",
       "SETTINGS_MANAGE",
     ],
+  },
+  OPERATOR: {
+    name: "Operator",
+    label: "License Operator",
+    badgeColor: "cyan",
+    permissions: [
+      "DASHBOARD_VIEW",
+      "LICENSES_VIEW",
+      "LICENSES_CREATE",
+      "LICENSES_MANAGE",
+      "ENGINE_VALIDATE",
+      "LOGS_VIEW",
+    ],
+  },
+  AUDITOR: {
+    name: "Auditor",
+    label: "Security Auditor",
+    badgeColor: "orange",
+    permissions: ["DASHBOARD_VIEW", "LICENSES_VIEW", "ENGINE_VALIDATE", "LOGS_VIEW"],
   },
 };
