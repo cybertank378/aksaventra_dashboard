@@ -3,6 +3,9 @@ import type { LicenseEntity } from "../../domain/entity/LicenseEntity";
 import type { LicenseRepositoryInterface } from "../../domain/interfaces/LicenseInterfaces";
 import { LicenseMapper } from "../../domain/mapper/LicenseMapper";
 
+/**
+ * Prisma ORM implementation of LicenseRepositoryInterface.
+ */
 export class LicenseRepository implements LicenseRepositoryInterface {
   public async findBySerialKey(serialKey: string): Promise<LicenseEntity | null> {
     const raw = await prisma.license.findUnique({
