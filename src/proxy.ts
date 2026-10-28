@@ -45,6 +45,10 @@ function isApiRoute(pathname: string): boolean {
 
 function isEngineValidationRoute(pathname: string): boolean {
   return (
+    pathname === "/api/v1/validate" ||
+    pathname === "/api/v1/validate-key" ||
+    pathname.startsWith("/api/v1/validate/") ||
+    pathname.startsWith("/api/v1/validate-key/") ||
     pathname.startsWith("/api/v1/engine/validate") ||
     pathname.startsWith("/api/engine/validate") ||
     pathname.startsWith("/api/v1/license/validate") ||
@@ -61,6 +65,7 @@ function isPublicRoute(pathname: string): boolean {
     ////////////////////////////////////////////////////////////
     // AUTH API
     ////////////////////////////////////////////////////////////
+    pathname.startsWith("/api/v1/auth") ||
     pathname.startsWith("/api/auth") ||
     ////////////////////////////////////////////////////////////
     // ENGINE VALIDATION API (Validated via License Key)
@@ -149,7 +154,7 @@ async function validateAccessToken(request: NextRequest): Promise<CurrentAuthRes
     ////////////////////////////////////////////////////////////
     // FETCH API
     ////////////////////////////////////////////////////////////
-    const response = await fetch(new URL("/api/auth/validate-access-token", request.url), {
+    const response = await fetch(new URL("/api/v1/auth/validate-access-token", request.url), {
       method: "GET",
       headers: {
         cookie: request.headers.get("cookie") ?? "",
@@ -202,6 +207,17 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     // ENGINE VALIDATION API (Validating aksaventra_engine.exe)
     ////////////////////////////////////////////////////////////
     if (isEngineValidationRoute(pathname)) {
+      // 1. Direct validation routes accept JSON body payload (serial_key, hwid, engine_version)
+      if (
+        pathname === "/api/v1/validate" ||
+        pathname === "/api/v1/validate-key" ||
+        pathname.startsWith("/api/v1/validate/") ||
+        pathname.startsWith("/api/v1/validate-key/")
+      ) {
+        return NextResponse.next();
+      }
+
+      // 2. Header-based license endpoints
       const licenseKey =
         request.headers.get("x-license-key") ??
         request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
@@ -210,6 +226,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
         return NextResponse.json(
           {
             success: false,
+            valid: false,
             message: "License key required for engine validation",
           },
           {

@@ -4,7 +4,7 @@ import * as path from "node:path";
 import type {
   FileStorageInterface,
   StoredFileResult,
-} from "../../application/ports/FileStorageInterface";
+} from "@/core/application/ports/FileStorageInterface";
 
 export class LocalFileStorageService implements FileStorageInterface {
   private readonly baseUploadDir: string;

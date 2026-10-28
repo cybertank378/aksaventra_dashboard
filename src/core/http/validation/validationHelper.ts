@@ -1,4 +1,4 @@
-import { ApiError } from "../errors/ApiError";
+import { ApiError } from "@/core/http/errors/ApiError";
 
 export class ValidationHelper {
   public static requireFields<T extends Record<string, unknown>>(
