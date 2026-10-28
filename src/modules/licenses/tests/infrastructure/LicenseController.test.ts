@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Result } from "@/core/domain/Result";
-import type { LicenseServices } from "../../application/services/LicenseServices";
-import { LicenseController } from "../../infrastructure/http/LicenseController";
+import type { LicenseServices } from "@/modules/licenses/application/services/LicenseServices";
+import { LicenseController } from "@/modules/licenses/infrastructure/http/LicenseController";
 
 describe("LicenseController (Triple A Pattern)", () => {
   let mockValidateLicense: ReturnType<typeof vi.fn>;

@@ -65,6 +65,7 @@ function isPublicRoute(pathname: string): boolean {
     ////////////////////////////////////////////////////////////
     // AUTH API
     ////////////////////////////////////////////////////////////
+    pathname.startsWith("/api/v1/auth") ||
     pathname.startsWith("/api/auth") ||
     ////////////////////////////////////////////////////////////
     // ENGINE VALIDATION API (Validated via License Key)
@@ -153,7 +154,7 @@ async function validateAccessToken(request: NextRequest): Promise<CurrentAuthRes
     ////////////////////////////////////////////////////////////
     // FETCH API
     ////////////////////////////////////////////////////////////
-    const response = await fetch(new URL("/api/auth/validate-access-token", request.url), {
+    const response = await fetch(new URL("/api/v1/auth/validate-access-token", request.url), {
       method: "GET",
       headers: {
         cookie: request.headers.get("cookie") ?? "",

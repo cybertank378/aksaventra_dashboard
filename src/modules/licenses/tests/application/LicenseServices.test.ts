@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { LicenseServices } from "../../application/services/LicenseServices";
-import { LicenseEntity } from "../../domain/entity/LicenseEntity";
-import { createMockLicenseRepository } from "../mocks/mockFactories";
+import { LicenseServices } from "@/modules/licenses/application/services/LicenseServices";
+import { LicenseEntity } from "@/modules/licenses/domain/entity/LicenseEntity";
+import { createMockLicenseRepository } from "@/modules/licenses/tests/mocks/mockFactories";
 
 describe("LicenseServices (Triple A Pattern)", () => {
   let mockRepo: ReturnType<typeof createMockLicenseRepository>;

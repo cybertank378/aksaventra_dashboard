@@ -1,7 +1,7 @@
 import { prisma } from "@/core/libs/prisma";
-import type { LicenseEntity } from "../../domain/entity/LicenseEntity";
-import type { LicenseRepositoryInterface } from "../../domain/interfaces/LicenseInterfaces";
-import { LicenseMapper } from "../../domain/mapper/LicenseMapper";
+import type { LicenseEntity } from "@/modules/licenses/domain/entity/LicenseEntity";
+import type { LicenseRepositoryInterface } from "@/modules/licenses/domain/interfaces/LicenseInterfaces";
+import { LicenseMapper } from "@/modules/licenses/domain/mapper/LicenseMapper";
 
 /**
  * Prisma ORM implementation of LicenseRepositoryInterface.

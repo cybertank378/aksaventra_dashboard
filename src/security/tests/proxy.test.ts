@@ -132,9 +132,9 @@ describe("Aksaventra Proxy Gateway (Triple A Pattern)", () => {
       expect(response.headers.get("x-middleware-next")).toBe("1");
     });
 
-    it("should allow access to /api/auth routes without token", async () => {
+    it("should allow access to /api/v1/auth routes without token", async () => {
       // Arrange
-      const request = new NextRequest("http://localhost:3000/api/auth/login", {
+      const request = new NextRequest("http://localhost:3000/api/v1/auth/login", {
         method: "POST",
       });
 

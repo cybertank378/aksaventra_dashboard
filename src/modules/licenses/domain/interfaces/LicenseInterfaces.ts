@@ -1,4 +1,4 @@
-import type { LicenseEntity } from "../entity/LicenseEntity";
+import type { LicenseEntity } from "@/modules/licenses/domain/entity/LicenseEntity";
 
 export interface LicenseRepositoryInterface {
   findBySerialKey(serialKey: string): Promise<LicenseEntity | null>;

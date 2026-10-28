@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LicenseValidator } from "../../infrastructure/validators/license.validator";
+import { LicenseValidator } from "@/modules/licenses/infrastructure/validators/license.validator";
 
 describe("LicenseValidator (Triple A Pattern)", () => {
   it("should validate and succeed when serial_key and hwid are valid", () => {

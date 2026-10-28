@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { AppError } from "../application/errors/AppError";
-import { ValidationError } from "../application/errors/ValidationError";
-import { DomainError } from "../domain/errors/DomainError";
-import type { Result } from "../domain/Result";
-import { ApiError } from "./errors/ApiError";
-import { ApiResponseBuilder } from "./response/ApiResponse";
+import { AppError } from "@/core/application/errors/AppError";
+import { ValidationError } from "@/core/application/errors/ValidationError";
+import { DomainError } from "@/core/domain/errors/DomainError";
+import type { Result } from "@/core/domain/Result";
+import { ApiError } from "@/core/http/errors/ApiError";
+import { ApiResponseBuilder } from "@/core/http/response/ApiResponse";
 
 export class HttpResultHandler {
   public static handle<T>(

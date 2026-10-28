@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LicenseEntity } from "../../domain/entity/LicenseEntity";
+import { LicenseEntity } from "@/modules/licenses/domain/entity/LicenseEntity";
 
 describe("LicenseEntity (Triple A Pattern)", () => {
   describe("create", () => {

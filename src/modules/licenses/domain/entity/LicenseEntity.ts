@@ -1,5 +1,5 @@
 import { BaseEntity } from "@/core/domain/BaseEntity";
-import type { ValidateLicenseSuccessResponseDTO } from "../dto/LicenseResponseDTO";
+import type { ValidateLicenseSuccessResponseDTO } from "@/modules/licenses/domain/dto/LicenseResponseDTO";
 
 export type LicenseStatus = "ACTIVE" | "SUSPENDED" | "EXPIRED";
 

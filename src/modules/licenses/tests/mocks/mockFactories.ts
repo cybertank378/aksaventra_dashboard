@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { LicenseRepositoryInterface } from "../../domain/interfaces/LicenseInterfaces";
+import type { LicenseRepositoryInterface } from "@/modules/licenses/domain/interfaces/LicenseInterfaces";
 
 export function createMockLicenseRepository(): LicenseRepositoryInterface {
   return {

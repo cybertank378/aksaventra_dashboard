@@ -2,7 +2,7 @@ import type {
   License as PrismaLicense,
   LicenseStatus as PrismaLicenseStatus,
 } from "@prisma/client";
-import { LicenseEntity, type LicenseStatus } from "../entity/LicenseEntity";
+import { LicenseEntity, type LicenseStatus } from "@/modules/licenses/domain/entity/LicenseEntity";
 
 export class LicenseMapper {
   public static toDomain(record: PrismaLicense): LicenseEntity {

@@ -1,4 +1,4 @@
-import type { ValidateLicenseRequestDTO } from "../../domain/dto/LicenseRequestDTO";
+import type { ValidateLicenseRequestDTO } from "@/modules/licenses/domain/dto/LicenseRequestDTO";
 
 export interface LicenseValidationResult {
   isValid: boolean;

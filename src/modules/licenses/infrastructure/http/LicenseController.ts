@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { BaseController } from "@/core/http/BaseController";
-import type { LicenseServices } from "../../application/services/LicenseServices";
-import { LicenseValidator } from "../validators/license.validator";
+import type { LicenseServices } from "@/modules/licenses/application/services/LicenseServices";
+import { LicenseValidator } from "@/modules/licenses/infrastructure/validators/license.validator";
 
 export class LicenseController extends BaseController {
   constructor(private readonly licenseServices: LicenseServices) {
