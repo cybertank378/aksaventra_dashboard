@@ -50,6 +50,12 @@ export interface CurrentAuthResponseDTO {
   role: UserRole;
   name?: string | null;
   isActive: boolean;
+  status?: string | boolean;
+  username?: string | null;
+  fullName?: string | null;
+  licenseKey?: string | null;
+  organization?: string | null;
+  engineAccess?: boolean;
 }
 
 export interface MessageResponseDTO {
