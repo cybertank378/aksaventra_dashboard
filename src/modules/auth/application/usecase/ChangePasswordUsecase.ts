@@ -1,24 +1,24 @@
 import type { BaseUseCase } from "@/core/application/BaseUseCase";
 import { Result } from "@/core/domain/Result";
+import type { ChangePasswordRequestDTO } from "@/modules/auth/domain/dto/AuthRequestDTO";
+import type { ChangePasswordResponseDTO } from "@/modules/auth/domain/dto/AuthResponseDTO";
 import type { AuthRepositoryInterface } from "@/modules/auth/domain/interfaces/AuthInterfaces";
 import type { PasswordHasherInterface } from "@/modules/auth/domain/interfaces/PasswordHasherInterface";
 import { PasswordPolicyRule } from "@/modules/auth/domain/rules/PasswordPolicyRule";
 
-export interface ChangePasswordInput {
-  userId: string;
-  oldPassword: string;
-  newPassword: string;
-}
+export type ChangePasswordInput = ChangePasswordRequestDTO;
 
 export class ChangePasswordUsecase
-  implements BaseUseCase<ChangePasswordInput, Result<boolean, string>>
+  implements BaseUseCase<ChangePasswordInput, Result<ChangePasswordResponseDTO, string>>
 {
   constructor(
     private readonly authRepo: AuthRepositoryInterface,
     private readonly hasher: PasswordHasherInterface,
   ) {}
 
-  public async execute(input: ChangePasswordInput): Promise<Result<boolean, string>> {
+  public async execute(
+    input: ChangePasswordInput,
+  ): Promise<Result<ChangePasswordResponseDTO, string>> {
     const user = await this.authRepo.findUserById(input.userId);
     if (!user) {
       return Result.fail("User not found");
@@ -38,6 +38,8 @@ export class ChangePasswordUsecase
     user.updatePassword(newHash);
     await this.authRepo.updateUser(user);
 
-    return Result.ok(true);
+    return Result.ok({ success: true, message: "Password updated successfully" });
   }
 }
+
+export { ChangePasswordUsecase as ChangePasswordUseCase };

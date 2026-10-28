@@ -29,3 +29,5 @@ export interface AuthRepositoryInterface {
   savePasswordResetToken(token: PasswordResetTokenEntity): Promise<PasswordResetTokenEntity>;
   findPasswordResetToken(token: string): Promise<PasswordResetTokenEntity | null>;
 }
+
+export type AuthInterfaces = AuthRepositoryInterface;

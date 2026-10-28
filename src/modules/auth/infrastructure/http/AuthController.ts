@@ -1,13 +1,24 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { AuthServices } from "@/modules/auth/application/services/AuthServices";
 import { getCurrentAuth } from "@/modules/auth/infrastructure/decorator/getCurrentAuth";
+import { ArgonProvider } from "@/modules/auth/infrastructure/providers/ArgonProvider";
+import { JwtProvider } from "@/modules/auth/infrastructure/providers/JwtProvider";
+import { MailProvider } from "@/modules/auth/infrastructure/providers/MailProvider";
+import { AuthRepository } from "@/modules/auth/infrastructure/repo/AuthRepository";
 import { AuthValidator } from "@/modules/auth/infrastructure/validators/auth.validator";
 
 export class AuthController {
   private readonly authServices: AuthServices;
 
   constructor(authServices?: AuthServices) {
-    this.authServices = authServices ?? new AuthServices();
+    this.authServices =
+      authServices ??
+      new AuthServices(
+        new AuthRepository(),
+        new ArgonProvider(),
+        new JwtProvider(),
+        new MailProvider(),
+      );
   }
 
   public async login(req: NextRequest): Promise<NextResponse> {
@@ -94,7 +105,7 @@ export class AuthController {
       const token = req.cookies.get("auth_token")?.value || req.cookies.get("session_token")?.value;
 
       if (token) {
-        await this.authServices.logout(token);
+        await this.authServices.logout({ token });
       }
 
       const response = NextResponse.json(

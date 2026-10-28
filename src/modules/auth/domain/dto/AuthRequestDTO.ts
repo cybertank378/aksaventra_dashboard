@@ -4,6 +4,8 @@ export interface LoginRequestDTO {
   email: string;
   password: string;
   rememberMe?: boolean;
+  ipAddress?: string;
+  userAgent?: string;
 }
 
 export interface RegisterRequestDTO {
@@ -15,6 +17,14 @@ export interface RegisterRequestDTO {
 
 export interface RefreshTokenRequestDTO {
   refreshToken: string;
+}
+
+export interface LogoutRequestDTO {
+  token: string;
+}
+
+export interface LogoutAllRequestDTO {
+  userId: string;
 }
 
 export interface ForgotPasswordRequestDTO {
@@ -32,10 +42,40 @@ export interface ChangePasswordRequestDTO {
   newPassword: string;
 }
 
+export interface VerifyEmailRequestDTO {
+  token: string;
+}
+
+export interface SendVerificationRequestDTO {
+  userId: string;
+}
+
+export interface ValidateAccessTokenRequestDTO {
+  token: string;
+}
+
 export interface CreateLoginAuditRequestDTO {
   userId?: string | null;
   action: string;
   target?: string | null;
   details?: string | null;
   ipAddress?: string | null;
+  userAgent?: string | null;
+}
+
+export interface FindRecentLoginAuditRequestDTO {
+  limit?: number;
+}
+
+export interface FindFailedLoginAuditRequestDTO {
+  limit?: number;
+}
+
+export interface FindSuspiciousLoginAuditRequestDTO {
+  limit?: number;
+}
+
+export interface FindLoginAuditByUserRequestDTO {
+  userId: string;
+  limit?: number;
 }
