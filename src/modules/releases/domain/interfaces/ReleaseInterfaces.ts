@@ -33,11 +33,28 @@ export interface EngineUpdateLogRepositoryInterface {
   countTodayChecks(): Promise<number>;
 }
 
+export interface StorageUploadResult {
+  filePath: string;
+  checksumSha256: string;
+  fileSize: bigint;
+  downloadUrl?: string;
+}
+
+export interface StorageDownloadStreamResult {
+  stream: NodeJS.ReadableStream | ReadableStream;
+  contentLength: number;
+  etag: string;
+  contentType: string;
+}
+
 export interface StorageProviderInterface {
-  saveFile(
-    filename: string,
-    buffer: Buffer,
-  ): Promise<{ filePath: string; checksumSha256: string; fileSize: bigint }>;
+  readonly driver: "local" | "s3";
+  saveFile(filename: string, buffer: Buffer, contentType?: string): Promise<StorageUploadResult>;
   getFilePath(filename: string): Promise<string | null>;
-  fileExists(filePath: string): Promise<boolean>;
+  fileExists(filePathOrKey: string): Promise<boolean>;
+  getPresignedDownloadUrl?(filenameOrKey: string, expiresInSeconds?: number): Promise<string>;
+  getFileStream?(
+    filePathOrKey: string,
+    range?: { start: number; end: number },
+  ): Promise<StorageDownloadStreamResult | null>;
 }

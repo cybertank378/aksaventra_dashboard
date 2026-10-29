@@ -127,6 +127,66 @@ export class UpdaterController extends BaseController {
         userAgent,
       });
 
+      // Handle S3 Storage Provider (Presigned URL redirect or direct S3 stream)
+      if (this.storageProvider?.driver === "s3") {
+        const fileKey = release.filePath || filename;
+
+        // Redirect to S3 presigned URL for high performance and native Range support
+        if (typeof this.storageProvider.getPresignedDownloadUrl === "function") {
+          try {
+            const presignedUrl = await this.storageProvider.getPresignedDownloadUrl(fileKey, 3600);
+            return NextResponse.redirect(presignedUrl, { status: 307 });
+          } catch (s3Error) {
+            console.warn(
+              "[UpdaterController] Presigned URL generation failed, falling back to stream:",
+              s3Error,
+            );
+          }
+        }
+
+        // Direct S3 streaming fallback
+        if (typeof this.storageProvider.getFileStream === "function") {
+          const rangeHeader = req.headers.get("range");
+          let range: { start: number; end: number } | undefined;
+          const totalSize = Number(release.fileSize);
+
+          if (rangeHeader && totalSize > 0) {
+            const parts = rangeHeader.replace(/bytes=/, "").split("-");
+            const start = Number.parseInt(parts[0], 10);
+            const end = parts[1] ? Number.parseInt(parts[1], 10) : totalSize - 1;
+
+            if (start >= totalSize || end >= totalSize || start > end) {
+              return new NextResponse(null, {
+                status: 416,
+                headers: { "Content-Range": `bytes */${totalSize}` },
+              });
+            }
+            range = { start, end };
+          }
+
+          const streamResult = await this.storageProvider.getFileStream(fileKey, range);
+          if (streamResult) {
+            const status = range ? 206 : 200;
+            const headers: Record<string, string> = {
+              "Content-Type": streamResult.contentType || "application/octet-stream",
+              "Content-Disposition": `attachment; filename="${filename}"`,
+              "Content-Length": streamResult.contentLength.toString(),
+              "Accept-Ranges": "bytes",
+              ETag: `"${release.checksumSha256}"`,
+            };
+
+            if (range) {
+              headers["Content-Range"] = `bytes ${range.start}-${range.end}/${totalSize}`;
+            }
+
+            return new Response(streamResult.stream as unknown as BodyInit, {
+              status,
+              headers,
+            });
+          }
+        }
+      }
+
       // Check if file exists on disk
       let diskPath: string | null = release.filePath ?? null;
       if (!diskPath && this.storageProvider) {

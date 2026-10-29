@@ -10,6 +10,7 @@ import { join } from "node:path";
 import type { StorageProviderInterface } from "@/modules/releases/domain/interfaces/ReleaseInterfaces";
 
 export class LocalStorageProvider implements StorageProviderInterface {
+  public readonly driver: "local" = "local";
   private readonly baseDir: string;
 
   constructor(baseDir?: string) {
@@ -22,6 +23,7 @@ export class LocalStorageProvider implements StorageProviderInterface {
   public async saveFile(
     filename: string,
     buffer: Buffer,
+    _contentType?: string,
   ): Promise<{ filePath: string; checksumSha256: string; fileSize: bigint }> {
     const safeFilename = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
     const filePath = join(this.baseDir, safeFilename);

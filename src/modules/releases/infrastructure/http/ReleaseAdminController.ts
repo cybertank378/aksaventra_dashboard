@@ -69,15 +69,23 @@ export class ReleaseAdminController extends BaseController {
         const file = formData.get("file") as File | null;
 
         let filePath: string | undefined;
+        let downloadUrl = (formData.get("downloadUrl") as string) || undefined;
         let checksumSha256 = (formData.get("checksumSha256") as string) || "";
         let fileSize = Number(formData.get("fileSize") ?? 0);
 
         if (file && this.storageProvider) {
           const buffer = Buffer.from(await file.arrayBuffer());
-          const saved = await this.storageProvider.saveFile(file.name, buffer);
+          const saved = await this.storageProvider.saveFile(
+            file.name,
+            buffer,
+            file.type || "application/octet-stream",
+          );
           filePath = saved.filePath;
           checksumSha256 = saved.checksumSha256;
           fileSize = Number(saved.fileSize);
+          if (saved.downloadUrl) {
+            downloadUrl = saved.downloadUrl;
+          }
         }
 
         rawData = {
@@ -86,6 +94,7 @@ export class ReleaseAdminController extends BaseController {
           minSupportedVersion: formData.get("minSupportedVersion") || null,
           mandatory: formData.get("mandatory") === "true",
           releaseNotes: formData.get("releaseNotes") || null,
+          downloadUrl: downloadUrl || null,
           filePath,
           checksumSha256,
           fileSize,
