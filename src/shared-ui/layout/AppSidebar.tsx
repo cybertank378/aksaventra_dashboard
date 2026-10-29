@@ -7,8 +7,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { UserRole } from "@/libs/enums";
-import type { AuthTelemetryResponseDTO } from "@/modules/auth/domain/dto/AuthResponseDTO";
 import { useAuthApi } from "@/modules/auth/presentation/hooks/useAuthApi";
+import type { DashboardSummaryResponseDTO } from "@/modules/dashboards/domain/dto/DashboardResponseDTO";
+import { useDashboardApi } from "@/modules/dashboards/presentation/hooks/useDashboardApi";
 import { roleConfig } from "@/security/rbacConfig";
 import { getSidebarMenu, type SidebarGroup } from "@/security/sidebar/getSidebarMenu";
 import { showSuccessToast } from "@/shared-ui/component/Toast";
@@ -46,36 +47,38 @@ function getInitials(name?: string | null, fallback = "AU"): string {
 
 export default function AppSidebar({ role = "ADMIN", user, mobileOpen, onClose }: Props) {
   const router = useRouter();
-  const { logout, getTelemetry } = useAuthApi();
+  const { logout } = useAuthApi();
+  const { getSummary } = useDashboardApi();
 
   const [collapsed, setCollapsed] = useState(false);
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [telemetry, setTelemetry] = useState<AuthTelemetryResponseDTO | null>(null);
+  const [summary, setSummary] = useState<DashboardSummaryResponseDTO | null>(null);
 
   useEffect(() => {
     let active = true;
 
-    getTelemetry()
+    getSummary()
       .then((res) => {
         if (active && res) {
-          setTelemetry(res);
+          setSummary(res);
         }
       })
       .catch(() => {
-        // Fallback jika telemetri belum tersedia
+        // Fallback jika ringkasan dasbor belum tersedia
       });
 
     return () => {
       active = false;
     };
-  }, [getTelemetry]);
+  }, [getSummary]);
 
   const groups = useMemo(() => {
     const baseGroups = getSidebarMenu(role);
     const activeLicensesLabel =
-      telemetry !== null ? telemetry.activeLicenses.toLocaleString("id-ID") : "0";
-    const utilizationLabel = telemetry !== null ? `${telemetry.utilizationPercent}%` : "0%";
+      summary !== null ? summary.kpis.activeLicenses.total.toLocaleString("id-ID") : "0";
+    const utilizationLabel =
+      summary !== null ? `${summary.kpis.hwidUtilization.rate.toFixed(0)}%` : "0%";
 
     return baseGroups.map((group: SidebarGroup) => ({
       ...group,
@@ -103,12 +106,12 @@ export default function AppSidebar({ role = "ADMIN", user, mobileOpen, onClose }
         return item;
       }),
     }));
-  }, [role, telemetry]);
+  }, [role, summary]);
 
   const displayName = user?.name?.trim() || "Admin Utama";
   const displaySubtitle = user?.email?.trim() || roleConfig[role]?.label || "Super Administrator";
   const userInitials = getInitials(user?.name, "AU");
-  const isServerOnline = telemetry ? telemetry.online : true;
+  const isServerOnline = true;
 
   const handleToggleCollapse = () => {
     setCollapsed((prev) => !prev);

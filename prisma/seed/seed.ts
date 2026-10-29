@@ -2,6 +2,7 @@ import { closeSeedPrismaContext, createSeedPrismaContext } from "./lib/prismaSee
 import { seedLogger } from "./logs/seedLogger.ts";
 import { seedAdminUsers } from "./seeders/adminSeeder.ts";
 import { seedLicenses } from "./seeders/licenseSeeder.ts";
+import { seedLicenseValidationLogs } from "./seeders/licenseValidationLogSeeder.ts";
 
 /**
  * Orkestrator Utama Database Seeder — Aksaventra Engine Validation & License Management System.
@@ -26,11 +27,12 @@ async function runDatabaseSeed(): Promise<void> {
 
     const seededAdmins = await seedAdminUsers(context.prisma);
     const seededLicenses = await seedLicenses(context.prisma);
+    const seededValidationLogsCount = await seedLicenseValidationLogs(context.prisma);
 
     const durationMs = Date.now() - startedAt;
     seedLogger.info("----------------------------------------------------------");
     seedLogger.success(
-      `Seluruh proses seeding selesai dalam ${durationMs} ms. Total Admin: ${seededAdmins.length} | Total Lisensi: ${seededLicenses.length}.`,
+      `Seluruh proses seeding selesai dalam ${durationMs} ms. Admin: ${seededAdmins.length} | Lisensi: ${seededLicenses.length} | Log Validasi: ${seededValidationLogsCount}.`,
     );
     seedLogger.info("==========================================================");
   } catch (error) {

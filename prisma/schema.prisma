@@ -30,6 +30,16 @@ enum LicenseStatus {
   EXPIRED
 }
 
+enum LicenseValidationResult {
+  ACTIVATED
+  VERIFIED
+  NOT_FOUND
+  EXPIRED
+  SUSPENDED
+  HWID_MISMATCH
+  BAD_REQUEST
+}
+
 // ----------------------------------------------------
 // USER & AUTHENTICATION MODELS
 // ----------------------------------------------------
@@ -138,7 +148,33 @@ model License {
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime      @updatedAt @map("updated_at")
 
+  validationLogs LicenseValidationLog[]
+
   @@index([serialKey])
   @@index([hwid])
   @@map("licenses")
+}
+
+// ----------------------------------------------------
+// LICENSE VALIDATION AUDIT LOG (Issue #20 & FR-06)
+// ----------------------------------------------------
+
+model LicenseValidationLog {
+  id            String                  @id @default(uuid())
+  licenseId     String?                 @map("license_id")
+  license       License?                @relation(fields: [licenseId], references: [id], onDelete: SetNull)
+  serialKeyHint String                  @map("serial_key_hint")
+  hwidHash      String?                 @map("hwid_hash")
+  result        LicenseValidationResult
+  statusCode    Int                     @map("status_code")
+  engineVersion String?                 @map("engine_version")
+  clientIp      String?                 @map("client_ip")
+  userAgent     String?                 @map("user_agent")
+  latencyMs     Int?                    @map("latency_ms")
+  checkedAt     DateTime                @default(now()) @map("checked_at")
+
+  @@index([checkedAt])
+  @@index([result, checkedAt])
+  @@index([licenseId])
+  @@map("license_validation_logs")
 }

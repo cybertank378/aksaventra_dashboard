@@ -6,14 +6,20 @@ import {
 } from "@/modules/licenses/application/usecase/ValidateLicenseUseCase";
 import type { ValidateLicenseRequestDTO } from "@/modules/licenses/domain/dto/LicenseRequestDTO";
 import type { ValidateLicenseSuccessResponseDTO } from "@/modules/licenses/domain/dto/LicenseResponseDTO";
-import type { LicenseRepositoryInterface } from "@/modules/licenses/domain/interfaces/LicenseInterfaces";
+import type {
+  LicenseRepositoryInterface,
+  LicenseValidationLogRepositoryInterface,
+} from "@/modules/licenses/domain/interfaces/LicenseInterfaces";
 
 export class LicenseServices extends BaseService {
   private readonly validateLicenseUseCase: ValidateLicenseUseCase;
 
-  constructor(repo: LicenseRepositoryInterface) {
+  constructor(
+    repo: LicenseRepositoryInterface,
+    validationLogRepo?: LicenseValidationLogRepositoryInterface,
+  ) {
     super("LicenseServices");
-    this.validateLicenseUseCase = new ValidateLicenseUseCase(repo);
+    this.validateLicenseUseCase = new ValidateLicenseUseCase(repo, validationLogRepo);
   }
 
   public validateLicense(
