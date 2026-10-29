@@ -1,6 +1,7 @@
 import { closeSeedPrismaContext, createSeedPrismaContext } from "./lib/prismaSeedClient.ts";
 import { seedLogger } from "./logs/seedLogger.ts";
 import { seedAdminUsers } from "./seeders/adminSeeder.ts";
+import { seedLicenses } from "./seeders/licenseSeeder.ts";
 
 /**
  * Orkestrator Utama Database Seeder — Aksaventra Engine Validation & License Management System.
@@ -24,11 +25,12 @@ async function runDatabaseSeed(): Promise<void> {
     seedLogger.info("Koneksi PostgreSQL via @prisma/adapter-pg berhasil terhubung.");
 
     const seededAdmins = await seedAdminUsers(context.prisma);
+    const seededLicenses = await seedLicenses(context.prisma);
 
     const durationMs = Date.now() - startedAt;
     seedLogger.info("----------------------------------------------------------");
     seedLogger.success(
-      `Seluruh proses seeding selesai dalam ${durationMs} ms. Total akun Admin diproses: ${seededAdmins.length}.`,
+      `Seluruh proses seeding selesai dalam ${durationMs} ms. Total Admin: ${seededAdmins.length} | Total Lisensi: ${seededLicenses.length}.`,
     );
     seedLogger.info("==========================================================");
   } catch (error) {

@@ -6,6 +6,16 @@ export interface LicenseValidationResult {
   data?: ValidateLicenseRequestDTO;
 }
 
+function pickFirstString(body: Record<string, unknown>, keys: readonly string[]): string {
+  for (const key of keys) {
+    const val = body[key];
+    if (typeof val === "string" && val.trim().length > 0) {
+      return val.trim();
+    }
+  }
+  return "";
+}
+
 export class LicenseValidator {
   public static validate(input: unknown): LicenseValidationResult {
     const errors: Record<string, string> = {};
@@ -19,10 +29,21 @@ export class LicenseValidator {
 
     const body = input as Record<string, unknown>;
 
-    const serialKey = typeof body.serial_key === "string" ? body.serial_key.trim() : "";
-    const hwid = typeof body.hwid === "string" ? body.hwid.trim() : "";
-    const engineVersion =
-      typeof body.engine_version === "string" ? body.engine_version.trim() : undefined;
+    const serialKey = pickFirstString(body, [
+      "serial_key",
+      "serialKey",
+      "license_key",
+      "licenseKey",
+    ]);
+    const hwid = pickFirstString(body, [
+      "hwid",
+      "hardware_id",
+      "hardwareId",
+      "machine_id",
+      "machineId",
+    ]);
+    const engineVersionRaw = pickFirstString(body, ["engine_version", "engineVersion", "version"]);
+    const engineVersion = engineVersionRaw.length > 0 ? engineVersionRaw : undefined;
 
     if (!serialKey) {
       errors.serial_key = "serial_key wajib diisi";
