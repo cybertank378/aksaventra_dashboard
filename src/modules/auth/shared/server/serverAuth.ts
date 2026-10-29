@@ -13,7 +13,10 @@ export interface ServerUser {
 export async function getCurrentUser(): Promise<ServerUser | null> {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("auth_token")?.value || cookieStore.get("session_token")?.value;
+    const token =
+      cookieStore.get("access_token")?.value ||
+      cookieStore.get("auth_token")?.value ||
+      cookieStore.get("session_token")?.value;
 
     if (!token) {
       return null;

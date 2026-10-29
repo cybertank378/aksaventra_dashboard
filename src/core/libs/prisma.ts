@@ -2,6 +2,7 @@ import "server-only";
 
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
+import dotenv from "dotenv";
 import pg, { type PoolConfig } from "pg";
 
 const { Pool } = pg;
@@ -9,6 +10,7 @@ const { Pool } = pg;
 interface GlobalPrismaState {
   prisma?: PrismaClient;
   pool?: pg.Pool;
+  connectionString?: string;
   isShuttingDown?: boolean;
 }
 
@@ -62,9 +64,21 @@ function createPoolConfig(): PoolConfig {
  * Lazily instantiates the pool if not already active or if previously closed.
  */
 export function getPrismaPool(): pg.Pool {
+  if (process.env.NODE_ENV !== "production") {
+    dotenv.config({ override: true, quiet: true });
+  }
+
+  const currentUrl = process.env.DATABASE_URL;
+  if (state.pool && state.connectionString !== currentUrl) {
+    state.pool.end().catch(() => {});
+    state.pool = undefined;
+    state.prisma = undefined;
+  }
+
   if (!state.pool) {
     const config = createPoolConfig();
     state.pool = new Pool(config);
+    state.connectionString = currentUrl;
 
     // Prevent uncaught errors on idle clients from crashing the process
     state.pool.on("error", (err: Error) => {
@@ -80,8 +94,8 @@ export function getPrismaPool(): pg.Pool {
  * Safe across Fast Refresh/Hot Module Replacement in Next.js development.
  */
 export function getPrismaClient(): PrismaClient {
+  const pool = getPrismaPool();
   if (!state.prisma) {
-    const pool = getPrismaPool();
     const adapter = new PrismaPg(pool);
     state.prisma = new PrismaClient({ adapter });
   }
@@ -120,6 +134,7 @@ export async function closePrismaConnection(): Promise<void> {
       console.warn("[Prisma:pg.Pool] Error during pool.end:", error);
     } finally {
       state.pool = undefined;
+      state.connectionString = undefined;
     }
   }
 }

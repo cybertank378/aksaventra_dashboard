@@ -1,16 +1,4 @@
-import {
-  Activity,
-  Cpu,
-  FileText,
-  History,
-  KeyRound,
-  LayoutDashboard,
-  PlusCircle,
-  Settings,
-  ShieldAlert,
-  ShieldCheck,
-  Users,
-} from "lucide-react";
+import { Activity, Cpu, History, KeyRound, PieChart, SlidersHorizontal, Users } from "lucide-react";
 import type { UserRole } from "@/libs/enums";
 import { canAccess } from "@/security/fieldGuard";
 import { evaluatePolicy } from "@/security/policyEngine";
@@ -62,84 +50,53 @@ function filterSidebarItems(items: SidebarItem[], role: UserRole): SidebarItem[]
   return result;
 }
 
+/**
+ * Struktur Navigasi Sidebar Hybrid Aksaventra (2 Grup Ringkas):
+ * 1. Menu Navigasi Utama: 5 modul operasional inti (aksi seperti "+ Buat Lisensi Baru" berada pada header/halaman).
+ * 2. Sistem & Administrasi: Pengelolaan pengguna RBAC dan konfigurasi sistem.
+ */
 export function getSidebarMenu(role: UserRole = "ADMIN"): SidebarGroup[] {
   const rawGroups: SidebarGroup[] = [
     {
-      label: "Ikhtisar",
+      label: "Menu Navigasi Utama",
       items: [
         {
-          label: "Dashboard",
+          label: "Dasbor",
           path: "/dashboard",
-          icon: LayoutDashboard,
+          icon: PieChart,
           permission: "DASHBOARD_VIEW",
         },
-      ],
-    },
-    {
-      label: "Manajemen Lisensi",
-      items: [
         {
-          label: "Semua Lisensi",
+          label: "Manajemen Lisensi",
           path: "/dashboard/licenses",
           icon: KeyRound,
           permission: "LICENSES_VIEW",
+          activeMatchPrefixes: ["/dashboard/licenses/create", "/dashboard/licenses/revocations"],
         },
         {
-          label: "Terbitkan Lisensi",
-          path: "/dashboard/licenses/create",
-          icon: PlusCircle,
-          permission: "LICENSES_CREATE",
-        },
-        {
-          label: "Perangkat Terikat (HWID)",
+          label: "Perangkat Terikat",
           path: "/dashboard/licenses/devices",
           icon: Cpu,
           permission: "LICENSES_MANAGE",
         },
         {
-          label: "Blacklist & Revokasi",
-          path: "/dashboard/licenses/revocations",
-          icon: ShieldAlert,
-          permission: "LICENSES_REVOKE",
-        },
-      ],
-    },
-    {
-      label: "Engine & Validasi",
-      items: [
-        {
-          label: "Live Validation Monitor",
+          label: "Monitor & Validasi Engine",
           path: "/dashboard/engine/monitor",
           icon: Activity,
           permission: "ENGINE_VALIDATE",
+          activeMatchPrefixes: ["/dashboard/engine"],
         },
         {
-          label: "Integritas Binary (SHA-256)",
-          path: "/dashboard/engine/integrity",
-          icon: ShieldCheck,
-          permission: "ENGINE_VALIDATE",
-        },
-      ],
-    },
-    {
-      label: "Audit & Logs",
-      items: [
-        {
-          label: "Log Validasi Mesin",
+          label: "Riwayat Aktivitas",
           path: "/dashboard/logs/validations",
-          icon: FileText,
-          permission: "LOGS_VIEW",
-        },
-        {
-          label: "Log Aktivitas Admin",
-          path: "/dashboard/logs/audit",
           icon: History,
           permission: "LOGS_VIEW",
+          activeMatchPrefixes: ["/dashboard/logs"],
         },
       ],
     },
     {
-      label: "Administrasi",
+      label: "Sistem & Administrasi",
       items: [
         {
           label: "Pengguna & Role",
@@ -148,9 +105,9 @@ export function getSidebarMenu(role: UserRole = "ADMIN"): SidebarGroup[] {
           permission: "USERS_MANAGE",
         },
         {
-          label: "Pengaturan & Kebijakan",
+          label: "Pengaturan Sistem",
           path: "/dashboard/settings",
-          icon: Settings,
+          icon: SlidersHorizontal,
           permission: "SETTINGS_MANAGE",
         },
       ],

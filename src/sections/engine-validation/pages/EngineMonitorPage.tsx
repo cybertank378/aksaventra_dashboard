@@ -6,6 +6,7 @@ import { useLicenseApi } from "@/modules/licenses/presentation/hooks/useLicenseA
 import Badge from "@/shared-ui/component/Badge";
 import Button from "@/shared-ui/component/Button";
 import Card from "@/shared-ui/component/Card";
+import LinkButton from "@/shared-ui/component/LinkButton";
 import TextField from "@/shared-ui/component/TextField";
 
 export default function EngineMonitorPage() {
@@ -35,9 +36,21 @@ export default function EngineMonitorPage() {
           </p>
         </div>
 
-        <Badge color="success" variant="soft">
-          Endpoint /api/v1/validate Aktif
-        </Badge>
+        <div className="flex items-center gap-2.5">
+          <LinkButton
+            href="/dashboard/engine/integrity"
+            variant="outline"
+            color="secondary"
+            size="sm"
+            leftIcon={ShieldCheck}
+          >
+            Integritas Binary (SHA-256)
+          </LinkButton>
+
+          <Badge color="success" variant="soft">
+            Endpoint /api/v1/validate Aktif
+          </Badge>
+        </div>
       </div>
 
       <Card className="space-y-4">

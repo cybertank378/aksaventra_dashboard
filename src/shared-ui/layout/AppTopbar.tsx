@@ -1,16 +1,16 @@
-//Files : src/shared-ui/layout/AppTopbar.tsx
 "use client";
 
-import { Bell, LogOut, Menu, Search } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Bell, LogOut, Menu, Plus, Search } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { UserRole } from "@/libs/enums";
 import { useAuthApi } from "@/modules/auth/presentation/hooks/useAuthApi";
 import { type AvatarMenuItem, getAvatarMenuByRole } from "@/security/AvatarMenu";
+import { canAccess } from "@/security/fieldGuard";
 import { roleConfig } from "@/security/rbacConfig";
 import Button from "@/shared-ui/component/Button";
 import { DropdownItem } from "@/shared-ui/component/DropdownItem";
+import LinkButton from "@/shared-ui/component/LinkButton";
 
 interface Props {
   role?: UserRole;
@@ -18,16 +18,81 @@ interface Props {
   onMenuClick?: () => void;
 }
 
+interface PageHeaderMeta {
+  title: string;
+  subtitle: string;
+}
+
+function resolvePageHeader(pathname: string): PageHeaderMeta {
+  if (pathname === "/dashboard/licenses/create") {
+    return {
+      title: "Penerbitan Kunci Lisensi Baru",
+      subtitle: "Konfigurasi serial key, paket lisensi, dan masa berlaku pelanggan",
+    };
+  }
+
+  if (pathname === "/dashboard/licenses/devices") {
+    return {
+      title: "Perangkat Terikat & Penguncian HWID",
+      subtitle: "Kelola mesin pelanggan yang terikat pada lisensi aktif dan reset HWID",
+    };
+  }
+
+  if (pathname === "/dashboard/licenses/revocations") {
+    return {
+      title: "Blacklist & Revokasi Lisensi",
+      subtitle: "Daftar serial key yang dibekukan atau dicabut dari akses validasi engine",
+    };
+  }
+
+  if (pathname.startsWith("/dashboard/licenses")) {
+    return {
+      title: "Manajemen Direktori Lisensi",
+      subtitle: "Pemantauan status serial key, alokasi perangkat, dan masa aktif lisensi",
+    };
+  }
+
+  if (pathname.startsWith("/dashboard/engine")) {
+    return {
+      title: "Monitor & Integritas Engine Aksaventra",
+      subtitle: "Telemetri validasi real-time (/api/v1/validate) dan verifikasi checksum SHA-256",
+    };
+  }
+
+  if (pathname.startsWith("/dashboard/logs")) {
+    return {
+      title: "Riwayat Aktivitas & Log Audit",
+      subtitle: "Rekam jejak validasi mesin dan aktivitas keamanan administrator",
+    };
+  }
+
+  return {
+    title: "Ringkasan Eksekutif & Aktivitas Lisensi",
+    subtitle: "Pemantauan kuota perangkat, masa berlaku paket, dan validasi lisensi pelanggan",
+  };
+}
+
 export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const { logout } = useAuthApi();
 
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 🔹 Get dynamic avatar menu based on role
   const avatarMenu = getAvatarMenuByRole(role);
+  const canCreateLicense = canAccess(role, "LICENSES_CREATE");
+  const headerMeta = useMemo(() => resolvePageHeader(pathname), [pathname]);
+
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleToggleDropdown = () => {
+    setIsOpen((prev) => !prev);
+  };
 
   const handleLogout = async () => {
     try {
@@ -40,7 +105,6 @@ export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Pro
     }
   };
 
-  // 🔹 Close dropdown when clicking outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -58,95 +122,85 @@ export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Pro
   }, [isOpen]);
 
   return (
-    <header className="sticky top-0 z-40 h-16 bg-white border-b border-gray-200 shadow-sm">
-      <div className="h-full px-4 md:px-8 flex items-center justify-between gap-3">
-        {/* ================= LEFT SECTION ================= */}
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+    <header className="sticky top-0 z-30 border-b border-slate-200/90 bg-white px-4 py-3.5 md:px-6">
+      <div className="flex items-center justify-between gap-4">
+        {/* ================= LEFT SECTION: PAGE TITLE ================= */}
+        <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
             onClick={onMenuClick}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 md:hidden"
-            aria-label="Open sidebar menu"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/80 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 md:hidden"
+            aria-label="Buka menu navigasi"
           >
-            <Menu size={22} />
+            <Menu size={20} />
           </button>
 
-          <div className="flex items-center gap-2 px-3 h-10 border border-gray-300 rounded-lg bg-white focus-within:border-emerald-500 transition-colors flex-1 min-w-0">
-            <Search size={16} className="text-gray-500 shrink-0" />
-            <input
-              type="text"
-              placeholder="Search"
-              className="flex-1 bg-transparent outline-none text-sm placeholder-gray-400 min-w-0"
-            />
+          <div className="min-w-0">
+            <h1 className="truncate text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">
+              {headerMeta.title}
+            </h1>
+            <p className="hidden truncate text-xs font-medium text-slate-500 sm:block">
+              {headerMeta.subtitle}
+            </p>
           </div>
         </div>
 
-        {/* ================= RIGHT SECTION ================= */}
-        <div className="flex items-center gap-4 shrink-0">
-          <Bell size={18} className="text-gray-600" />
+        {/* ================= RIGHT SECTION: SEARCH, BELL, PRIMARY CTA ================= */}
+        <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
+          {/* Search Input */}
+          <div className="hidden h-10 w-56 items-center gap-2 rounded-xl border border-slate-200/90 bg-slate-50/70 px-3.5 transition-colors focus-within:border-blue-500 focus-within:bg-white lg:flex xl:w-72">
+            <Search size={15} className="shrink-0 text-slate-400" />
+            <input
+              type="text"
+              value={searchValue}
+              onChange={handleSearchChange}
+              placeholder="Cari lisensi atau pelanggan..."
+              className="min-w-0 flex-1 bg-transparent text-xs font-medium text-slate-700 outline-none placeholder:text-slate-400"
+            />
+          </div>
 
-          {/* ================= AVATAR ================= */}
-          <div className="relative z-50" ref={dropdownRef}>
+          {/* Notification Bell with Badge Dot */}
+          <div className="relative" ref={dropdownRef}>
             <button
               type="button"
-              onClick={() => setIsOpen((prev) => !prev)}
-              className="w-8 h-8 rounded-full overflow-hidden"
+              onClick={handleToggleDropdown}
+              title="Notifikasi & Profil Sesi"
+              aria-label="Notifikasi & Profil Sesi"
+              className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/90 bg-slate-50/70 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
-              <Image
-                src="/assets/images/avatar.png"
-                alt="User Avatar"
-                width={32}
-                height={32}
-                className="rounded-full object-cover"
-              />
+              <Bell size={17} />
+              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
             </button>
 
             {isOpen && (
-              <div className="absolute right-0 mt-4 w-64 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
-                {/* ===== USER HEADER ===== */}
-                <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-100">
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                    <Image
-                      src="/assets/images/no_avatar.png"
-                      alt="User"
-                      fill
-                      className="object-cover"
-                    />
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">{username || "User"}</p>
-                    <p className="text-xs text-gray-500">{roleConfig[role].label}</p>
-                  </div>
+              <div className="absolute right-0 mt-2.5 w-64 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xl">
+                <div className="border-b border-slate-100 px-4 py-3.5">
+                  <p className="truncate text-xs font-bold text-slate-900">
+                    {username || "Admin Utama"}
+                  </p>
+                  <p className="truncate text-[11px] font-medium text-slate-500">
+                    {roleConfig[role].label}
+                  </p>
                 </div>
 
-                {/* ===== DYNAMIC MENU ===== */}
-                <div className="py-2">
+                <div className="py-1.5">
                   {avatarMenu.map((item: AvatarMenuItem) => {
-                    ////////////////////////////////////////////////////////////
-                    // ACTION ITEM
-                    ////////////////////////////////////////////////////////////
-
                     if ("action" in item && item.action === "logout") {
                       return null;
                     }
 
-                    ////////////////////////////////////////////////////////////
-                    // LINK ITEM
-                    ////////////////////////////////////////////////////////////
-
                     if ("path" in item) {
+                      const handleNavigateItem = () => {
+                        router.push(item.path);
+                        setIsOpen(false);
+                      };
+
                       return (
                         <DropdownItem
                           key={item.path}
                           icon={item.icon}
                           label={item.label}
-                          onClick={() => {
-                            router.push(item.path);
-
-                            setIsOpen(false);
-                          }}
+                          onClick={handleNavigateItem}
                         />
                       );
                     }
@@ -155,25 +209,37 @@ export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Pro
                   })}
                 </div>
 
-                <div className="border-t border-gray-100" />
-
-                {/* ===== LOGOUT BUTTON ===== */}
-                <div className="p-4">
+                <div className="border-t border-slate-100 p-3">
                   <Button
                     type="button"
                     onClick={handleLogout}
                     loading={loading}
                     variant="filled"
                     color="error"
+                    size="sm"
                     leftIcon={LogOut}
-                    className="w-full"
+                    fullWidth
                   >
-                    {loading ? "Logging out..." : "Logout"}
+                    {loading ? "Mengakhiri sesi..." : "Keluar Sesi"}
                   </Button>
                 </div>
               </div>
             )}
           </div>
+
+          {/* Primary Action Button: + Buat Lisensi Baru */}
+          {canCreateLicense && (
+            <LinkButton
+              href="/dashboard/licenses/create"
+              variant="filled"
+              color="primary"
+              size="md"
+              leftIcon={Plus}
+              className="!rounded-xl !bg-blue-600 px-4 py-2.5 text-xs font-bold shadow-sm shadow-blue-600/20 hover:!bg-blue-700"
+            >
+              Buat Lisensi Baru
+            </LinkButton>
+          )}
         </div>
       </div>
     </header>
