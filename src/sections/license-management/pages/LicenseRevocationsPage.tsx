@@ -5,4 +5,3 @@ import LicenseRevocationsOrganism from "@/sections/license-management/organisms/
 export default function LicenseRevocationsPage() {
   return <LicenseRevocationsOrganism />;
 }
-

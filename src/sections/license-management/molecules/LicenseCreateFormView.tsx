@@ -143,4 +143,3 @@ export default function LicenseCreateFormView({ loading = false, onSubmitLicense
     </Card>
   );
 }
-

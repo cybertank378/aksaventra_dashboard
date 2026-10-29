@@ -6,7 +6,7 @@ export interface ApiExecutorState {
   loading: boolean;
   error: string | null;
   clearError: () => void;
-  execute: <T>(fn: () => Promise<T>) => Promise<T>;
+  execute: <T>(fn: () => Promise<T>) => Promise<T | null>;
 }
 
 export function useApiExecutor(): ApiExecutorState {
@@ -17,7 +17,7 @@ export function useApiExecutor(): ApiExecutorState {
     setError(null);
   }, []);
 
-  const execute = useCallback(async <T>(fn: () => Promise<T>): Promise<T> => {
+  const execute = useCallback(async <T>(fn: () => Promise<T>): Promise<T | null> => {
     setLoading(true);
     setError(null);
     try {
@@ -26,7 +26,7 @@ export function useApiExecutor(): ApiExecutorState {
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Terjadi kesalahan pada sistem";
       setError(errorMessage);
-      throw err;
+      return null;
     } finally {
       setLoading(false);
     }

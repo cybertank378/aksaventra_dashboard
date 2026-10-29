@@ -7,6 +7,7 @@ import { FindLoginAuditsByUserUseCase } from "@/modules/auth/application/usecase
 import { FindRecentLoginAuditsUseCase } from "@/modules/auth/application/usecase/FindRecentLoginAuditsUseCase";
 import { FindSuspiciousLoginAuditsUseCase } from "@/modules/auth/application/usecase/FindSuspiciousLoginAuditsUseCase";
 import { ForgotPasswordUseCase } from "@/modules/auth/application/usecase/ForgotPasswordUseCase";
+import { GetPortalTelemetryUseCase } from "@/modules/auth/application/usecase/GetPortalTelemetryUseCase";
 import { LoginUseCase } from "@/modules/auth/application/usecase/LoginUseCase";
 import { LogoutAllUseCase } from "@/modules/auth/application/usecase/LogoutAllUsecase";
 import { LogoutUseCase } from "@/modules/auth/application/usecase/LogoutUseCase";
@@ -35,6 +36,7 @@ import type {
   VerifyEmailRequestDTO,
 } from "@/modules/auth/domain/dto/AuthRequestDTO";
 import type {
+  AuthTelemetryResponseDTO,
   ChangePasswordResponseDTO,
   CurrentAuthResponseDTO,
   ForgotPasswordResponseDTO,
@@ -84,6 +86,7 @@ export class AuthServices extends BaseService {
   private readonly verifyEmailUseCase: VerifyEmailUseCase;
   private readonly sendVerificationUseCase: SendVerificationUseCase;
   private readonly validateAccessTokenUseCase: ValidateAccessTokenUseCase;
+  private readonly getPortalTelemetryUseCase: GetPortalTelemetryUseCase;
 
   //////////////////////////////////////////////////////////////
   // AUDIT USE CASES
@@ -132,6 +135,8 @@ export class AuthServices extends BaseService {
     this.sendVerificationUseCase = new SendVerificationUseCase(repo, mailProvider);
 
     this.validateAccessTokenUseCase = new ValidateAccessTokenUseCase(repo, tokenProvider);
+
+    this.getPortalTelemetryUseCase = new GetPortalTelemetryUseCase(repo);
 
     ////////////////////////////////////////////////////////////
     // AUDIT
@@ -283,6 +288,13 @@ export class AuthServices extends BaseService {
     dto: FindSuspiciousLoginAuditRequestDTO,
   ): Promise<Result<LoginAuditEntity[]>> {
     return this.execute(() => this.findSuspiciousLoginAuditsUseCase.execute(dto));
+  }
+
+  /* ==========================================================
+   * GET PORTAL TELEMETRY
+   * ======================================================== */
+  getPortalTelemetry(): Promise<Result<AuthTelemetryResponseDTO>> {
+    return this.execute(() => this.getPortalTelemetryUseCase.execute());
   }
 }
 

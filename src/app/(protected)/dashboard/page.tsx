@@ -3,4 +3,3 @@ import LicenseManagementPage from "@/sections/license-management/pages/LicenseMa
 export default function DashboardOverviewPage() {
   return <LicenseManagementPage />;
 }
-

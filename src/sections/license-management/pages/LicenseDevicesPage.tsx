@@ -5,4 +5,3 @@ import BoundDevicesOrganism from "@/sections/license-management/organisms/BoundD
 export default function LicenseDevicesPage() {
   return <BoundDevicesOrganism />;
 }
-

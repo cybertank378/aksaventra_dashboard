@@ -5,4 +5,3 @@ import LicenseDirectoryOrganism from "@/sections/license-management/organisms/Li
 export default function LicenseManagementPage() {
   return <LicenseDirectoryOrganism />;
 }
-

@@ -83,4 +83,3 @@ describe("getSidebarMenu (Triple A Pattern)", () => {
     ]);
   });
 });
-
