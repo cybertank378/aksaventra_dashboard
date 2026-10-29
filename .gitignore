@@ -47,3 +47,7 @@ next-env.d.ts
 /.claude/
 /.windsurf/
 /skills-lock.json
+
+
+# prisma seed execution logs
+prisma/seed/logs/*.log
