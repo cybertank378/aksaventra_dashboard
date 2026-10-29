@@ -193,7 +193,7 @@ export const ReleaseUploadModal: React.FC<ReleaseUploadModalProps> = ({
         </div>
 
         {!selectedFile && (
-          <>
+          <div className="space-y-4">
             <TextField
               label="URL Unduhan Biner (Opsional jika file di-host di S3 / CDN)"
               placeholder="misal: https://s3.amazonaws.com/aksaventra-releases/aksaventra_engine.exe"
@@ -209,7 +209,7 @@ export const ReleaseUploadModal: React.FC<ReleaseUploadModalProps> = ({
               onChange={(e) => setChecksumSha256(e.target.value)}
               helperText="64 karakter hex sha256 hash"
             />
-          </>
+          </div>
         )}
 
         <TextAreaField
