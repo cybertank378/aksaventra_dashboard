@@ -1,6 +1,7 @@
 import { closeSeedPrismaContext, createSeedPrismaContext } from "./lib/prismaSeedClient.ts";
 import { seedLogger } from "./logs/seedLogger.ts";
 import { seedAdminUsers } from "./seeders/adminSeeder.ts";
+import { seedEngineReleases } from "./seeders/engineReleaseSeeder.ts";
 import { seedLicenses } from "./seeders/licenseSeeder.ts";
 import { seedLicenseValidationLogs } from "./seeders/licenseValidationLogSeeder.ts";
 
@@ -28,11 +29,12 @@ async function runDatabaseSeed(): Promise<void> {
     const seededAdmins = await seedAdminUsers(context.prisma);
     const seededLicenses = await seedLicenses(context.prisma);
     const seededValidationLogsCount = await seedLicenseValidationLogs(context.prisma);
+    const seededReleasesCount = await seedEngineReleases(context.prisma);
 
     const durationMs = Date.now() - startedAt;
     seedLogger.info("----------------------------------------------------------");
     seedLogger.success(
-      `Seluruh proses seeding selesai dalam ${durationMs} ms. Admin: ${seededAdmins.length} | Lisensi: ${seededLicenses.length} | Log Validasi: ${seededValidationLogsCount}.`,
+      `Seluruh proses seeding selesai dalam ${durationMs} ms. Admin: ${seededAdmins.length} | Lisensi: ${seededLicenses.length} | Log Validasi: ${seededValidationLogsCount} | Rilis: ${seededReleasesCount}.`,
     );
     seedLogger.info("==========================================================");
   } catch (error) {

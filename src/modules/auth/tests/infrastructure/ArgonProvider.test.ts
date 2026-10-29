@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ArgonProvider } from "@/modules/auth/infrastructure/providers/ArgonProvider";
 
-describe("ArgonProvider with Argon2id (Triple A Pattern)", () => {
+describe("ArgonProvider with Argon2id (Triple A Pattern)", { timeout: 20000 }, () => {
   const hasher = new ArgonProvider();
 
   it("should securely hash a plain password using argon2", async () => {

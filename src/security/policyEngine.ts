@@ -91,6 +91,14 @@ export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationP
     return canAccess(auth.role, "LOGS_VIEW");
   }
 
+  // API pembuatan dan pengelolaan rilis biner engine
+  if (path.startsWith("/api/v1/releases")) {
+    if (normalizedMethod !== "GET") {
+      return false;
+    }
+    return canAccess(auth.role, "ENGINE_VALIDATE");
+  }
+
   // Akses rute API engine management lainnya
   if (path.startsWith("/api/v1/engine") && !auth.engineAccess && !auth.licenseKey) {
     return false;

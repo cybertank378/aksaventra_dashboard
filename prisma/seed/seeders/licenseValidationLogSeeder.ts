@@ -39,4 +39,3 @@ export async function seedLicenseValidationLogs(prisma: PrismaClient): Promise<n
 
   return totalInserted;
 }
-
