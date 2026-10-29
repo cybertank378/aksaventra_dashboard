@@ -1,16 +1,14 @@
 "use client";
 
-import { Bell, LogOut, Menu, Plus, Search } from "lucide-react";
+import { Bell, LogOut, Menu, Search } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { UserRole } from "@/libs/enums";
 import { useAuthApi } from "@/modules/auth/presentation/hooks/useAuthApi";
 import { type AvatarMenuItem, getAvatarMenuByRole } from "@/security/AvatarMenu";
-import { canAccess } from "@/security/fieldGuard";
 import { roleConfig } from "@/security/rbacConfig";
 import Button from "@/shared-ui/component/Button";
 import { DropdownItem } from "@/shared-ui/component/DropdownItem";
-import LinkButton from "@/shared-ui/component/LinkButton";
 
 interface Props {
   role?: UserRole;
@@ -83,7 +81,6 @@ export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Pro
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const avatarMenu = getAvatarMenuByRole(role);
-  const canCreateLicense = canAccess(role, "LICENSES_CREATE");
   const headerMeta = useMemo(() => resolvePageHeader(pathname), [pathname]);
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -226,20 +223,6 @@ export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Pro
               </div>
             )}
           </div>
-
-          {/* Primary Action Button: + Buat Lisensi Baru */}
-          {canCreateLicense && (
-            <LinkButton
-              href="/dashboard/licenses/create"
-              variant="filled"
-              color="primary"
-              size="md"
-              leftIcon={Plus}
-              className="!rounded-xl !bg-blue-600 px-4 py-2.5 text-xs font-bold shadow-sm shadow-blue-600/20 hover:!bg-blue-700"
-            >
-              Buat Lisensi Baru
-            </LinkButton>
-          )}
         </div>
       </div>
     </header>
