@@ -2,8 +2,6 @@ import { type ReactNode, Suspense } from "react";
 import { getCurrentUser } from "@/modules/auth/shared/server/serverAuth";
 import AppLayout from "@/shared-ui/layout/AppLayout";
 
-export const dynamic = "force-dynamic";
-
 async function ProtectedLayoutContent({ children }: { children: ReactNode }) {
   const user = await getCurrentUser();
 
