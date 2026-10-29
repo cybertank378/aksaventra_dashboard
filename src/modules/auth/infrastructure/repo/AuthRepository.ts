@@ -1,5 +1,6 @@
 import { prisma } from "@/core/libs/prisma";
 import type { UserRole } from "@/libs/enums";
+import type { AuthTelemetryResponseDTO } from "@/modules/auth/domain/dto/AuthResponseDTO";
 import type { EmailVerificationTokenEntity } from "@/modules/auth/domain/entity/EmailVerificationTokenEntity";
 import { LoginAuditEntity } from "@/modules/auth/domain/entity/LoginAuditEntity";
 import type { PasswordResetTokenEntity } from "@/modules/auth/domain/entity/PasswordResetTokenEntity";
@@ -288,5 +289,34 @@ export class AuthRepository implements AuthRepositoryInterface {
 
   public async findPasswordResetToken(token: string): Promise<PasswordResetTokenEntity | null> {
     return this.inMemoryResetTokens.get(token) || null;
+  }
+
+  public async getPortalTelemetry(): Promise<AuthTelemetryResponseDTO> {
+    const start = performance.now();
+
+    const [activeLicenses, boundLicenses] = await Promise.all([
+      prisma.license.count({
+        where: { status: "ACTIVE" },
+      }),
+      prisma.license.count({
+        where: {
+          status: "ACTIVE",
+          hwid: { not: null },
+        },
+      }),
+    ]);
+
+    const latencyMs = Math.max(1, Math.round(performance.now() - start));
+    const utilizationPercent =
+      activeLicenses > 0 ? Number(((boundLicenses / activeLicenses) * 100).toFixed(1)) : 0;
+
+    return {
+      online: true,
+      activeLicenses,
+      boundLicenses,
+      utilizationPercent,
+      latencyMs,
+      algorithm: "SHA-256",
+    };
   }
 }

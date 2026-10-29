@@ -53,4 +53,3 @@ export default function DeviceResetModal({ open, license, onClose, onConfirmRese
     </Modal>
   );
 }
-

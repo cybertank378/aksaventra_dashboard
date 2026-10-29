@@ -25,4 +25,3 @@ export default function SerialKeyBadge({ serialKey, hwid }: Props) {
     </div>
   );
 }
-

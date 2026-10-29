@@ -1,3 +1,4 @@
+import type { AuthTelemetryResponseDTO } from "@/modules/auth/domain/dto/AuthResponseDTO";
 import type { EmailVerificationTokenEntity } from "@/modules/auth/domain/entity/EmailVerificationTokenEntity";
 import type { LoginAuditEntity } from "@/modules/auth/domain/entity/LoginAuditEntity";
 import type { PasswordResetTokenEntity } from "@/modules/auth/domain/entity/PasswordResetTokenEntity";
@@ -28,6 +29,8 @@ export interface AuthRepositoryInterface {
 
   savePasswordResetToken(token: PasswordResetTokenEntity): Promise<PasswordResetTokenEntity>;
   findPasswordResetToken(token: string): Promise<PasswordResetTokenEntity | null>;
+
+  getPortalTelemetry(): Promise<AuthTelemetryResponseDTO>;
 }
 
 export type AuthInterfaces = AuthRepositoryInterface;

@@ -2,7 +2,9 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 
-import { LayoutDashboard, ShieldCheck } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
+
+import Image from "next/image";
 
 import { useState } from "react";
 
@@ -48,8 +50,14 @@ export default function AppSidebar({ role = "ADMIN", mobileOpen, onClose }: Prop
         {/* LOGO + TITLE */}
 
         <div className="flex items-center gap-3.5">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
-            <ShieldCheck size={24} />
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm">
+            <Image
+              src="/assets/images/logo/logo.png"
+              alt="Aksaventra Logo"
+              width={32}
+              height={32}
+              className="h-8 w-8 object-contain"
+            />
           </div>
 
           <div>

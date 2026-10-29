@@ -24,6 +24,7 @@ export function createMockAuthRepository(): AuthRepositoryInterface {
     findEmailVerificationToken: vi.fn(),
     savePasswordResetToken: vi.fn(),
     findPasswordResetToken: vi.fn(),
+    getPortalTelemetry: vi.fn(),
   };
 }
 

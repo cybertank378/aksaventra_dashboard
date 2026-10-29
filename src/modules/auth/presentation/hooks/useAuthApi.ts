@@ -10,6 +10,7 @@ import type {
   VerifyEmailRequestDTO,
 } from "@/modules/auth/domain/dto/AuthRequestDTO";
 import type {
+  AuthTelemetryResponseDTO,
   AuthUserResponseDTO,
   ChangePasswordResponseDTO,
   ForgotPasswordResponseDTO,
@@ -268,6 +269,22 @@ export const useAuthApi = () => {
   );
 
   ////////////////////////////////////////////////////////////
+  // GET TELEMETRY
+  ////////////////////////////////////////////////////////////
+
+  const getTelemetry = useCallback(
+    () =>
+      execute(async () => {
+        const response = await apiRequest<AuthTelemetryResponseDTO>("/api/v1/auth/telemetry", {
+          method: "GET",
+        });
+
+        return unwrapApiResponse(response);
+      }),
+    [execute],
+  );
+
+  ////////////////////////////////////////////////////////////
   // RETURN
   ////////////////////////////////////////////////////////////
 
@@ -301,5 +318,6 @@ export const useAuthApi = () => {
     verifyEmail,
     sendVerification,
     validateAccessToken,
+    getTelemetry,
   };
 };

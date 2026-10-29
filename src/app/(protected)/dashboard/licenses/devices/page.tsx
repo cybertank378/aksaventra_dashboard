@@ -3,4 +3,3 @@ import LicenseDevicesPage from "@/sections/license-management/pages/LicenseDevic
 export default function LicenseDevicesRoutePage() {
   return <LicenseDevicesPage />;
 }
-

@@ -62,3 +62,12 @@ export interface MessageResponseDTO {
   message: string;
   success: boolean;
 }
+
+export interface AuthTelemetryResponseDTO {
+  online: boolean;
+  activeLicenses: number;
+  boundLicenses: number;
+  utilizationPercent: number;
+  latencyMs: number;
+  algorithm: string;
+}

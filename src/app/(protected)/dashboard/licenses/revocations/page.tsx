@@ -3,4 +3,3 @@ import LicenseRevocationsPage from "@/sections/license-management/pages/LicenseR
 export default function LicenseRevocationsRoutePage() {
   return <LicenseRevocationsPage />;
 }
-

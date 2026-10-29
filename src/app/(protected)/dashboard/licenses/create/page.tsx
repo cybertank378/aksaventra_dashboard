@@ -3,4 +3,3 @@ import CreateLicensePage from "@/sections/license-management/pages/CreateLicense
 export default function CreateLicenseRoutePage() {
   return <CreateLicensePage />;
 }
-

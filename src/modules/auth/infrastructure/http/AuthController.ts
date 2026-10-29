@@ -436,4 +436,21 @@ export class AuthController {
       );
     }
   }
+
+  public async getTelemetry(_req: NextRequest): Promise<NextResponse> {
+    try {
+      const result = await this.authServices.getPortalTelemetry();
+      if (!result.isSuccess) {
+        return NextResponse.json({ success: false, message: result.getError() }, { status: 500 });
+      }
+
+      return NextResponse.json({ success: true, data: result.getValue() }, { status: 200 });
+    } catch (error) {
+      console.error("[AuthController.getTelemetry]", error);
+      return NextResponse.json(
+        { success: false, message: "Internal server error" },
+        { status: 500 },
+      );
+    }
+  }
 }
