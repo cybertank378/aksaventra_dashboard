@@ -1,4 +1,13 @@
-import { Activity, Cpu, History, KeyRound, PieChart, SlidersHorizontal, Users } from "lucide-react";
+import {
+  Activity,
+  ArrowUpCircle,
+  Cpu,
+  History,
+  KeyRound,
+  PieChart,
+  SlidersHorizontal,
+  Users,
+} from "lucide-react";
 import type { UserRole } from "@/libs/enums";
 import { canAccess } from "@/security/fieldGuard";
 import { evaluatePolicy } from "@/security/policyEngine";
@@ -84,7 +93,14 @@ export function getSidebarMenu(role: UserRole = "ADMIN"): SidebarGroup[] {
           path: "/dashboard/engine/monitor",
           icon: Activity,
           permission: "ENGINE_VALIDATE",
-          activeMatchPrefixes: ["/dashboard/engine"],
+          activeMatchPrefixes: ["/dashboard/engine/monitor", "/dashboard/engine/integrity"],
+        },
+        {
+          label: "Rilis Biner Engine",
+          path: "/dashboard/engine/releases",
+          icon: ArrowUpCircle,
+          permission: "ENGINE_REGISTER",
+          activeMatchPrefixes: ["/dashboard/engine/releases"],
         },
         {
           label: "Riwayat Aktivitas",

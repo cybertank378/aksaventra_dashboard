@@ -40,6 +40,12 @@ enum LicenseValidationResult {
   BAD_REQUEST
 }
 
+enum ReleaseChannel {
+  STABLE
+  BETA
+  NIGHTLY
+}
+
 // ----------------------------------------------------
 // USER & AUTHENTICATION MODELS
 // ----------------------------------------------------
@@ -177,4 +183,52 @@ model LicenseValidationLog {
   @@index([result, checkedAt])
   @@index([licenseId])
   @@map("license_validation_logs")
+}
+
+// ----------------------------------------------------
+// ENGINE RELEASE & AUTO-UPDATER (Issue #21)
+// ----------------------------------------------------
+
+model EngineRelease {
+  id                  String         @id @default(uuid())
+  version             String         @unique
+  channel             ReleaseChannel @default(STABLE)
+  minSupportedVersion String?        @map("min_supported_version")
+  mandatory           Boolean        @default(false)
+  downloadUrl         String?        @map("download_url")
+  filePath            String?        @map("file_path")
+  checksumSha256      String         @map("checksum_sha256")
+  fileSize            BigInt         @map("file_size")
+  releaseNotes        String?        @map("release_notes")
+  isActive            Boolean        @default(true) @map("is_active")
+  downloadCount       Int            @default(0) @map("download_count")
+  publishedAt         DateTime       @default(now()) @map("published_at")
+  createdAt           DateTime       @default(now()) @map("created_at")
+  updatedAt           DateTime       @updatedAt @map("updated_at")
+
+  updateLogs          EngineUpdateLog[]
+
+  @@index([channel, isActive])
+  @@index([publishedAt])
+  @@map("engine_releases")
+}
+
+model EngineUpdateLog {
+  id            String         @id @default(uuid())
+  releaseId     String?        @map("release_id")
+  release       EngineRelease? @relation(fields: [releaseId], references: [id], onDelete: SetNull)
+  clientVersion String         @map("client_version")
+  hwid          String?        @map("hwid")
+  serialKey     String?        @map("serial_key")
+  channel       String         @default("stable")
+  action        String         @default("CHECK") // CHECK | DOWNLOAD
+  status        String         @default("SUCCESS") // SUCCESS | FAILED
+  clientIp      String?        @map("client_ip")
+  userAgent     String?        @map("user_agent")
+  createdAt     DateTime       @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@index([releaseId])
+  @@index([action, createdAt])
+  @@map("engine_update_logs")
 }

@@ -23,7 +23,29 @@ import type { ClockInterface } from "@/modules/dashboards/domain/interfaces/Cloc
 import type { DashboardRepositoryInterface } from "@/modules/dashboards/domain/interfaces/DashboardInterfaces";
 import type { ValidationTrendSeriesKey } from "@/modules/dashboards/domain/types/ValidationTrendSeriesKey";
 
+/* ============================================================
+ * DASHBOARD SERVICE
+ * ============================================================
+ *
+ * Responsibility:
+ * - Application Facade
+ * - UseCase Orchestrator
+ * - Transaction Boundary
+ * - Dashboard Analytics Coordinator
+ * - Thin Application Entry Point
+ *
+ * NOT:
+ * - Business Logic Layer
+ * - repo Wrapper
+ * - Database Layer
+ * ============================================================
+ */
+
 export class DashboardServices extends BaseService {
+  //////////////////////////////////////////////////////////////
+  // DASHBOARD USE CASES
+  //////////////////////////////////////////////////////////////
+
   private readonly getSummaryUseCase: GetDashboardSummaryUseCase;
   private readonly getRecentLicensesUseCase: GetRecentLicensesUseCase;
   private readonly getRecentActivitiesUseCase: GetRecentActivitiesUseCase;
@@ -32,11 +54,25 @@ export class DashboardServices extends BaseService {
   private readonly getIssuanceTrendUseCase: GetIssuanceTrendUseCase;
   private readonly getExpiryForecastUseCase: GetExpiryForecastUseCase;
 
+  //////////////////////////////////////////////////////////////
+  // CONSTRUCTOR
+  //////////////////////////////////////////////////////////////
+
   constructor(repository: DashboardRepositoryInterface, clock: ClockInterface) {
-    super("DashboardServices");
+    super("DashboardService");
+
+    ////////////////////////////////////////////////////////////
+    // SUMMARY & RECENT
+    ////////////////////////////////////////////////////////////
+
     this.getSummaryUseCase = new GetDashboardSummaryUseCase(repository, clock);
     this.getRecentLicensesUseCase = new GetRecentLicensesUseCase(repository, clock);
     this.getRecentActivitiesUseCase = new GetRecentActivitiesUseCase(repository);
+
+    ////////////////////////////////////////////////////////////
+    // CHARTS & ANALYTICS
+    ////////////////////////////////////////////////////////////
+
     this.getValidationTrendUseCase = new GetValidationTrendUseCase(repository, clock);
     this.getLicenseStatusDistributionUseCase = new GetLicenseStatusDistributionUseCase(
       repository,
@@ -46,37 +82,67 @@ export class DashboardServices extends BaseService {
     this.getExpiryForecastUseCase = new GetExpiryForecastUseCase(repository, clock);
   }
 
-  public getSummary(): Promise<Result<DashboardSummaryResponseDTO, string>> {
+  /* ==========================================================
+   * GET SUMMARY
+   * ======================================================== */
+
+  getSummary(): Promise<Result<DashboardSummaryResponseDTO, string>> {
     return this.execute(() => this.getSummaryUseCase.execute());
   }
 
-  public getRecentLicenses(
-    dto?: RecentLicensesQueryDTO,
+  /* ==========================================================
+   * GET RECENT LICENSES
+   * ======================================================== */
+
+  getRecentLicenses(
+    request?: RecentLicensesQueryDTO,
   ): Promise<Result<RecentLicensesResponseDTO, string>> {
-    return this.execute(() => this.getRecentLicensesUseCase.execute(dto));
+    return this.execute(() => this.getRecentLicensesUseCase.execute(request));
   }
 
-  public getRecentActivities(
-    dto?: ActivitiesQueryDTO,
+  /* ==========================================================
+   * GET RECENT ACTIVITIES
+   * ======================================================== */
+
+  getRecentActivities(
+    request?: ActivitiesQueryDTO,
   ): Promise<Result<DashboardActivityDTO[], string>> {
-    return this.execute(() => this.getRecentActivitiesUseCase.execute(dto));
+    return this.execute(() => this.getRecentActivitiesUseCase.execute(request));
   }
 
-  public getValidationTrend(
-    dto?: ChartRangeQueryDTO,
+  /* ==========================================================
+   * GET VALIDATION TREND
+   * ======================================================== */
+
+  getValidationTrend(
+    request?: ChartRangeQueryDTO,
   ): Promise<Result<TimeSeriesChartResponseDTO<ValidationTrendSeriesKey>, string>> {
-    return this.execute(() => this.getValidationTrendUseCase.execute(dto));
+    return this.execute(() => this.getValidationTrendUseCase.execute(request));
   }
 
-  public getLicenseStatusDistribution(): Promise<Result<DistributionChartResponseDTO, string>> {
+  /* ==========================================================
+   * GET LICENSE STATUS DISTRIBUTION
+   * ======================================================== */
+
+  getLicenseStatusDistribution(): Promise<Result<DistributionChartResponseDTO, string>> {
     return this.execute(() => this.getLicenseStatusDistributionUseCase.execute());
   }
 
-  public getIssuanceTrend(): Promise<Result<TimeSeriesChartResponseDTO, string>> {
+  /* ==========================================================
+   * GET ISSUANCE TREND
+   * ======================================================== */
+
+  getIssuanceTrend(): Promise<Result<TimeSeriesChartResponseDTO, string>> {
     return this.execute(() => this.getIssuanceTrendUseCase.execute());
   }
 
-  public getExpiryForecast(): Promise<Result<TimeSeriesChartResponseDTO, string>> {
+  /* ==========================================================
+   * GET EXPIRY FORECAST
+   * ======================================================== */
+
+  getExpiryForecast(): Promise<Result<TimeSeriesChartResponseDTO, string>> {
     return this.execute(() => this.getExpiryForecastUseCase.execute());
   }
 }
+
+export { DashboardServices as DashboardService };
