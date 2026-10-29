@@ -1,0 +1,144 @@
+// Prisma Schema: Aksaventra Engine Validation & Dashboard
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ----------------------------------------------------
+// ENUMS
+// ----------------------------------------------------
+
+enum UserRole {
+  ADMIN
+  OPERATOR
+  AUDITOR
+}
+
+enum EngineStatus {
+  VALID
+  REVOKED
+  PENDING
+}
+
+enum LicenseStatus {
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+}
+
+// ----------------------------------------------------
+// USER & AUTHENTICATION MODELS
+// ----------------------------------------------------
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  name        String?
+  password    String // Password hash (e.g. bcrypt/argon2)
+  role        UserRole  @default(ADMIN)
+  isActive    Boolean   @default(true)
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  sessions  Session[]
+  auditLogs AuditLog[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+// ----------------------------------------------------
+// ENGINE VALIDATION CORE MODELS (Issue #001 & #39)
+// ----------------------------------------------------
+
+model EngineValidation {
+  id            String       @id @default(uuid())
+  version       String       @unique
+  sha256Hash    String
+  fileSize      BigInt
+  status        EngineStatus @default(VALID)
+  signature     String
+  downloadUrl   String
+  verifiedCount Int          @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  logs ValidationLog[]
+
+  @@map("engine_validations")
+}
+
+model ValidationLog {
+  id                 String           @id @default(uuid())
+  engineValidationId String
+  engineValidation   EngineValidation @relation(fields: [engineValidationId], references: [id], onDelete: Cascade)
+  clientIp           String
+  userAgent          String?
+  isValid            Boolean
+  checkedAt          DateTime         @default(now())
+
+  @@index([engineValidationId])
+  @@index([checkedAt])
+  @@map("validation_logs")
+}
+
+// ----------------------------------------------------
+// AUDIT LOG MODEL (Security & Admin Activity Tracking)
+// ----------------------------------------------------
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String // e.g. "REGISTER_ENGINE", "REVOKE_ENGINE", "LOGIN"
+  target    String? // e.g. "EngineValidation:v1.2.0"
+  details   String? // JSON string or summary of action
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ----------------------------------------------------
+// LICENSE MANAGEMENT & HARDWARE LOCKING (Issue #13)
+// ----------------------------------------------------
+
+model License {
+  id             String        @id @default(uuid())
+  serialKey      String        @unique @map("serial_key")
+  hwid           String?       @map("hwid")
+  clientName     String        @map("client_name")
+  vaultSecret    String        @map("vault_secret")
+  status         LicenseStatus @default(ACTIVE)
+  expiresAt      DateTime?     @map("expires_at")
+  activatedAt    DateTime?     @map("activated_at")
+  lastVerifiedAt DateTime?     @map("last_verified_at")
+  engineVersion  String?       @map("engine_version")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@index([serialKey])
+  @@index([hwid])
+  @@map("licenses")
+}
