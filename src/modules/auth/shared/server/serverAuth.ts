@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { prisma } from "@/core/libs/prisma";
 import type { UserRole } from "@/libs/enums";
 
@@ -10,7 +11,7 @@ export interface ServerUser {
   isActive: boolean;
 }
 
-export async function getCurrentUser(): Promise<ServerUser | null> {
+export const getCurrentUser = cache(async function getCurrentUser(): Promise<ServerUser | null> {
   try {
     const cookieStore = await cookies();
     const token =
@@ -46,4 +47,4 @@ export async function getCurrentUser(): Promise<ServerUser | null> {
     console.error("[getCurrentUser] Error fetching user session:", error);
     return null;
   }
-}
+});
