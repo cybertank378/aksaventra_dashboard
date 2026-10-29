@@ -194,6 +194,22 @@ describe("Aksaventra Proxy Gateway (Triple A Pattern)", () => {
       expect(response.headers.get("location")).toContain("/login?redirect=%2Fdashboard%2Fengines");
     });
 
+    it("should return 401 JSON for unauthenticated /api/v1/dashboard/charts/validation-trend", async () => {
+      // Arrange
+      const request = new NextRequest(
+        "http://localhost:3000/api/v1/dashboard/charts/validation-trend",
+      );
+
+      // Act
+      const response = await proxy(request);
+      const data = await response.json();
+
+      // Assert
+      expect(response.status).toBe(401);
+      expect(data.success).toBe(false);
+      expect(data.message).toBe("Authentication required");
+    });
+
     it("should return 401 JSON for unauthenticated protected API request", async () => {
       // Arrange
       const request = new NextRequest("http://localhost:3000/api/v1/admin/engines");

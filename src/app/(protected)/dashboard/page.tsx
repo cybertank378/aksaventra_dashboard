@@ -1,5 +1,7 @@
-import LicenseManagementPage from "@/sections/license-management/pages/LicenseManagementPage";
+import { getCurrentUser } from "@/modules/auth/shared/server/serverAuth";
+import DashboardOverviewPage from "@/sections/dashboard/pages/DashboardOverviewPage";
 
-export default function DashboardOverviewPage() {
-  return <LicenseManagementPage />;
+export default async function DashboardPage() {
+  const user = await getCurrentUser();
+  return <DashboardOverviewPage userRole={user?.role ?? "ADMIN"} />;
 }

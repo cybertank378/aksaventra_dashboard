@@ -34,6 +34,15 @@ export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationP
     return false;
   }
 
+  // API Dashboard
+  if (path.startsWith("/api/v1/dashboard/activities")) {
+    return canAccess(auth.role, "LOGS_VIEW");
+  }
+
+  if (path.startsWith("/api/v1/dashboard")) {
+    return canAccess(auth.role, "DASHBOARD_VIEW");
+  }
+
   // Rute Administrasi (Pengguna & Pengaturan) hanya untuk pemilik izin terkait (ADMIN)
   if (path.startsWith("/dashboard/users") || path.startsWith("/api/v1/users")) {
     return canAccess(auth.role, "USERS_MANAGE");
