@@ -11,21 +11,56 @@ import type {
   LicenseValidationLogRepositoryInterface,
 } from "@/modules/licenses/domain/interfaces/LicenseInterfaces";
 
+/* ============================================================
+ * LICENSE SERVICE
+ * ============================================================
+ *
+ * Responsibility:
+ * - Application Facade
+ * - UseCase Orchestrator
+ * - Transaction Boundary
+ * - License Workflow Coordinator
+ * - Thin Application Entry Point
+ *
+ * NOT:
+ * - Business Logic Layer
+ * - repo Wrapper
+ * - Database Layer
+ * ============================================================
+ */
+
 export class LicenseServices extends BaseService {
+  //////////////////////////////////////////////////////////////
+  // LICENSE USE CASES
+  //////////////////////////////////////////////////////////////
+
   private readonly validateLicenseUseCase: ValidateLicenseUseCase;
+
+  //////////////////////////////////////////////////////////////
+  // CONSTRUCTOR
+  //////////////////////////////////////////////////////////////
 
   constructor(
     repo: LicenseRepositoryInterface,
     validationLogRepo?: LicenseValidationLogRepositoryInterface,
   ) {
-    super("LicenseServices");
+    super("LicenseService");
+
+    ////////////////////////////////////////////////////////////
+    // VALIDATION
+    ////////////////////////////////////////////////////////////
+
     this.validateLicenseUseCase = new ValidateLicenseUseCase(repo, validationLogRepo);
   }
 
-  public validateLicense(
-    dto: ValidateLicenseRequestDTO,
+  /* ==========================================================
+   * VALIDATE LICENSE
+   * ======================================================== */
+
+  validateLicense(
+    request: ValidateLicenseRequestDTO,
   ): Promise<Result<ValidateLicenseSuccessResponseDTO, LicenseValidationError>> {
-    return this.execute(() => this.validateLicenseUseCase.execute(dto));
+    return this.execute(() => this.validateLicenseUseCase.execute(request));
   }
 }
 
