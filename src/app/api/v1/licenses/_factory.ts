@@ -10,3 +10,4 @@ export function buildLicenseAdminController(): LicenseAdminController {
 
   return new LicenseAdminController(licenseServices);
 }
+
