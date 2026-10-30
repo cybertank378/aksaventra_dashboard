@@ -76,3 +76,4 @@ describe("ListLicensesUseCase (Triple A)", () => {
     expect(data.licenses[0].serialKeyMasked).toContain("••••");
   });
 });
+

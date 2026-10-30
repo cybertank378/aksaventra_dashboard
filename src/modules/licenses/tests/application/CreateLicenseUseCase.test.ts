@@ -63,3 +63,4 @@ describe("CreateLicenseUseCase (Triple A)", () => {
     expect(result.getError().message).toContain("Nama klien");
   });
 });
+

@@ -48,4 +48,23 @@ export class LicenseValidationLogRepository implements LicenseValidationLogRepos
       checkedAt: l.checkedAt,
     }));
   }
+
+  public async findRecentByLicenseId(licenseId: string, limit = 10): Promise<RawLicenseValidationLogRecord[]> {
+    const raw = await prisma.licenseValidationLog.findMany({
+      where: { licenseId },
+      orderBy: { checkedAt: "desc" },
+      take: limit,
+    });
+
+    return raw.map((l) => ({
+      id: l.id,
+      result: l.result,
+      statusCode: l.statusCode,
+      hwidHash: l.hwidHash,
+      clientIp: l.clientIp,
+      engineVersion: l.engineVersion,
+      latencyMs: l.latencyMs,
+      checkedAt: l.checkedAt,
+    }));
+  }
 }

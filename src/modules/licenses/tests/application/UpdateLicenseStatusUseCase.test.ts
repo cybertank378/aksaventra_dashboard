@@ -86,3 +86,4 @@ describe("UpdateLicenseStatusUseCase (Triple A)", () => {
     expect(updated.expiresAt).toBe(futureDate);
   });
 });
+
