@@ -29,6 +29,7 @@ export const ReleaseUploadModal: React.FC<ReleaseUploadModalProps> = ({
   const [mandatory, setMandatory] = useState(false);
   const [releaseNotes, setReleaseNotes] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [downloadUrl, setDownloadUrl] = useState("");
   const [checksumSha256, setChecksumSha256] = useState("");
   const [fileSize, setFileSize] = useState(12582912);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -68,6 +69,9 @@ export const ReleaseUploadModal: React.FC<ReleaseUploadModalProps> = ({
     }
     formData.append("mandatory", String(mandatory));
     formData.append("releaseNotes", releaseNotes);
+    if (downloadUrl.trim()) {
+      formData.append("downloadUrl", downloadUrl.trim());
+    }
 
     if (selectedFile) {
       formData.append("file", selectedFile);
@@ -88,6 +92,7 @@ export const ReleaseUploadModal: React.FC<ReleaseUploadModalProps> = ({
       setMandatory(false);
       setReleaseNotes("");
       setSelectedFile(null);
+      setDownloadUrl("");
       setChecksumSha256("");
       onClose();
     } catch (err: unknown) {
@@ -188,13 +193,23 @@ export const ReleaseUploadModal: React.FC<ReleaseUploadModalProps> = ({
         </div>
 
         {!selectedFile && (
-          <TextField
-            label="Checksum SHA-256 Manual (Jika biner di-host di CDN eksternal)"
-            placeholder="misal: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
-            value={checksumSha256}
-            onChange={(e) => setChecksumSha256(e.target.value)}
-            helperText="64 karakter hex sha256 hash"
-          />
+          <div className="space-y-4">
+            <TextField
+              label="URL Unduhan Biner (Opsional jika file di-host di S3 / CDN)"
+              placeholder="misal: https://s3.amazonaws.com/aksaventra-releases/aksaventra_engine.exe"
+              value={downloadUrl}
+              onChange={(e) => setDownloadUrl(e.target.value)}
+              helperText="Tautan langsung unduhan biner"
+            />
+
+            <TextField
+              label="Checksum SHA-256 Manual (Jika biner di-host di CDN eksternal)"
+              placeholder="misal: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+              value={checksumSha256}
+              onChange={(e) => setChecksumSha256(e.target.value)}
+              helperText="64 karakter hex sha256 hash"
+            />
+          </div>
         )}
 
         <TextAreaField

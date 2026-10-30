@@ -294,7 +294,9 @@ export class AuthRepository implements AuthRepositoryInterface {
   public async getPortalTelemetry(): Promise<AuthTelemetryResponseDTO> {
     const start = performance.now();
 
-    const [activeLicenses, boundLicenses] = await Promise.all([
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    const [activeLicenses, boundLicenses, totalLogs, serverErrors] = await Promise.all([
       prisma.license.count({
         where: { status: "ACTIVE" },
       }),
@@ -304,11 +306,28 @@ export class AuthRepository implements AuthRepositoryInterface {
           hwid: { not: null },
         },
       }),
+      prisma.licenseValidationLog.count({
+        where: {
+          checkedAt: { gte: thirtyDaysAgo },
+        },
+      }),
+      prisma.licenseValidationLog.count({
+        where: {
+          checkedAt: { gte: thirtyDaysAgo },
+          statusCode: { gte: 500 },
+        },
+      }),
     ]);
 
     const latencyMs = Math.max(1, Math.round(performance.now() - start));
     const utilizationPercent =
       activeLicenses > 0 ? Number(((boundLicenses / activeLicenses) * 100).toFixed(1)) : 0;
+
+    // SLA Ketersediaan Server Validasi (SRE Standard):
+    // Uptime % = ((Total Validasi - Server Error 5xx) / Total Validasi) * 100
+    // Jika belum ada log panggilan validasi (fresh install / new deployment), default ke 100.00%
+    const uptimePercent =
+      totalLogs > 0 ? Number((((totalLogs - serverErrors) / totalLogs) * 100).toFixed(2)) : 100.0;
 
     return {
       online: true,
@@ -317,6 +336,7 @@ export class AuthRepository implements AuthRepositoryInterface {
       utilizationPercent,
       latencyMs,
       algorithm: "SHA-256",
+      uptimePercent,
     };
   }
 }

@@ -82,12 +82,17 @@ export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationP
     return canAccess(auth.role, "ENGINE_VALIDATE");
   }
 
+  // Pruning log validasi hanya boleh dilakukan oleh ADMIN (role non-ADMIN ditolak)
+  if (path.startsWith("/api/v1/logs/validations/prune")) {
+    return false;
+  }
+
   // Rute Audit & Logs
   if (path.startsWith("/dashboard/logs/audit")) {
     return auth.role === "AUDITOR" && canAccess(auth.role, "LOGS_VIEW");
   }
 
-  if (path.startsWith("/dashboard/logs")) {
+  if (path.startsWith("/dashboard/logs") || path.startsWith("/api/v1/logs")) {
     return canAccess(auth.role, "LOGS_VIEW");
   }
 

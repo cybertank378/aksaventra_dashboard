@@ -45,6 +45,16 @@ export class LicenseValidator {
     const engineVersionRaw = pickFirstString(body, ["engine_version", "engineVersion", "version"]);
     const engineVersion = engineVersionRaw.length > 0 ? engineVersionRaw : undefined;
 
+    const publicIpRaw = pickFirstString(body, [
+      "public_ip",
+      "publicIp",
+      "client_ip",
+      "clientIp",
+      "ip",
+      "ip_address",
+    ]);
+    const public_ip = publicIpRaw.length > 0 ? publicIpRaw : undefined;
+
     if (!serialKey) {
       errors.serial_key = "serial_key wajib diisi";
     } else if (serialKey.length < 8) {
@@ -69,6 +79,7 @@ export class LicenseValidator {
         serial_key: serialKey,
         hwid,
         engine_version: engineVersion,
+        public_ip,
       },
     };
   }

@@ -48,6 +48,10 @@ export class LicenseController extends BaseController {
       }
 
       const clientIp =
+        validation.data.public_ip ||
+        validation.data.clientIp ||
+        req.headers.get("cf-connecting-ip") ||
+        req.headers.get("x-client-ip") ||
         req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
         req.headers.get("x-real-ip") ||
         undefined;

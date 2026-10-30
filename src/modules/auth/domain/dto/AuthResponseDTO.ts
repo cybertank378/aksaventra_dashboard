@@ -70,4 +70,5 @@ export interface AuthTelemetryResponseDTO {
   utilizationPercent: number;
   latencyMs: number;
   algorithm: string;
+  uptimePercent: number;
 }
