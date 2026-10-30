@@ -178,6 +178,14 @@ describe("policyEngine (Triple A Pattern)", () => {
         auth: auditorAuth,
       }),
     ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/logs/validations",
+        method: "GET",
+        auth: auditorAuth,
+      }),
+    ).toBe(true);
   });
 
   it("should deny policy evaluation when auth context is empty or missing userId", () => {

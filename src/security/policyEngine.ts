@@ -87,7 +87,7 @@ export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationP
     return auth.role === "AUDITOR" && canAccess(auth.role, "LOGS_VIEW");
   }
 
-  if (path.startsWith("/dashboard/logs")) {
+  if (path.startsWith("/dashboard/logs") || path.startsWith("/api/v1/logs")) {
     return canAccess(auth.role, "LOGS_VIEW");
   }
 

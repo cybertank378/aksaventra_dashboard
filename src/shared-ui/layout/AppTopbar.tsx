@@ -58,6 +58,13 @@ function resolvePageHeader(pathname: string): PageHeaderMeta {
     };
   }
 
+  if (pathname === "/dashboard/logs/validations") {
+    return {
+      title: "Log Validasi Mesin (Engine Telemetry)",
+      subtitle: "Rekam jejak seluruh permintaan otentikasi lisensi dari aksaventra_engine.exe",
+    };
+  }
+
   if (pathname.startsWith("/dashboard/logs")) {
     return {
       title: "Riwayat Aktivitas & Log Audit",
