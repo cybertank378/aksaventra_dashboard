@@ -68,22 +68,22 @@ export class LicenseEntity extends BaseEntity<string> {
 
   public static readonly ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
 
-  public isExpired(): boolean {
+  public isExpired(now: Date = new Date()): boolean {
     if (this.props.status === "EXPIRED") {
       return true;
     }
 
-    const now = Date.now();
+    const nowMs = now.getTime();
 
     // 1. Cek tanggal kedaluwarsa eksplisit jika ada
-    if (this.props.expiresAt && this.props.expiresAt.getTime() <= now) {
+    if (this.props.expiresAt && this.props.expiresAt.getTime() <= nowMs) {
       return true;
     }
 
     // 2. Evaluasi otonom batas umur 1 tahun (365 hari)
     const baseDate = this.props.activatedAt ?? this.props.createdAt ?? this._createdAt;
     if (baseDate) {
-      const ageMs = now - baseDate.getTime();
+      const ageMs = nowMs - baseDate.getTime();
       if (ageMs >= LicenseEntity.ONE_YEAR_MS) {
         return true;
       }
@@ -92,15 +92,50 @@ export class LicenseEntity extends BaseEntity<string> {
     return false;
   }
 
-  public isActive(): boolean {
-    if (this.isExpired()) {
+  public isActive(now: Date = new Date()): boolean {
+    if (this.isExpired(now)) {
       return false;
     }
     return this.props.status === "ACTIVE";
   }
 
+  public isExpiringSoon(now: Date = new Date(), thresholdDays = 30): boolean {
+    if (this.props.status !== "ACTIVE" || !this.props.expiresAt) {
+      return false;
+    }
+
+    const diffMs = this.props.expiresAt.getTime() - now.getTime();
+    const thresholdMs = thresholdDays * 24 * 60 * 60 * 1000;
+
+    return diffMs > 0 && diffMs <= thresholdMs;
+  }
+
   public markExpired(): void {
     this.props.status = "EXPIRED";
+    this._updatedAt = new Date();
+  }
+
+  public suspend(): void {
+    this.props.status = "SUSPENDED";
+    this._updatedAt = new Date();
+  }
+
+  public activate(): void {
+    this.props.status = "ACTIVE";
+    this._updatedAt = new Date();
+  }
+
+  public extendExpiration(newExpiresAt: Date): void {
+    this.props.expiresAt = newExpiresAt;
+    if (this.props.status === "EXPIRED") {
+      this.props.status = "ACTIVE";
+    }
+    this._updatedAt = new Date();
+  }
+
+  public resetHwid(): void {
+    this.props.hwid = null;
+    this.props.activatedAt = null;
     this._updatedAt = new Date();
   }
 
