@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Eye, ShieldAlert, ShieldCheck, UserCheck } from "lucide-react";
 import type { UserRole } from "@/libs/enums";
 import Card from "@/shared-ui/component/Card";
 
@@ -52,6 +52,20 @@ export const RolePermissionSummaryBox = ({ role, className }: RolePermissionSumm
             "Investigasi kegagalan validasi mesin klien",
             "Verifikasi integritas binary & signature",
             "Akses murni Read-Only tanpa hak mutasi",
+          ],
+        };
+      case "CLIENT":
+        return {
+          title: "Klien / Pemilik Lisensi",
+          badgeColor: "text-purple-700 bg-purple-50 border-purple-200",
+          icon: <UserCheck className="w-5 h-5 text-purple-600" />,
+          description:
+            "Akses portal pelanggan untuk memeriksa serial key, status aktivasi, dan masa berlaku lisensi yang dimiliki.",
+          permissions: [
+            "Lihat informasi lisensi yang dimiliki",
+            "Pantau masa kedaluwarsa lisensi",
+            "Dilarang mengakses log validasi sistem",
+            "Akses murni Read-Only terbatas pada portal klien",
           ],
         };
     }

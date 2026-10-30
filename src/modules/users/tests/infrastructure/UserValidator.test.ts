@@ -29,6 +29,15 @@ describe("User Validators", () => {
       });
       expect(valid.isValid).toBe(true);
 
+      const validClient = UserValidator.validateCreateUser({
+        name: "Client Account",
+        email: "client@perusahaan.com",
+        password: "Password123",
+        role: "CLIENT",
+      });
+      expect(validClient.isValid).toBe(true);
+      expect(validClient.data?.role).toBe("CLIENT");
+
       const weakPass = UserValidator.validateCreateUser({
         name: "Ahmad Rizky",
         email: "ahmad@aksaventra.com",
