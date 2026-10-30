@@ -64,6 +64,7 @@ model User {
 
   sessions  Session[]
   auditLogs AuditLog[]
+  licenses  License[]
 
   @@map("users")
 }
@@ -145,6 +146,9 @@ model License {
   id             String        @id @default(uuid())
   serialKey      String        @unique @map("serial_key")
   hwid           String?       @map("hwid")
+  npsn           String?       @map("npsn")
+  userId         String?       @map("user_id")
+  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   clientName     String        @map("client_name")
   vaultSecret    String        @map("vault_secret")
   status         LicenseStatus @default(ACTIVE)
@@ -159,6 +163,8 @@ model License {
 
   @@index([serialKey])
   @@index([hwid])
+  @@index([npsn])
+  @@index([userId])
   @@map("licenses")
 }
 

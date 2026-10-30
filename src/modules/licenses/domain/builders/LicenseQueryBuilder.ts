@@ -9,7 +9,7 @@ export class LicenseQueryBuilder {
     const where: Prisma.LicenseWhereInput = {};
     const conditions: Prisma.LicenseWhereInput[] = [];
 
-    // Search filter across clientName, serialKey, or hwid
+    // Search filter across clientName, serialKey, hwid, or npsn
     if (query.search && query.search.trim().length > 0) {
       const term = query.search.trim();
       conditions.push({
@@ -17,8 +17,19 @@ export class LicenseQueryBuilder {
           { clientName: { contains: term, mode: "insensitive" } },
           { serialKey: { contains: term, mode: "insensitive" } },
           { hwid: { contains: term, mode: "insensitive" } },
+          { npsn: { contains: term, mode: "insensitive" } },
         ],
       });
+    }
+
+    // Direct npsn filter
+    if (query.npsn && query.npsn.trim().length > 0) {
+      conditions.push({ npsn: query.npsn.trim() });
+    }
+
+    // Client/User ownership filter
+    if (query.userId && query.userId.trim().length > 0) {
+      conditions.push({ userId: query.userId.trim() });
     }
 
     // Status filter
