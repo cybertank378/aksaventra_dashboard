@@ -95,7 +95,8 @@ function RecoveryAuthLayout({ mode, token, redirectTo }: AuthFormContentProps) {
               alt="Aksaventra Logo"
               width={32}
               height={32}
-              className="h-8 w-8 object-contain"
+              style={{ width: "auto", height: "auto" }}
+              className="max-h-8 max-w-8 object-contain"
               priority
             />
           </div>
@@ -297,7 +298,8 @@ function SplitEnterpriseAuthLayout({ mode, token, redirectTo }: AuthFormContentP
               alt="Aksaventra Logo"
               width={32}
               height={32}
-              className="h-8 w-8 object-contain"
+              style={{ width: "auto", height: "auto" }}
+              className="max-h-8 max-w-8 object-contain"
               priority
             />
           </div>
@@ -468,7 +470,8 @@ function PasswordUpdateAuthLayout({ mode, token, redirectTo }: AuthFormContentPr
               alt="Aksaventra Logo"
               width={32}
               height={32}
-              className="h-8 w-8 object-contain"
+              style={{ width: "auto", height: "auto" }}
+              className="max-h-8 max-w-8 object-contain"
               priority
             />
           </div>
