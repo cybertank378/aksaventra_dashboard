@@ -10,17 +10,32 @@ import type { SettingCategoryType } from "../../shared/constants/defaultSystemSe
 
 export class SystemSettingsRepository implements SystemSettingsRepositoryInterface {
   public async getAllSettings(): Promise<SystemConfigurationEntity> {
-    const records = await prisma.systemSetting.findMany({
-      include: {
-        updatedBy: {
-          select: {
-            name: true,
+    try {
+      const delegate = (prisma as unknown as { systemSetting?: typeof prisma.systemSetting })
+        .systemSetting;
+
+      if (!delegate) {
+        return SystemSettingsMapper.toEntity([]);
+      }
+
+      const records = await delegate.findMany({
+        include: {
+          updatedBy: {
+            select: {
+              name: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return SystemSettingsMapper.toEntity(records);
+      return SystemSettingsMapper.toEntity(records);
+    } catch (error) {
+      console.warn(
+        "[SystemSettingsRepository.getAllSettings] Falling back to default settings:",
+        error,
+      );
+      return SystemSettingsMapper.toEntity([]);
+    }
   }
 
   public async saveSettings(
