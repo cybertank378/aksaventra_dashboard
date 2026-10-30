@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { getSidebarMenu } from "@/security/sidebar/getSidebarMenu";
 
 describe("getSidebarMenu (Triple A Pattern — Hybrid Structure)", () => {
-  it("should return 2 streamlined groups and 7 navigation items for ADMIN role", () => {
+  it("should return 2 streamlined groups and 8 navigation items for ADMIN role", () => {
     // Arrange
     const role = "ADMIN";
 
@@ -18,6 +18,7 @@ describe("getSidebarMenu (Triple A Pattern — Hybrid Structure)", () => {
       "/dashboard/licenses",
       "/dashboard/licenses/devices",
       "/dashboard/engine/monitor",
+      "/dashboard/engine/releases",
       "/dashboard/logs/validations",
       "/dashboard/users",
       "/dashboard/settings",

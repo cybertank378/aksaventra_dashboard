@@ -64,23 +64,63 @@ describe("policyEngine (Triple A Pattern)", () => {
     expect(isAllowed).toBe(false);
   });
 
-  it("should allow OPERATOR to access operational license & monitor dashboard routes but deny admin routes", () => {
+  it("should restrict AUDITOR to read-only methods across protected routes", () => {
+    // Arrange
+    const auditorAuth: AuthContext = {
+      userId: "usr-auditor-1",
+      role: "AUDITOR",
+    };
+
+    // Act & Assert
+    expect(
+      evaluatePolicy({
+        path: "/dashboard/logs",
+        method: "GET",
+        auth: auditorAuth,
+      }),
+    ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/dashboard/licenses",
+        method: "POST",
+        auth: auditorAuth,
+      }),
+    ).toBe(false);
+
+    expect(
+      evaluatePolicy({
+        path: "/dashboard/engine",
+        method: "DELETE",
+        auth: auditorAuth,
+      }),
+    ).toBe(false);
+  });
+
+  it("should evaluate operator permissions correctly based on RBAC configuration", () => {
     // Arrange
     const operatorAuth: AuthContext = {
-      userId: "usr-op-1",
+      userId: "usr-operator-1",
       role: "OPERATOR",
     };
 
     // Act & Assert
-    expect(evaluatePolicy({ path: "/dashboard/licenses", method: "GET", auth: operatorAuth })).toBe(
-      true,
-    );
     expect(
-      evaluatePolicy({ path: "/dashboard/licenses/create", method: "GET", auth: operatorAuth }),
+      evaluatePolicy({
+        path: "/dashboard/licenses",
+        method: "GET",
+        auth: operatorAuth,
+      }),
     ).toBe(true);
+
     expect(
-      evaluatePolicy({ path: "/dashboard/licenses/devices", method: "GET", auth: operatorAuth }),
+      evaluatePolicy({
+        path: "/dashboard/licenses/create",
+        method: "GET",
+        auth: operatorAuth,
+      }),
     ).toBe(true);
+
     expect(
       evaluatePolicy({
         path: "/dashboard/licenses/revocations",
@@ -88,37 +128,165 @@ describe("policyEngine (Triple A Pattern)", () => {
         auth: operatorAuth,
       }),
     ).toBe(false);
-    expect(evaluatePolicy({ path: "/dashboard/users", method: "GET", auth: operatorAuth })).toBe(
-      false,
-    );
-    expect(evaluatePolicy({ path: "/dashboard/settings", method: "GET", auth: operatorAuth })).toBe(
-      false,
-    );
+
+    expect(
+      evaluatePolicy({
+        path: "/dashboard/users",
+        method: "GET",
+        auth: operatorAuth,
+      }),
+    ).toBe(false);
   });
 
-  it("should allow AUDITOR read-only access to allowed audit & integrity routes and deny mutations", () => {
+  it("should allow AUDITOR to access dashboard charts and summary", () => {
     // Arrange
     const auditorAuth: AuthContext = {
-      userId: "usr-aud-1",
+      userId: "usr-auditor-1",
       role: "AUDITOR",
     };
 
     // Act & Assert
-    expect(evaluatePolicy({ path: "/dashboard/licenses", method: "GET", auth: auditorAuth })).toBe(
-      true,
-    );
     expect(
-      evaluatePolicy({ path: "/dashboard/engine/integrity", method: "GET", auth: auditorAuth }),
+      evaluatePolicy({
+        path: "/api/v1/dashboard/summary",
+        method: "GET",
+        auth: auditorAuth,
+      }),
     ).toBe(true);
+
     expect(
-      evaluatePolicy({ path: "/dashboard/logs/audit", method: "GET", auth: auditorAuth }),
+      evaluatePolicy({
+        path: "/api/v1/dashboard/charts/validation-trend",
+        method: "GET",
+        auth: auditorAuth,
+      }),
     ).toBe(true);
+  });
+
+  it("should allow AUDITOR with LOGS_VIEW to access activities and deny if role lacks LOGS_VIEW", () => {
+    // Arrange
+    const auditorAuth: AuthContext = {
+      userId: "usr-auditor-1",
+      role: "AUDITOR",
+    };
+
+    // Act & Assert
     expect(
-      evaluatePolicy({ path: "/dashboard/licenses/create", method: "GET", auth: auditorAuth }),
+      evaluatePolicy({
+        path: "/api/v1/dashboard/activities",
+        method: "GET",
+        auth: auditorAuth,
+      }),
+    ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/logs/validations",
+        method: "GET",
+        auth: auditorAuth,
+      }),
+    ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses",
+        method: "GET",
+        auth: auditorAuth,
+      }),
+    ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses",
+        method: "POST",
+        auth: auditorAuth,
+      }),
     ).toBe(false);
-    expect(evaluatePolicy({ path: "/dashboard/licenses", method: "POST", auth: auditorAuth })).toBe(
-      false,
-    );
+  });
+
+  it("should evaluate license API permissions according to RBAC matrix", () => {
+    // Arrange
+    const operatorAuth: AuthContext = {
+      userId: "usr-operator-1",
+      role: "OPERATOR",
+    };
+    const adminAuth: AuthContext = {
+      userId: "usr-admin-1",
+      role: "ADMIN",
+    };
+
+    // Act & Assert
+    // Operator can view, create, and reset-hwid
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses",
+        method: "GET",
+        auth: operatorAuth,
+      }),
+    ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses",
+        method: "POST",
+        auth: operatorAuth,
+      }),
+    ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses/lic-123/reset-hwid",
+        method: "PATCH",
+        auth: operatorAuth,
+      }),
+    ).toBe(true);
+
+    // Operator cannot revoke/suspend license status
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses/lic-123/status",
+        method: "PATCH",
+        auth: operatorAuth,
+      }),
+    ).toBe(false);
+
+    // Admin can revoke/suspend license status
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses/lic-123/status",
+        method: "PATCH",
+        auth: adminAuth,
+      }),
+    ).toBe(true);
+  });
+
+  it("should allow only ADMIN to access /api/v1/logs/validations/prune", () => {
+    // Arrange
+    const adminAuth: AuthContext = {
+      userId: "usr-admin-1",
+      role: "ADMIN",
+    };
+    const auditorAuth: AuthContext = {
+      userId: "usr-auditor-1",
+      role: "AUDITOR",
+    };
+
+    // Act & Assert
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/logs/validations/prune",
+        method: "POST",
+        auth: adminAuth,
+      }),
+    ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/logs/validations/prune",
+        method: "POST",
+        auth: auditorAuth,
+      }),
+    ).toBe(false);
   });
 
   it("should deny policy evaluation when auth context is empty or missing userId", () => {

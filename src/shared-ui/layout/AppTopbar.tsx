@@ -1,16 +1,15 @@
 "use client";
 
-import { Bell, LogOut, Menu, Plus, Search } from "lucide-react";
+import { Bell, LogOut, Menu, Search } from "lucide-react";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { UserRole } from "@/libs/enums";
 import { useAuthApi } from "@/modules/auth/presentation/hooks/useAuthApi";
 import { type AvatarMenuItem, getAvatarMenuByRole } from "@/security/AvatarMenu";
-import { canAccess } from "@/security/fieldGuard";
 import { roleConfig } from "@/security/rbacConfig";
 import Button from "@/shared-ui/component/Button";
 import { DropdownItem } from "@/shared-ui/component/DropdownItem";
-import LinkButton from "@/shared-ui/component/LinkButton";
 
 interface Props {
   role?: UserRole;
@@ -59,6 +58,13 @@ function resolvePageHeader(pathname: string): PageHeaderMeta {
     };
   }
 
+  if (pathname === "/dashboard/logs/validations") {
+    return {
+      title: "Log Validasi Mesin (Engine Telemetry)",
+      subtitle: "Rekam jejak seluruh permintaan otentikasi lisensi dari aksaventra_engine.exe",
+    };
+  }
+
   if (pathname.startsWith("/dashboard/logs")) {
     return {
       title: "Riwayat Aktivitas & Log Audit",
@@ -83,7 +89,6 @@ export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Pro
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const avatarMenu = getAvatarMenuByRole(role);
-  const canCreateLicense = canAccess(role, "LICENSES_CREATE");
   const headerMeta = useMemo(() => resolvePageHeader(pathname), [pathname]);
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -159,30 +164,59 @@ export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Pro
             />
           </div>
 
-          {/* Notification Bell with Badge Dot */}
-          <div className="relative" ref={dropdownRef}>
+          {/* Notification Bell */}
+          <button
+            type="button"
+            title="Notifikasi"
+            aria-label="Notifikasi"
+            className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/90 bg-slate-50/70 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+          >
+            <Bell size={18} className="text-slate-600" />
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
+          </button>
+
+          {/* ================= AVATAR USER AKTIF ================= */}
+          <div className="relative z-50" ref={dropdownRef}>
             <button
               type="button"
               onClick={handleToggleDropdown}
-              title="Notifikasi & Profil Sesi"
-              aria-label="Notifikasi & Profil Sesi"
-              className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/90 bg-slate-50/70 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className="flex h-9 w-9 items-center justify-center rounded-full overflow-hidden border border-slate-200 shadow-sm transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Menu Profil Pengguna"
             >
-              <Bell size={17} />
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
+              <Image
+                src="/assets/images/avatar.png"
+                alt="User Avatar"
+                width={36}
+                height={36}
+                className="h-full w-full rounded-full object-cover"
+              />
             </button>
 
             {isOpen && (
-              <div className="absolute right-0 mt-2.5 w-64 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xl">
-                <div className="border-b border-slate-100 px-4 py-3.5">
-                  <p className="truncate text-xs font-bold text-slate-900">
-                    {username || "Admin Utama"}
-                  </p>
-                  <p className="truncate text-[11px] font-medium text-slate-500">
-                    {roleConfig[role].label}
-                  </p>
+              <div className="absolute right-0 mt-3 w-64 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xl">
+                {/* ===== USER HEADER ===== */}
+                <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3.5">
+                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-slate-200">
+                    <Image
+                      src="/assets/images/no_avatar.png"
+                      alt="User"
+                      fill
+                      className="object-cover"
+                    />
+                    <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-green-500" />
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-bold text-slate-900">
+                      {username || "User"}
+                    </p>
+                    <p className="truncate text-[11px] font-medium text-slate-500">
+                      {roleConfig[role].label}
+                    </p>
+                  </div>
                 </div>
 
+                {/* ===== DYNAMIC MENU ===== */}
                 <div className="py-1.5">
                   {avatarMenu.map((item: AvatarMenuItem) => {
                     if ("action" in item && item.action === "logout") {
@@ -220,26 +254,12 @@ export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Pro
                     leftIcon={LogOut}
                     fullWidth
                   >
-                    {loading ? "Mengakhiri sesi..." : "Keluar Sesi"}
+                    {loading ? "Logging out..." : "Logout"}
                   </Button>
                 </div>
               </div>
             )}
           </div>
-
-          {/* Primary Action Button: + Buat Lisensi Baru */}
-          {canCreateLicense && (
-            <LinkButton
-              href="/dashboard/licenses/create"
-              variant="filled"
-              color="primary"
-              size="md"
-              leftIcon={Plus}
-              className="!rounded-xl !bg-blue-600 px-4 py-2.5 text-xs font-bold shadow-sm shadow-blue-600/20 hover:!bg-blue-700"
-            >
-              Buat Lisensi Baru
-            </LinkButton>
-          )}
         </div>
       </div>
     </header>

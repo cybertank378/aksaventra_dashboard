@@ -47,7 +47,21 @@ export class LicenseController extends BaseController {
         );
       }
 
-      const result = await this.licenseServices.validateLicense(validation.data);
+      const clientIp =
+        validation.data.public_ip ||
+        validation.data.clientIp ||
+        req.headers.get("cf-connecting-ip") ||
+        req.headers.get("x-client-ip") ||
+        req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+        req.headers.get("x-real-ip") ||
+        undefined;
+      const userAgent = req.headers.get("user-agent") ?? undefined;
+
+      const result = await this.licenseServices.validateLicense({
+        ...validation.data,
+        clientIp,
+        userAgent,
+      });
 
       if (result.isSuccess) {
         const data = result.getValue();
@@ -62,19 +76,18 @@ export class LicenseController extends BaseController {
         },
         { status: error.statusCode },
       );
-    } catch (err) {
-      console.error("[LicenseController] Validation Exception:", err);
+    } catch (_error) {
       return NextResponse.json(
         {
           valid: false,
-          message: "Internal server error during license validation",
+          message: "Internal server error saat validasi lisensi",
         },
         { status: 500 },
       );
     }
   }
 
-  public validate(req: NextRequest): Promise<NextResponse> {
-    return this.execute(req);
+  public async validate(req: NextRequest): Promise<NextResponse> {
+    return this.handle(req);
   }
 }

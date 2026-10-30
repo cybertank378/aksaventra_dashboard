@@ -30,6 +30,22 @@ enum LicenseStatus {
   EXPIRED
 }
 
+enum LicenseValidationResult {
+  ACTIVATED
+  VERIFIED
+  NOT_FOUND
+  EXPIRED
+  SUSPENDED
+  HWID_MISMATCH
+  BAD_REQUEST
+}
+
+enum ReleaseChannel {
+  STABLE
+  BETA
+  NIGHTLY
+}
+
 // ----------------------------------------------------
 // USER & AUTHENTICATION MODELS
 // ----------------------------------------------------
@@ -138,7 +154,81 @@ model License {
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime      @updatedAt @map("updated_at")
 
+  validationLogs LicenseValidationLog[]
+
   @@index([serialKey])
   @@index([hwid])
   @@map("licenses")
+}
+
+// ----------------------------------------------------
+// LICENSE VALIDATION AUDIT LOG (Issue #20 & FR-06)
+// ----------------------------------------------------
+
+model LicenseValidationLog {
+  id            String                  @id @default(uuid())
+  licenseId     String?                 @map("license_id")
+  license       License?                @relation(fields: [licenseId], references: [id], onDelete: SetNull)
+  serialKeyHint String                  @map("serial_key_hint")
+  hwidHash      String?                 @map("hwid_hash")
+  result        LicenseValidationResult
+  statusCode    Int                     @map("status_code")
+  engineVersion String?                 @map("engine_version")
+  clientIp      String?                 @map("client_ip")
+  userAgent     String?                 @map("user_agent")
+  latencyMs     Int?                    @map("latency_ms")
+  checkedAt     DateTime                @default(now()) @map("checked_at")
+
+  @@index([checkedAt])
+  @@index([result, checkedAt])
+  @@index([licenseId])
+  @@map("license_validation_logs")
+}
+
+// ----------------------------------------------------
+// ENGINE RELEASE & AUTO-UPDATER (Issue #21)
+// ----------------------------------------------------
+
+model EngineRelease {
+  id                  String         @id @default(uuid())
+  version             String         @unique
+  channel             ReleaseChannel @default(STABLE)
+  minSupportedVersion String?        @map("min_supported_version")
+  mandatory           Boolean        @default(false)
+  downloadUrl         String?        @map("download_url")
+  filePath            String?        @map("file_path")
+  checksumSha256      String         @map("checksum_sha256")
+  fileSize            BigInt         @map("file_size")
+  releaseNotes        String?        @map("release_notes")
+  isActive            Boolean        @default(true) @map("is_active")
+  downloadCount       Int            @default(0) @map("download_count")
+  publishedAt         DateTime       @default(now()) @map("published_at")
+  createdAt           DateTime       @default(now()) @map("created_at")
+  updatedAt           DateTime       @updatedAt @map("updated_at")
+
+  updateLogs          EngineUpdateLog[]
+
+  @@index([channel, isActive])
+  @@index([publishedAt])
+  @@map("engine_releases")
+}
+
+model EngineUpdateLog {
+  id            String         @id @default(uuid())
+  releaseId     String?        @map("release_id")
+  release       EngineRelease? @relation(fields: [releaseId], references: [id], onDelete: SetNull)
+  clientVersion String         @map("client_version")
+  hwid          String?        @map("hwid")
+  serialKey     String?        @map("serial_key")
+  channel       String         @default("stable")
+  action        String         @default("CHECK") // CHECK | DOWNLOAD
+  status        String         @default("SUCCESS") // SUCCESS | FAILED
+  clientIp      String?        @map("client_ip")
+  userAgent     String?        @map("user_agent")
+  createdAt     DateTime       @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@index([releaseId])
+  @@index([action, createdAt])
+  @@map("engine_update_logs")
 }

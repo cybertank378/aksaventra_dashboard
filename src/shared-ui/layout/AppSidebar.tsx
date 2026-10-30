@@ -9,6 +9,8 @@ import { useEffect, useMemo, useState } from "react";
 import type { UserRole } from "@/libs/enums";
 import type { AuthTelemetryResponseDTO } from "@/modules/auth/domain/dto/AuthResponseDTO";
 import { useAuthApi } from "@/modules/auth/presentation/hooks/useAuthApi";
+import type { DashboardSummaryResponseDTO } from "@/modules/dashboards/domain/dto/DashboardResponseDTO";
+import { useDashboardApi } from "@/modules/dashboards/presentation/hooks/useDashboardApi";
 import { roleConfig } from "@/security/rbacConfig";
 import { getSidebarMenu, type SidebarGroup } from "@/security/sidebar/getSidebarMenu";
 import { showSuccessToast } from "@/shared-ui/component/Toast";
@@ -47,14 +49,26 @@ function getInitials(name?: string | null, fallback = "AU"): string {
 export default function AppSidebar({ role = "ADMIN", user, mobileOpen, onClose }: Props) {
   const router = useRouter();
   const { logout, getTelemetry } = useAuthApi();
+  const { getSummary } = useDashboardApi();
 
   const [collapsed, setCollapsed] = useState(false);
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [summary, setSummary] = useState<DashboardSummaryResponseDTO | null>(null);
   const [telemetry, setTelemetry] = useState<AuthTelemetryResponseDTO | null>(null);
 
   useEffect(() => {
     let active = true;
+
+    getSummary()
+      .then((res) => {
+        if (active && res) {
+          setSummary(res);
+        }
+      })
+      .catch(() => {
+        // Fallback jika ringkasan dasbor belum tersedia
+      });
 
     getTelemetry()
       .then((res) => {
@@ -63,19 +77,20 @@ export default function AppSidebar({ role = "ADMIN", user, mobileOpen, onClose }
         }
       })
       .catch(() => {
-        // Fallback jika telemetri belum tersedia
+        // Fallback jika telemetri sistem belum tersedia
       });
 
     return () => {
       active = false;
     };
-  }, [getTelemetry]);
+  }, [getSummary, getTelemetry]);
 
   const groups = useMemo(() => {
     const baseGroups = getSidebarMenu(role);
     const activeLicensesLabel =
-      telemetry !== null ? telemetry.activeLicenses.toLocaleString("id-ID") : "0";
-    const utilizationLabel = telemetry !== null ? `${telemetry.utilizationPercent}%` : "0%";
+      summary !== null ? summary.kpis.activeLicenses.total.toLocaleString("id-ID") : "0";
+    const utilizationLabel =
+      summary !== null ? `${summary.kpis.hwidUtilization.rate.toFixed(0)}%` : "0%";
 
     return baseGroups.map((group: SidebarGroup) => ({
       ...group,
@@ -103,12 +118,16 @@ export default function AppSidebar({ role = "ADMIN", user, mobileOpen, onClose }
         return item;
       }),
     }));
-  }, [role, telemetry]);
+  }, [role, summary]);
 
   const displayName = user?.name?.trim() || "Admin Utama";
   const displaySubtitle = user?.email?.trim() || roleConfig[role]?.label || "Super Administrator";
   const userInitials = getInitials(user?.name, "AU");
-  const isServerOnline = telemetry ? telemetry.online : true;
+  const isServerOnline = telemetry?.online ?? true;
+  const uptimeLabel =
+    telemetry !== null && typeof telemetry.uptimePercent === "number"
+      ? `${telemetry.uptimePercent.toFixed(2)}%`
+      : "100.00%";
 
   const handleToggleCollapse = () => {
     setCollapsed((prev) => !prev);
@@ -265,9 +284,16 @@ export default function AppSidebar({ role = "ADMIN", user, mobileOpen, onClose }
               {/* Server Status Indicator (Collapsed) */}
               <div
                 title={
-                  isServerOnline ? "Server Validasi Aktif (99.99%)" : "Server Validasi Gangguan"
+                  isServerOnline
+                    ? `Server Validasi Aktif (${uptimeLabel})`
+                    : `Server Validasi Terkendala (${uptimeLabel})`
                 }
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-200/80 bg-emerald-50/70"
+                className={clsx(
+                  "flex h-9 w-9 items-center justify-center rounded-xl border",
+                  isServerOnline
+                    ? "border-emerald-200/80 bg-emerald-50/70"
+                    : "border-amber-200/80 bg-amber-50/70",
+                )}
               >
                 <span
                   className={clsx(
@@ -293,7 +319,14 @@ export default function AppSidebar({ role = "ADMIN", user, mobileOpen, onClose }
           ) : (
             <>
               {/* Indikator Uptime Server Validasi */}
-              <div className="flex items-center justify-between rounded-xl border border-emerald-200/90 bg-emerald-50/75 px-3.5 py-2">
+              <div
+                className={clsx(
+                  "flex items-center justify-between rounded-xl border px-3.5 py-2",
+                  isServerOnline
+                    ? "border-emerald-200/90 bg-emerald-50/75"
+                    : "border-amber-200/90 bg-amber-50/75",
+                )}
+              >
                 <div className="flex items-center gap-2">
                   <span
                     className={clsx(
@@ -301,12 +334,24 @@ export default function AppSidebar({ role = "ADMIN", user, mobileOpen, onClose }
                       isServerOnline ? "bg-emerald-500" : "bg-amber-500",
                     )}
                   />
-                  <span className="text-[11px] font-bold text-emerald-800">
-                    Server Validasi Aktif
+                  <span
+                    className={clsx(
+                      "text-[11px] font-bold",
+                      isServerOnline ? "text-emerald-800" : "text-amber-800",
+                    )}
+                  >
+                    {isServerOnline ? "Server Validasi Aktif" : "Server Terkendala"}
                   </span>
                 </div>
 
-                <span className="text-[11px] font-extrabold text-emerald-600">99.99%</span>
+                <span
+                  className={clsx(
+                    "text-[11px] font-extrabold",
+                    isServerOnline ? "text-emerald-600" : "text-amber-600",
+                  )}
+                >
+                  {uptimeLabel}
+                </span>
               </div>
 
               {/* Kartu Sesi Pengguna & Tombol Keluar */}

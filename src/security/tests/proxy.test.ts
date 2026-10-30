@@ -194,6 +194,22 @@ describe("Aksaventra Proxy Gateway (Triple A Pattern)", () => {
       expect(response.headers.get("location")).toContain("/login?redirect=%2Fdashboard%2Fengines");
     });
 
+    it("should return 401 JSON for unauthenticated /api/v1/dashboard/charts/validation-trend", async () => {
+      // Arrange
+      const request = new NextRequest(
+        "http://localhost:3000/api/v1/dashboard/charts/validation-trend",
+      );
+
+      // Act
+      const response = await proxy(request);
+      const data = await response.json();
+
+      // Assert
+      expect(response.status).toBe(401);
+      expect(data.success).toBe(false);
+      expect(data.message).toBe("Authentication required");
+    });
+
     it("should return 401 JSON for unauthenticated protected API request", async () => {
       // Arrange
       const request = new NextRequest("http://localhost:3000/api/v1/admin/engines");
@@ -279,7 +295,43 @@ describe("Aksaventra Proxy Gateway (Triple A Pattern)", () => {
   });
 
   /* ==========================================================
-   * 6. ERROR HANDLING
+   * 6. ENGINE UPDATER ROUTE (/api/v1/updater/*)
+   * ======================================================== */
+  describe("Engine Auto-Updater Gateway (/api/v1/updater/*)", () => {
+    it("should allow /api/v1/updater/version as public route without session cookie", async () => {
+      // Arrange
+      const request = new NextRequest("http://localhost:3000/api/v1/updater/version", {
+        method: "GET",
+      });
+
+      // Act
+      const response = await proxy(request);
+
+      // Assert
+      expect(response.status).toBe(200);
+      expect(response.headers.get("x-middleware-next")).toBe("1");
+    });
+
+    it("should allow /api/v1/updater/download/aksaventra_engine.exe as public route", async () => {
+      // Arrange
+      const request = new NextRequest(
+        "http://localhost:3000/api/v1/updater/download/aksaventra_engine.exe",
+        {
+          method: "GET",
+        },
+      );
+
+      // Act
+      const response = await proxy(request);
+
+      // Assert
+      expect(response.status).toBe(200);
+      expect(response.headers.get("x-middleware-next")).toBe("1");
+    });
+  });
+
+  /* ==========================================================
+   * 7. ERROR HANDLING
    * ======================================================== */
   describe("Internal Server Error Handling", () => {
     it("should return JSON 500 when unexpected runtime error occurs", async () => {

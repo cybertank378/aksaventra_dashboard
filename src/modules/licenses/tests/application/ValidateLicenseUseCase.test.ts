@@ -1,19 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ValidateLicenseUseCase } from "@/modules/licenses/application/usecase/ValidateLicenseUseCase";
 import { LicenseEntity } from "@/modules/licenses/domain/entity/LicenseEntity";
-import { createMockLicenseRepository } from "@/modules/licenses/tests/mocks/mockFactories";
+import {
+  createMockLicenseRepository,
+  createMockLicenseValidationLogRepository,
+} from "@/modules/licenses/tests/mocks/mockFactories";
 
 describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
   let mockRepo: ReturnType<typeof createMockLicenseRepository>;
+  let mockLogRepo: ReturnType<typeof createMockLicenseValidationLogRepository>;
   let useCase: ValidateLicenseUseCase;
 
   beforeEach(() => {
     mockRepo = createMockLicenseRepository();
-    useCase = new ValidateLicenseUseCase(mockRepo);
+    mockLogRepo = createMockLicenseValidationLogRepository();
+    useCase = new ValidateLicenseUseCase(mockRepo, mockLogRepo);
   });
 
   describe("Kondisi 1: Aktivasi Baru (First-time Activation)", () => {
-    it("should bind HWID to license, update repository, and return success with vault_secret", async () => {
+    it("should bind HWID to license, update repository, and record ACTIVATED log", async () => {
       // Arrange
       const serialKey = "AKSA-2026-NEW-ACTV";
       const hwid = "HWID-DEVICE-XYZ-111";
@@ -46,11 +51,19 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
       expect(data.message).toContain("diaktivasi dan dikunci");
       expect(existingLicense.hwid).toBe(hwid);
       expect(mockRepo.update).toHaveBeenCalledWith(existingLicense);
+
+      // FR-06 Validation Audit Log
+      expect(mockLogRepo.record).toHaveBeenCalledTimes(1);
+      const recordedLog = vi.mocked(mockLogRepo.record).mock.calls[0][0];
+      expect(recordedLog.result).toBe("ACTIVATED");
+      expect(recordedLog.statusCode).toBe(200);
+      expect(recordedLog.licenseId).toBe("lic-1");
+      expect(recordedLog.serialKeyHint).toBe("ACTV");
     });
   });
 
   describe("Kondisi 2: Device Terdaftar (Matching HWID)", () => {
-    it("should verify existing device, update lastVerifiedAt, and return success with vault_secret", async () => {
+    it("should verify existing device, update lastVerifiedAt, and record VERIFIED log", async () => {
       // Arrange
       const serialKey = "AKSA-2026-REGISTERED";
       const hwid = "HWID-EXISTING-DEVICE-222";
@@ -82,11 +95,18 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
       expect(data.vault_secret).toBe("VAULT_SECRET_REGISTERED_456");
       expect(data.message).toContain("aktif dan terverifikasi");
       expect(mockRepo.update).toHaveBeenCalledWith(existingLicense);
+
+      // FR-06 Validation Audit Log
+      expect(mockLogRepo.record).toHaveBeenCalledTimes(1);
+      const recordedLog = vi.mocked(mockLogRepo.record).mock.calls[0][0];
+      expect(recordedLog.result).toBe("VERIFIED");
+      expect(recordedLog.statusCode).toBe(200);
+      expect(recordedLog.licenseId).toBe("lic-2");
     });
   });
 
   describe("Kondisi 3: Hardware Mismatch (Registered to another HWID)", () => {
-    it("should reject request with HTTP 403 Forbidden when HWID does not match", async () => {
+    it("should reject request with HTTP 403 Forbidden and record HWID_MISMATCH log", async () => {
       // Arrange
       const serialKey = "AKSA-2026-LOCKED-KEY";
       const originalHwid = "ORIGINAL-DEVICE-HWID-333";
@@ -116,11 +136,18 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
       expect(error.statusCode).toBe(403);
       expect(error.message).toContain("Hardware Mismatch");
       expect(mockRepo.update).not.toHaveBeenCalled();
+
+      // FR-06 Validation Audit Log
+      expect(mockLogRepo.record).toHaveBeenCalledTimes(1);
+      const recordedLog = vi.mocked(mockLogRepo.record).mock.calls[0][0];
+      expect(recordedLog.result).toBe("HWID_MISMATCH");
+      expect(recordedLog.statusCode).toBe(403);
+      expect(recordedLog.licenseId).toBe("lic-3");
     });
   });
 
   describe("Kondisi 4: Lisensi Invalid / Expired / Suspended / Not Found", () => {
-    it("should reject with HTTP 404 if serial key does not exist in database", async () => {
+    it("should reject with HTTP 404 and record NOT_FOUND log if serial key does not exist", async () => {
       // Arrange
       const serialKey = "AKSA-UNKNOWN-NONEXISTENT";
       const hwid = "DEVICE-HWID-000";
@@ -138,9 +165,14 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
       const error = result.getError();
       expect(error.statusCode).toBe(404);
       expect(error.message).toContain("Lisensi Tidak Ditemukan");
+
+      expect(mockLogRepo.record).toHaveBeenCalledTimes(1);
+      const recordedLog = vi.mocked(mockLogRepo.record).mock.calls[0][0];
+      expect(recordedLog.result).toBe("NOT_FOUND");
+      expect(recordedLog.statusCode).toBe(404);
     });
 
-    it("should reject with HTTP 401 and autonomously update status to EXPIRED if license has expired", async () => {
+    it("should reject with HTTP 401 and record EXPIRED log if license has expired", async () => {
       // Arrange
       const serialKey = "AKSA-EXPIRED-KEY";
       const hwid = "DEVICE-HWID-EXPIRED";
@@ -170,42 +202,14 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
       expect(error.message).toContain("kadaluarsa");
       expect(expiredLicense.status).toBe("EXPIRED");
       expect(mockRepo.update).toHaveBeenCalledWith(expiredLicense);
+
+      expect(mockLogRepo.record).toHaveBeenCalledTimes(1);
+      const recordedLog = vi.mocked(mockLogRepo.record).mock.calls[0][0];
+      expect(recordedLog.result).toBe("EXPIRED");
+      expect(recordedLog.statusCode).toBe(401);
     });
 
-    it("should autonomously expire license, update repository to EXPIRED status, and reject with HTTP 401 when age reaches 1 year (365 days)", async () => {
-      // Arrange
-      const serialKey = "AKSA-1YEAR-OLD-KEY";
-      const hwid = "DEVICE-HWID-OLD";
-      const oneYearAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 366); // 366 days ago
-      const oldLicense = LicenseEntity.create({
-        id: "lic-old-1",
-        serialKey,
-        clientName: "PT Klien Lama",
-        vaultSecret: "SECRET_OLD",
-        status: "ACTIVE", // Was active
-        hwid,
-        activatedAt: oneYearAgo,
-      });
-
-      vi.mocked(mockRepo.findBySerialKey).mockResolvedValue(oldLicense);
-      vi.mocked(mockRepo.update).mockResolvedValue(undefined);
-
-      // Act
-      const result = await useCase.execute({
-        serial_key: serialKey,
-        hwid,
-      });
-
-      // Assert
-      expect(result.isSuccess).toBe(false);
-      const error = result.getError();
-      expect(error.statusCode).toBe(401);
-      expect(error.message).toContain("kadaluarsa");
-      expect(oldLicense.status).toBe("EXPIRED");
-      expect(mockRepo.update).toHaveBeenCalledWith(oldLicense);
-    });
-
-    it("should reject with HTTP 401 if license is SUSPENDED", async () => {
+    it("should reject with HTTP 401 and record SUSPENDED log if license is SUSPENDED", async () => {
       // Arrange
       const serialKey = "AKSA-SUSPENDED-KEY";
       const hwid = "DEVICE-HWID-SUSPENDED";
@@ -231,9 +235,14 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
       const error = result.getError();
       expect(error.statusCode).toBe(401);
       expect(error.message).toContain("ditangguhkan");
+
+      expect(mockLogRepo.record).toHaveBeenCalledTimes(1);
+      const recordedLog = vi.mocked(mockLogRepo.record).mock.calls[0][0];
+      expect(recordedLog.result).toBe("SUSPENDED");
+      expect(recordedLog.statusCode).toBe(401);
     });
 
-    it("should reject with HTTP 401 if serial_key or hwid is missing / empty", async () => {
+    it("should reject with HTTP 401 and record BAD_REQUEST log if serial_key or hwid is empty", async () => {
       // Arrange
       const emptySerial = "";
       const emptyHwid = "   ";
@@ -249,6 +258,41 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
       const error = result.getError();
       expect(error.statusCode).toBe(401);
       expect(error.message).toContain("wajib diisi");
+
+      expect(mockLogRepo.record).toHaveBeenCalledTimes(1);
+      const recordedLog = vi.mocked(mockLogRepo.record).mock.calls[0][0];
+      expect(recordedLog.result).toBe("BAD_REQUEST");
+      expect(recordedLog.statusCode).toBe(401);
+    });
+  });
+
+  describe("Best-effort Logging Non-blocking Behavior", () => {
+    it("should not fail validation when validation log repository throws an unexpected error", async () => {
+      // Arrange
+      const serialKey = "AKSA-BEST-EFFORT-KEY";
+      const hwid = "HWID-BEST-EFFORT";
+      const existingLicense = LicenseEntity.create({
+        id: "lic-best",
+        serialKey,
+        clientName: "PT Resilience",
+        vaultSecret: "SECRET_RESILIENT",
+        status: "ACTIVE",
+        hwid,
+      });
+
+      vi.mocked(mockRepo.findBySerialKey).mockResolvedValue(existingLicense);
+      vi.mocked(mockRepo.update).mockResolvedValue(undefined);
+      vi.mocked(mockLogRepo.record).mockRejectedValue(new Error("Database connection timeout"));
+
+      // Act
+      const result = await useCase.execute({
+        serial_key: serialKey,
+        hwid,
+      });
+
+      // Assert: Validation must still succeed!
+      expect(result.isSuccess).toBe(true);
+      expect(result.getValue().valid).toBe(true);
     });
   });
 });

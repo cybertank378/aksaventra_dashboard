@@ -19,8 +19,29 @@ export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationP
 
   const normalizedMethod = method.toUpperCase();
 
-  // API pembuatan dan pengelolaan lisensi engine HANYA boleh dilakukan oleh ADMIN
+  // API pembuatan dan pengelolaan lisensi engine berdasarkan matriks RBAC
   if (path.startsWith("/api/v1/licenses")) {
+    if (normalizedMethod === "GET") {
+      return canAccess(auth.role, "LICENSES_VIEW");
+    }
+
+    // Legacy direct route guard /api/v1/licenses/create HANYA untuk ADMIN
+    if (path.startsWith("/api/v1/licenses/create")) {
+      return auth.role === "ADMIN";
+    }
+
+    if (path.includes("/reset-hwid")) {
+      return canAccess(auth.role, "LICENSES_MANAGE");
+    }
+
+    if (path.includes("/status")) {
+      return canAccess(auth.role, "LICENSES_REVOKE");
+    }
+
+    if (path === "/api/v1/licenses" && normalizedMethod === "POST") {
+      return canAccess(auth.role, "LICENSES_CREATE");
+    }
+
     return auth.role === "ADMIN";
   }
 
@@ -32,6 +53,15 @@ export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationP
   // AUDITOR hanya memiliki akses Read-Only (GET)
   if (auth.role === "AUDITOR" && normalizedMethod !== "GET") {
     return false;
+  }
+
+  // API Dashboard
+  if (path.startsWith("/api/v1/dashboard/activities")) {
+    return canAccess(auth.role, "LOGS_VIEW");
+  }
+
+  if (path.startsWith("/api/v1/dashboard")) {
+    return canAccess(auth.role, "DASHBOARD_VIEW");
   }
 
   // Rute Administrasi (Pengguna & Pengaturan) hanya untuk pemilik izin terkait (ADMIN)
@@ -73,13 +103,26 @@ export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationP
     return canAccess(auth.role, "ENGINE_VALIDATE");
   }
 
+  // Pruning log validasi hanya boleh dilakukan oleh ADMIN (role non-ADMIN ditolak)
+  if (path.startsWith("/api/v1/logs/validations/prune")) {
+    return false;
+  }
+
   // Rute Audit & Logs
   if (path.startsWith("/dashboard/logs/audit")) {
     return auth.role === "AUDITOR" && canAccess(auth.role, "LOGS_VIEW");
   }
 
-  if (path.startsWith("/dashboard/logs")) {
+  if (path.startsWith("/dashboard/logs") || path.startsWith("/api/v1/logs")) {
     return canAccess(auth.role, "LOGS_VIEW");
+  }
+
+  // API pembuatan dan pengelolaan rilis biner engine
+  if (path.startsWith("/api/v1/releases")) {
+    if (normalizedMethod !== "GET") {
+      return false;
+    }
+    return canAccess(auth.role, "ENGINE_VALIDATE");
   }
 
   // Akses rute API engine management lainnya
