@@ -7,6 +7,7 @@ export interface ValidateLicenseSuccessResponseDTO {
   valid: true;
   message: string;
   client_name: string;
+  npsn?: string | null;
   vault_secret: string;
   expires_at?: number; // UNIX epoch timestamp in seconds
 }
@@ -29,6 +30,8 @@ export interface LicenseAdminItemDTO {
   serialKey: string;
   serialKeyMasked: string;
   clientName: string;
+  npsn: string | null;
+  userId: string | null;
   hwid: string | null;
   isBound: boolean;
   status: LicenseStatus;

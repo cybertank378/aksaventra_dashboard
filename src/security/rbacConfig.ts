@@ -46,4 +46,10 @@ export const roleConfig: Record<UserRole, RoleConfigItem> = {
     badgeColor: "orange",
     permissions: ["DASHBOARD_VIEW", "LICENSES_VIEW", "ENGINE_VALIDATE", "LOGS_VIEW"],
   },
+  CLIENT: {
+    name: "Client",
+    label: "Client / Customer",
+    badgeColor: "purple",
+    permissions: ["DASHBOARD_VIEW", "LICENSES_VIEW"],
+  },
 };

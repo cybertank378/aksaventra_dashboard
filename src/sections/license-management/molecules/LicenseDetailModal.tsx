@@ -96,6 +96,11 @@ export default function LicenseDetailModal({
 
               <div>
                 <h3 className="text-base font-bold text-slate-900">{license.clientName}</h3>
+                {license.npsn && (
+                  <p className="font-mono text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded w-fit my-1 border border-emerald-200">
+                    NPSN: {license.npsn}
+                  </p>
+                )}
                 <p className="font-mono text-xs text-slate-500">ID: {license.id}</p>
               </div>
 

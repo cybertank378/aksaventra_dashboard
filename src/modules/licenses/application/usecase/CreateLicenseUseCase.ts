@@ -52,6 +52,8 @@ export class CreateLicenseUseCase {
         id: randomUUID(),
         serialKey,
         clientName,
+        npsn: dto.npsn?.trim() || null,
+        userId: dto.userId?.trim() || null,
         vaultSecret,
         status: "ACTIVE",
         expiresAt,

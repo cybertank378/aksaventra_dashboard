@@ -1,9 +1,10 @@
-export type UserRole = "ADMIN" | "OPERATOR" | "AUDITOR";
+export type UserRole = "ADMIN" | "OPERATOR" | "AUDITOR" | "CLIENT";
 
 export const UserRole = {
   ADMIN: "ADMIN",
   OPERATOR: "OPERATOR",
   AUDITOR: "AUDITOR",
+  CLIENT: "CLIENT",
 } as const;
 
 export type EngineStatus = "VALID" | "REVOKED" | "PENDING";
