@@ -18,6 +18,7 @@ export default function LicenseCreateOrganism() {
   const handleCreateLicense = async (values: CreateLicenseFormValues) => {
     const result = await createLicense({
       clientName: values.clientName,
+      npsn: values.npsn,
       customSerialKey: values.serialKey,
       tier: values.tier,
       durationMonths: values.durationMonths,

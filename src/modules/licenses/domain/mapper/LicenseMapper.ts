@@ -32,6 +32,8 @@ export class LicenseMapper {
       id: record.id,
       serialKey: record.serialKey,
       hwid: record.hwid,
+      npsn: record.npsn,
+      userId: record.userId,
       clientName: record.clientName,
       vaultSecret: record.vaultSecret,
       status: record.status as LicenseStatus,
@@ -48,6 +50,8 @@ export class LicenseMapper {
     id: string;
     serialKey: string;
     hwid: string | null;
+    npsn: string | null;
+    userId: string | null;
     clientName: string;
     vaultSecret: string;
     status: PrismaLicenseStatus;
@@ -61,6 +65,8 @@ export class LicenseMapper {
       id: props.id,
       serialKey: props.serialKey,
       hwid: props.hwid ?? null,
+      npsn: props.npsn ?? null,
+      userId: props.userId ?? null,
       clientName: props.clientName,
       vaultSecret: props.vaultSecret,
       status: props.status as PrismaLicenseStatus,
@@ -89,6 +95,8 @@ export class LicenseMapper {
       serialKey: visibleSerialKey,
       serialKeyMasked: masked,
       clientName: props.clientName,
+      npsn: props.npsn ?? null,
+      userId: props.userId ?? null,
       hwid: props.hwid ?? null,
       isBound,
       status: props.status,
