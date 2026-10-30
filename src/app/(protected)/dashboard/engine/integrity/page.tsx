@@ -1,5 +1,5 @@
-import EngineMonitorPage from "@/sections/engine-validation/pages/EngineMonitorPage";
+import EngineIntegrityPage from "@/sections/engine-validation/pages/EngineIntegrityPage";
 
 export default function EngineIntegrityRoutePage() {
-  return <EngineMonitorPage />;
+  return <EngineIntegrityPage />;
 }
