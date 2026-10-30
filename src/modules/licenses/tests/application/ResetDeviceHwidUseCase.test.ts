@@ -75,4 +75,3 @@ describe("ResetDeviceHwidUseCase (Triple A)", () => {
     expect(result.getError().message).toContain("tidak ditemukan");
   });
 });
-

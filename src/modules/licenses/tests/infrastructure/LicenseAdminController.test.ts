@@ -149,4 +149,3 @@ describe("LicenseAdminController (Triple A Pattern)", () => {
     expect(body.license.hwid).toBeNull();
   });
 });
-

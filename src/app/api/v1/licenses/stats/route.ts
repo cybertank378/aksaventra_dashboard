@@ -6,4 +6,3 @@ const controller = buildLicenseAdminController();
 export async function GET(req: NextRequest) {
   return controller.getStats(req);
 }
-

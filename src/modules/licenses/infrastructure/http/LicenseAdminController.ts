@@ -219,4 +219,3 @@ export class LicenseAdminController extends BaseController {
     }
   }
 }
-
