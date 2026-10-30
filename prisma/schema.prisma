@@ -47,6 +47,12 @@ enum ReleaseChannel {
   NIGHTLY
 }
 
+enum SettingCategory {
+  LICENSE_ENGINE
+  SECURITY_AUTH
+  RETENTION_AUDIT
+}
+
 // ----------------------------------------------------
 // USER & AUTHENTICATION MODELS
 // ----------------------------------------------------
@@ -62,9 +68,10 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  sessions  Session[]
-  auditLogs AuditLog[]
-  licenses  License[]
+  sessions        Session[]
+  auditLogs       AuditLog[]
+  licenses        License[]
+  updatedSettings SystemSetting[]
 
   @@map("users")
 }
@@ -238,4 +245,23 @@ model EngineUpdateLog {
   @@index([releaseId])
   @@index([action, createdAt])
   @@map("engine_update_logs")
+}
+
+// ----------------------------------------------------
+// SYSTEM SETTINGS & CONFIGURATION (Issue #37)
+// ----------------------------------------------------
+
+model SystemSetting {
+  key         String          @id @map("setting_key")
+  category    SettingCategory
+  value       String          @map("setting_value") // Serialized string / json
+  valueType   String          @default("string") @map("value_type") // "number" | "boolean" | "string"
+  description String?
+  updatedById String?         @map("updated_by_id")
+  updatedBy   User?           @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@map("system_settings")
 }

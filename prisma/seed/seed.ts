@@ -4,6 +4,7 @@ import { seedAdminUsers } from "./seeders/adminSeeder.ts";
 import { seedEngineReleases } from "./seeders/engineReleaseSeeder.ts";
 import { seedLicenses } from "./seeders/licenseSeeder.ts";
 import { seedLicenseValidationLogs } from "./seeders/licenseValidationLogSeeder.ts";
+import { seedSystemSettings } from "./seeders/systemSettingSeeder.ts";
 
 /**
  * Orkestrator Utama Database Seeder — Aksaventra Engine Validation & License Management System.
@@ -30,11 +31,12 @@ async function runDatabaseSeed(): Promise<void> {
     const seededLicenses = await seedLicenses(context.prisma);
     const seededValidationLogsCount = await seedLicenseValidationLogs(context.prisma);
     const seededReleasesCount = await seedEngineReleases(context.prisma);
+    const seededSettingsCount = await seedSystemSettings(context.prisma);
 
     const durationMs = Date.now() - startedAt;
     seedLogger.info("----------------------------------------------------------");
     seedLogger.success(
-      `Seluruh proses seeding selesai dalam ${durationMs} ms. Admin: ${seededAdmins.length} | Lisensi: ${seededLicenses.length} | Log Validasi: ${seededValidationLogsCount} | Rilis: ${seededReleasesCount}.`,
+      `Seluruh proses seeding selesai dalam ${durationMs} ms. Admin: ${seededAdmins.length} | Lisensi: ${seededLicenses.length} | Log Validasi: ${seededValidationLogsCount} | Rilis: ${seededReleasesCount} | Pengaturan: ${seededSettingsCount}.`,
     );
     seedLogger.info("==========================================================");
   } catch (error) {
