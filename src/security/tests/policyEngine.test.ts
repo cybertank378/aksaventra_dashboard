@@ -322,4 +322,70 @@ describe("policyEngine (Triple A Pattern)", () => {
     // Assert
     expect(isAllowed).toBe(false);
   });
+
+  it("should evaluate engine monitor and binary integrity RBAC policies correctly", () => {
+    // Arrange
+    const adminAuth: AuthContext = { userId: "usr-admin-1", role: "ADMIN" };
+    const operatorAuth: AuthContext = { userId: "usr-operator-1", role: "OPERATOR" };
+    const auditorAuth: AuthContext = { userId: "usr-auditor-1", role: "AUDITOR" };
+    const clientAuth: AuthContext = { userId: "usr-client-1", role: "CLIENT" };
+
+    // Act & Assert
+    // 1. Dashboard routes access
+    expect(
+      evaluatePolicy({ path: "/dashboard/engine/monitor", method: "GET", auth: adminAuth }),
+    ).toBe(true);
+    expect(
+      evaluatePolicy({ path: "/dashboard/engine/monitor", method: "GET", auth: operatorAuth }),
+    ).toBe(true);
+    expect(
+      evaluatePolicy({ path: "/dashboard/engine/monitor", method: "GET", auth: auditorAuth }),
+    ).toBe(false);
+    expect(
+      evaluatePolicy({ path: "/dashboard/engine/integrity", method: "GET", auth: auditorAuth }),
+    ).toBe(true);
+    expect(
+      evaluatePolicy({ path: "/dashboard/engine/monitor", method: "GET", auth: clientAuth }),
+    ).toBe(false);
+
+    // 2. Summary API
+    expect(
+      evaluatePolicy({ path: "/api/v1/engine/monitor/summary", method: "GET", auth: operatorAuth }),
+    ).toBe(true);
+    expect(
+      evaluatePolicy({ path: "/api/v1/engine/monitor/summary", method: "GET", auth: clientAuth }),
+    ).toBe(false);
+
+    // 3. Verify checksum API
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/engine/integrity/verify",
+        method: "POST",
+        auth: auditorAuth,
+      }),
+    ).toBe(true);
+
+    // 4. Status patch (HANYA ADMIN yang memiliki ENGINE_REVOKE)
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/engine/integrity/rel-1/status",
+        method: "PATCH",
+        auth: adminAuth,
+      }),
+    ).toBe(true);
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/engine/integrity/rel-1/status",
+        method: "PATCH",
+        auth: operatorAuth,
+      }),
+    ).toBe(false);
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/engine/integrity/rel-1/status",
+        method: "PATCH",
+        auth: auditorAuth,
+      }),
+    ).toBe(false);
+  });
 });

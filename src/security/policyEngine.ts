@@ -50,8 +50,15 @@ export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationP
     return true;
   }
 
-  // AUDITOR dan CLIENT hanya memiliki akses Read-Only (GET)
-  if ((auth.role === "AUDITOR" || auth.role === "CLIENT") && normalizedMethod !== "GET") {
+  // AUDITOR dan CLIENT hanya memiliki akses Read-Only (GET), kecuali kueri simulasi verifikasi biner (POST /api/v1/engine/integrity/verify)
+  const isIntegrityVerifyPost =
+    normalizedMethod === "POST" && path === "/api/v1/engine/integrity/verify";
+
+  if (
+    (auth.role === "AUDITOR" || auth.role === "CLIENT") &&
+    normalizedMethod !== "GET" &&
+    !(auth.role === "AUDITOR" && isIntegrityVerifyPost)
+  ) {
     return false;
   }
 
@@ -90,16 +97,29 @@ export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationP
     return canAccess(auth.role, "LICENSES_VIEW");
   }
 
-  // Rute Engine & Validasi
+  // Rute Dashboard Engine & Validasi
   if (path.startsWith("/dashboard/engine/monitor")) {
     return auth.role === "OPERATOR" && canAccess(auth.role, "ENGINE_VALIDATE");
   }
 
   if (path.startsWith("/dashboard/engine/integrity")) {
-    return auth.role === "AUDITOR" && canAccess(auth.role, "ENGINE_VALIDATE");
+    return canAccess(auth.role, "ENGINE_VALIDATE");
   }
 
   if (path.startsWith("/dashboard/engine")) {
+    return canAccess(auth.role, "ENGINE_VALIDATE");
+  }
+
+  // API Engine Integrity Status Update (HANYA ADMIN / ENGINE_REVOKE via PATCH)
+  if (path.startsWith("/api/v1/engine/integrity") && path.endsWith("/status")) {
+    if (normalizedMethod === "PATCH") {
+      return canAccess(auth.role, "ENGINE_REVOKE");
+    }
+    return false;
+  }
+
+  // API Engine Monitor & Integrity (ADMIN, OPERATOR, AUDITOR via ENGINE_VALIDATE)
+  if (path.startsWith("/api/v1/engine/monitor") || path.startsWith("/api/v1/engine/integrity")) {
     return canAccess(auth.role, "ENGINE_VALIDATE");
   }
 
