@@ -388,4 +388,47 @@ describe("policyEngine (Triple A Pattern)", () => {
       }),
     ).toBe(false);
   });
+
+  it("should restrict /dashboard/settings and /api/v1/settings to ADMIN only", () => {
+    // Arrange
+    const adminAuth: AuthContext = { userId: "usr-admin", role: "ADMIN" };
+    const operatorAuth: AuthContext = { userId: "usr-op", role: "OPERATOR" };
+    const auditorAuth: AuthContext = { userId: "usr-auditor", role: "AUDITOR" };
+    const clientAuth: AuthContext = { userId: "usr-client", role: "CLIENT" };
+
+    // Act & Assert
+    // Dashboard page
+    expect(evaluatePolicy({ path: "/dashboard/settings", method: "GET", auth: adminAuth })).toBe(
+      true,
+    );
+    expect(evaluatePolicy({ path: "/dashboard/settings", method: "GET", auth: operatorAuth })).toBe(
+      false,
+    );
+    expect(evaluatePolicy({ path: "/dashboard/settings", method: "GET", auth: auditorAuth })).toBe(
+      false,
+    );
+    expect(evaluatePolicy({ path: "/dashboard/settings", method: "GET", auth: clientAuth })).toBe(
+      false,
+    );
+
+    // API route GET
+    expect(evaluatePolicy({ path: "/api/v1/settings", method: "GET", auth: adminAuth })).toBe(true);
+    expect(evaluatePolicy({ path: "/api/v1/settings", method: "GET", auth: operatorAuth })).toBe(
+      false,
+    );
+    expect(evaluatePolicy({ path: "/api/v1/settings", method: "GET", auth: auditorAuth })).toBe(
+      false,
+    );
+    expect(evaluatePolicy({ path: "/api/v1/settings", method: "GET", auth: clientAuth })).toBe(
+      false,
+    );
+
+    // API route PATCH
+    expect(evaluatePolicy({ path: "/api/v1/settings", method: "PATCH", auth: adminAuth })).toBe(
+      true,
+    );
+    expect(evaluatePolicy({ path: "/api/v1/settings", method: "PATCH", auth: operatorAuth })).toBe(
+      false,
+    );
+  });
 });
