@@ -4,7 +4,9 @@ import { RefreshCw, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useEngineMonitorApi } from "@/modules/engine-validation/presentation/hooks/useEngineMonitorApi";
 import BinaryIntegrityTableView from "@/sections/engine-validation/molecules/BinaryIntegrityTableView";
-import EngineValidationSimulatorModal from "@/sections/engine-validation/molecules/EngineValidationSimulatorModal";
+import EngineValidationSimulatorModal, {
+  type SimulatorInitialValues,
+} from "@/sections/engine-validation/molecules/EngineValidationSimulatorModal";
 import Button from "@/shared-ui/component/Button";
 
 interface EngineIntegrityOrganismProps {
@@ -22,12 +24,23 @@ export default function EngineIntegrityOrganism({ isAdmin = true }: EngineIntegr
   } = useEngineMonitorApi();
 
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
+  const [simulatorValues, setSimulatorValues] = useState<SimulatorInitialValues | null>(null);
 
   useEffect(() => {
     listIntegrity();
   }, [listIntegrity]);
 
-  const handleVerifyChecksumClick = (_version: string, _hash: string) => {
+  const handleVerifyChecksumClick = (version: string, hash: string) => {
+    setSimulatorValues({
+      tab: "CHECKSUM_INTEGRITY",
+      checksumVersion: version,
+      sha256Hash: hash,
+    });
+    setIsSimulatorOpen(true);
+  };
+
+  const handleOpenGeneralSimulator = () => {
+    setSimulatorValues(null);
     setIsSimulatorOpen(true);
   };
 
@@ -66,7 +79,7 @@ export default function EngineIntegrityOrganism({ isAdmin = true }: EngineIntegr
             color="primary"
             size="sm"
             leftIcon={ShieldCheck}
-            onClick={() => setIsSimulatorOpen(true)}
+            onClick={handleOpenGeneralSimulator}
           >
             Simulator &amp; Verifikator Checksum
           </Button>
@@ -86,6 +99,7 @@ export default function EngineIntegrityOrganism({ isAdmin = true }: EngineIntegr
       <EngineValidationSimulatorModal
         isOpen={isSimulatorOpen}
         onClose={() => setIsSimulatorOpen(false)}
+        initialValues={simulatorValues}
         onSimulateValidate={simulateValidation}
         onVerifyChecksum={verifyChecksum}
       />

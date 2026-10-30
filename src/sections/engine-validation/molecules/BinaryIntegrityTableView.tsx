@@ -142,14 +142,16 @@ export default function BinaryIntegrityTableView({
                       <span>
                         {release.checksumSha256.slice(0, 14)}…{release.checksumSha256.slice(-8)}
                       </span>
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
+                        color="secondary"
+                        size="sm"
+                        iconOnly
+                        leftIcon={Copy}
                         onClick={() => handleCopyHash(release.checksumSha256)}
-                        className="text-slate-400 hover:text-slate-700 transition-colors"
                         title="Salin Hash SHA-256 Penuh"
-                      >
-                        <Copy size={12} />
-                      </button>
+                      />
                     </div>
                   </TableCell>
 

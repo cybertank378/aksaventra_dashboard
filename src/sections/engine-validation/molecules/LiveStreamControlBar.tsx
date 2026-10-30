@@ -50,20 +50,18 @@ export default function LiveStreamControlBar({
         </Button>
 
         {/* Interval Dropdown/Buttons */}
-        <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-sm text-xs">
+        <div className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1 shadow-xs">
           {intervals.map((item) => (
-            <button
+            <Button
               key={item.value}
               type="button"
+              variant={pollIntervalMs === item.value ? "filled" : "ghost"}
+              color={pollIntervalMs === item.value ? "primary" : "secondary"}
+              size="sm"
               onClick={() => onIntervalChange(item.value)}
-              className={`rounded-md px-2.5 py-1 font-medium transition-colors ${
-                pollIntervalMs === item.value
-                  ? "bg-slate-900 text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
             >
               {item.label}
-            </button>
+            </Button>
           ))}
         </div>
 

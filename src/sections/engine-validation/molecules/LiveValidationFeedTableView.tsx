@@ -79,20 +79,18 @@ export default function LiveValidationFeedTableView({
         </div>
 
         {/* Group Filter Tabs */}
-        <div className="flex flex-wrap gap-1 rounded-xl border border-slate-200/90 bg-slate-50 p-1">
+        <div className="flex flex-wrap items-center gap-1.5 rounded-xl border border-slate-200/90 bg-slate-50 p-1.5">
           {groupTabs.map((tab) => (
-            <button
+            <Button
               key={tab.id}
               type="button"
+              variant={activeGroup === tab.id ? "filled" : "ghost"}
+              color={activeGroup === tab.id ? "primary" : "secondary"}
+              size="sm"
               onClick={() => onGroupChange(tab.id)}
-              className={`rounded-lg px-3 py-1 text-xs font-semibold transition-all ${
-                activeGroup === tab.id
-                  ? "bg-white text-slate-900 shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
             >
               {tab.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -186,14 +184,16 @@ export default function LiveValidationFeedTableView({
                           <span>
                             {log.hwidHash.slice(0, 10)}…{log.hwidHash.slice(-6)}
                           </span>
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            color="secondary"
+                            size="sm"
+                            iconOnly
+                            leftIcon={Copy}
                             onClick={() => handleCopyText(log.hwidHash || "", "HWID Hash")}
-                            className="text-slate-400 hover:text-slate-700 transition-colors"
                             title="Salin Hash HWID Penuh"
-                          >
-                            <Copy size={12} />
-                          </button>
+                          />
                         </div>
                       ) : (
                         <span className="text-slate-400 text-xs">-</span>
