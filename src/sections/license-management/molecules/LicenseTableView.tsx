@@ -91,6 +91,11 @@ export default function LicenseTableView({
                   </TableCell>
                   <TableCell>
                     <div className="font-semibold text-slate-900">{item.clientName}</div>
+                    {item.npsn && (
+                      <div className="text-[11px] font-mono font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded w-fit my-0.5">
+                        NPSN: {item.npsn}
+                      </div>
+                    )}
                     <div className="text-xs text-slate-500">
                       Verifikasi: {formatDate(item.lastVerifiedAt)}
                     </div>

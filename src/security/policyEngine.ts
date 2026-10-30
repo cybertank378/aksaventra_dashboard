@@ -50,8 +50,8 @@ export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationP
     return true;
   }
 
-  // AUDITOR hanya memiliki akses Read-Only (GET)
-  if (auth.role === "AUDITOR" && normalizedMethod !== "GET") {
+  // AUDITOR dan CLIENT hanya memiliki akses Read-Only (GET)
+  if ((auth.role === "AUDITOR" || auth.role === "CLIENT") && normalizedMethod !== "GET") {
     return false;
   }
 
