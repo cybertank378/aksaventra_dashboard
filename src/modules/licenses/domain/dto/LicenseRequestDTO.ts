@@ -5,6 +5,7 @@ export interface ValidateLicenseRequestDTO {
   serial_key: string;
   hwid: string;
   engine_version?: string;
+  public_ip?: string;
   clientIp?: string;
   userAgent?: string;
 }

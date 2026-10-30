@@ -7,14 +7,25 @@ import type { ValidationLogFilterGroup } from "@/modules/validation-logs/domain/
 import { useValidationLogApi } from "@/modules/validation-logs/presentation/hooks/useValidationLogApi";
 import Card from "@/shared-ui/component/Card";
 import Pagination from "@/shared-ui/component/Pagination";
+import { showSuccessToast } from "@/shared-ui/component/Toast";
 import { ValidationLogDetailModal } from "../molecules/ValidationLogDetailModal";
 import { ValidationLogFilterBar } from "../molecules/ValidationLogFilterBar";
+import { ValidationLogPruneModal } from "../molecules/ValidationLogPruneModal";
 import { ValidationLogStatsGrid } from "../molecules/ValidationLogStatsGrid";
 import { ValidationLogsTableView } from "../molecules/ValidationLogsTableView";
 
 export const ValidationLogsDirectoryOrganism = () => {
-  const { loading, logs, stats, activeDetail, fetchLogs, fetchStats, fetchDetail, exportLogs } =
-    useValidationLogApi();
+  const {
+    loading,
+    logs,
+    stats,
+    activeDetail,
+    fetchLogs,
+    fetchStats,
+    fetchDetail,
+    exportLogs,
+    pruneLogs,
+  } = useValidationLogApi();
 
   const [page, setPage] = useState(1);
   const [limit] = useState(15);
@@ -23,6 +34,7 @@ export const ValidationLogsDirectoryOrganism = () => {
   const [resultFilter, setResultFilter] = useState<LicenseValidationResult | undefined>(undefined);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPruneModalOpen, setIsPruneModalOpen] = useState(false);
 
   useEffect(() => {
     fetchStats().catch(() => {});
@@ -96,6 +108,27 @@ export const ValidationLogsDirectoryOrganism = () => {
     }).catch(() => {});
   };
 
+  const handleOpenPruneModal = () => {
+    setIsPruneModalOpen(true);
+  };
+
+  const handleClosePruneModal = () => {
+    setIsPruneModalOpen(false);
+  };
+
+  const handleConfirmPrune = async (days: number) => {
+    try {
+      const res = await pruneLogs(days);
+      setIsPruneModalOpen(false);
+      showSuccessToast(
+        res?.message || `Berhasil memangkas log validasi yang lebih tua dari ${days} hari`,
+      );
+      handleRefresh();
+    } catch {
+      // Handled by api executor
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* 1. Header Ringkasan Halaman */}
@@ -125,6 +158,7 @@ export const ValidationLogsDirectoryOrganism = () => {
           onResetFilters={handleResetFilters}
           onRefresh={handleRefresh}
           onExport={handleExport}
+          onOpenPruneModal={handleOpenPruneModal}
           loading={loading}
         />
 
@@ -152,6 +186,14 @@ export const ValidationLogsDirectoryOrganism = () => {
         onClose={handleCloseModal}
         detail={activeDetail}
         loading={loading && !activeDetail}
+      />
+
+      {/* 5. Modal Pemangkasan Log Lama */}
+      <ValidationLogPruneModal
+        open={isPruneModalOpen}
+        onClose={handleClosePruneModal}
+        onConfirmPrune={handleConfirmPrune}
+        loading={loading}
       />
     </div>
   );

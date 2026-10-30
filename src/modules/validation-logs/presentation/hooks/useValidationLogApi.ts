@@ -114,6 +114,22 @@ export const useValidationLogApi = () => {
     [execute],
   );
 
+  const pruneLogs = useCallback(
+    (days = 90) =>
+      execute(async () => {
+        const response = await apiRequest<{
+          success: boolean;
+          deletedCount: number;
+          message: string;
+        }>("/api/v1/logs/validations/prune", {
+          method: "POST",
+          payload: { days },
+        });
+        return unwrapApiResponse(response);
+      }),
+    [execute],
+  );
+
   return {
     loading,
     error,
@@ -125,5 +141,6 @@ export const useValidationLogApi = () => {
     fetchStats,
     fetchDetail,
     exportLogs,
+    pruneLogs,
   };
 };

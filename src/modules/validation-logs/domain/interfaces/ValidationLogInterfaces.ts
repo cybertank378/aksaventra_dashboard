@@ -17,6 +17,11 @@ export interface ValidationLogWithLicenseDetail {
   } | null;
 }
 
+export interface PruneValidationLogsResult {
+  deletedCount: number;
+  cutoffDate: Date;
+}
+
 export interface ValidationLogRepositoryInterface {
   findManyWithFilter(params: ListValidationLogsQueryDTO): Promise<{
     data: ValidationLogReadEntity[];
@@ -25,4 +30,5 @@ export interface ValidationLogRepositoryInterface {
   getStats24h(): Promise<ValidationLogStatsDTO>;
   findById(id: string): Promise<ValidationLogWithLicenseDetail | null>;
   exportLogs(params: ExportValidationLogsQueryDTO): Promise<ValidationLogReadEntity[]>;
+  pruneLogsOlderThan(days: number): Promise<PruneValidationLogsResult>;
 }

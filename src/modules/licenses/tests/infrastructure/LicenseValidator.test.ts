@@ -21,6 +21,22 @@ describe("LicenseValidator (Triple A Pattern)", () => {
     expect(result.data?.engine_version).toBe("2.1.0");
   });
 
+  it("should extract public_ip or client_ip when provided in body payload", () => {
+    // Arrange
+    const input = {
+      serial_key: "AKSA-2026-TEST-1234",
+      hwid: "DEVICE-HWID-UUID",
+      public_ip: "103.14.20.15",
+    };
+
+    // Act
+    const result = LicenseValidator.validate(input);
+
+    // Assert
+    expect(result.isValid).toBe(true);
+    expect(result.data?.public_ip).toBe("103.14.20.15");
+  });
+
   it("should fail when serial_key is missing or shorter than 8 characters", () => {
     // Arrange
     const inputMissing = { hwid: "DEVICE-HWID" };

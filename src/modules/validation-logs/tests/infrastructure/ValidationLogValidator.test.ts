@@ -67,4 +67,28 @@ describe("ValidationLogValidator (Triple A Pattern)", () => {
       expect(resEmpty.isValid).toBe(false);
     });
   });
+
+  describe("validatePruneQuery", () => {
+    it("should accept valid days parameter or default to 90", () => {
+      // Arrange & Act
+      const resDefault = ValidationLogValidator.validatePruneQuery({});
+      const resCustom = ValidationLogValidator.validatePruneQuery({ days: 60 });
+
+      // Assert
+      expect(resDefault.isValid).toBe(true);
+      expect(resDefault.data?.days).toBe(90);
+
+      expect(resCustom.isValid).toBe(true);
+      expect(resCustom.data?.days).toBe(60);
+    });
+
+    it("should reject days less than 7", () => {
+      // Arrange & Act
+      const resInvalid = ValidationLogValidator.validatePruneQuery({ days: 4 });
+
+      // Assert
+      expect(resInvalid.isValid).toBe(false);
+      expect(resInvalid.errors.days).toBeDefined();
+    });
+  });
 });

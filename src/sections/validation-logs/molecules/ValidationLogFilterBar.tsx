@@ -2,7 +2,7 @@
 
 import type { LicenseValidationResult } from "@prisma/client";
 import clsx from "clsx";
-import { Download, RefreshCw, RotateCcw } from "lucide-react";
+import { Download, RefreshCw, RotateCcw, Trash2 } from "lucide-react";
 import type { ValidationLogFilterGroup } from "@/modules/validation-logs/domain/types/ValidationLogFilterGroup";
 import Button from "@/shared-ui/component/Button";
 import SearchField from "@/shared-ui/component/SearchField";
@@ -18,6 +18,7 @@ interface Props {
   onResetFilters: () => void;
   onRefresh: () => void;
   onExport: () => void;
+  onOpenPruneModal?: () => void;
   loading: boolean;
 }
 
@@ -38,6 +39,7 @@ export const ValidationLogFilterBar: React.FC<Props> = ({
   onResetFilters,
   onRefresh,
   onExport,
+  onOpenPruneModal,
   loading,
 }) => {
   const handleSelectResult = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -74,8 +76,22 @@ export const ValidationLogFilterBar: React.FC<Props> = ({
           })}
         </div>
 
-        {/* Action Buttons: Segarkan & Ekspor */}
+        {/* Action Buttons: Segarkan, Pangkas Log & Ekspor */}
         <div className="flex items-center gap-2 self-end lg:self-auto">
+          {onOpenPruneModal && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onOpenPruneModal}
+              disabled={loading}
+              leftIcon={Trash2}
+              className="border-slate-200 text-slate-600 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50"
+            >
+              Pangkas Log
+            </Button>
+          )}
+
           <Button
             type="button"
             variant="outline"

@@ -9,6 +9,7 @@ describe("ValidationLogController (Triple A Pattern)", () => {
   let mockGetStats: ReturnType<typeof vi.fn>;
   let mockGetDetail: ReturnType<typeof vi.fn>;
   let mockExportLogs: ReturnType<typeof vi.fn>;
+  let mockPruneLogs: ReturnType<typeof vi.fn>;
   let controller: ValidationLogController;
 
   beforeEach(() => {
@@ -16,12 +17,14 @@ describe("ValidationLogController (Triple A Pattern)", () => {
     mockGetStats = vi.fn();
     mockGetDetail = vi.fn();
     mockExportLogs = vi.fn();
+    mockPruneLogs = vi.fn();
 
     const mockServices = {
       listLogs: mockListLogs,
       getStats: mockGetStats,
       getDetail: mockGetDetail,
       exportLogs: mockExportLogs,
+      pruneLogs: mockPruneLogs,
     } as unknown as ValidationLogServices;
 
     controller = new ValidationLogController(mockServices);
@@ -138,6 +141,45 @@ describe("ValidationLogController (Triple A Pattern)", () => {
       expect(res.status).toBe(200);
       expect(res.headers.get("Content-Type")).toBe("text/csv; charset=utf-8");
       expect(res.headers.get("Content-Disposition")).toContain("test.csv");
+    });
+  });
+
+  describe("POST /api/v1/logs/validations/prune", () => {
+    it("should return HTTP 200 with deletedCount when pruning succeeds", async () => {
+      // Arrange
+      const req = new NextRequest("http://localhost:3000/api/v1/logs/validations/prune", {
+        method: "POST",
+        body: JSON.stringify({ days: 90 }),
+      });
+      mockPruneLogs.mockResolvedValue(
+        Result.ok({
+          deletedCount: 450,
+          cutoffDate: new Date("2026-07-30T00:00:00Z"),
+        }),
+      );
+
+      // Act
+      const res = await controller.prune(req);
+
+      // Assert
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.deletedCount).toBe(450);
+      expect(json.success).toBe(true);
+    });
+
+    it("should return HTTP 400 when days parameter is invalid", async () => {
+      // Arrange
+      const req = new NextRequest("http://localhost:3000/api/v1/logs/validations/prune", {
+        method: "POST",
+        body: JSON.stringify({ days: 2 }),
+      });
+
+      // Act
+      const res = await controller.prune(req);
+
+      // Assert
+      expect(res.status).toBe(400);
     });
   });
 });

@@ -175,4 +175,27 @@ export class ValidationLogValidator {
       data: { id: id.trim() },
     };
   }
+
+  public static validatePruneQuery(input: unknown): ValidationOutput<{ days: number }> {
+    let days = 90;
+    if (input && typeof input === "object") {
+      const obj = input as Record<string, unknown>;
+      if (obj.days !== undefined && obj.days !== null && obj.days !== "") {
+        const parsed = Number(obj.days);
+        if (Number.isNaN(parsed) || parsed < 7) {
+          return {
+            isValid: false,
+            errors: { days: "Batas retensi hari minimal adalah 7 hari" },
+          };
+        }
+        days = Math.floor(parsed);
+      }
+    }
+
+    return {
+      isValid: true,
+      errors: {},
+      data: { days },
+    };
+  }
 }

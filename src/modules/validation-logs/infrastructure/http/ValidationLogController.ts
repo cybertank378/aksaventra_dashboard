@@ -133,4 +133,49 @@ export class ValidationLogController extends BaseController {
       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
   }
+
+  /* ==========================================================
+   * PRUNE OLD LOGS (POST/DELETE /api/v1/logs/validations/prune)
+   * ======================================================== */
+  public async prune(req: NextRequest): Promise<NextResponse> {
+    try {
+      const url = new URL(req.url);
+      const queryParams: Record<string, string> = {};
+      url.searchParams.forEach((val, key) => {
+        queryParams[key] = val;
+      });
+
+      const body = await req.json().catch(() => ({}));
+      const combined = { ...queryParams, ...(body && typeof body === "object" ? body : {}) };
+
+      const validation = ValidationLogValidator.validatePruneQuery(combined);
+      if (!validation.isValid) {
+        return NextResponse.json(
+          { message: "Parameter retensi tidak valid", errors: validation.errors },
+          { status: 400 },
+        );
+      }
+
+      const days = validation.data?.days ?? 90;
+      const result = await this.services.pruneLogs(days);
+
+      if (result.isSuccess) {
+        const val = result.getValue();
+        return NextResponse.json(
+          {
+            success: true,
+            deletedCount: val.deletedCount,
+            cutoffDate: val.cutoffDate.toISOString(),
+            message: `Berhasil memangkas ${val.deletedCount} log validasi yang lebih lama dari ${days} hari`,
+          },
+          { status: 200 },
+        );
+      }
+
+      return NextResponse.json({ message: result.getError() }, { status: 400 });
+    } catch (error) {
+      console.error("[ValidationLogController.prune] error:", error);
+      return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    }
+  }
 }

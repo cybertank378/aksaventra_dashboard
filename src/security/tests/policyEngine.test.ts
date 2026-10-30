@@ -188,6 +188,35 @@ describe("policyEngine (Triple A Pattern)", () => {
     ).toBe(true);
   });
 
+  it("should allow only ADMIN to access /api/v1/logs/validations/prune", () => {
+    // Arrange
+    const adminAuth: AuthContext = {
+      userId: "usr-admin-1",
+      role: "ADMIN",
+    };
+    const auditorAuth: AuthContext = {
+      userId: "usr-auditor-1",
+      role: "AUDITOR",
+    };
+
+    // Act & Assert
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/logs/validations/prune",
+        method: "POST",
+        auth: adminAuth,
+      }),
+    ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/logs/validations/prune",
+        method: "POST",
+        auth: auditorAuth,
+      }),
+    ).toBe(false);
+  });
+
   it("should deny policy evaluation when auth context is empty or missing userId", () => {
     // Arrange
     const auth = {

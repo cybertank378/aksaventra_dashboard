@@ -13,6 +13,7 @@ describe("GetValidationLogDetailUseCase (Triple A Pattern)", () => {
       getStats24h: vi.fn(),
       findById: vi.fn(),
       exportLogs: vi.fn(),
+      pruneLogsOlderThan: vi.fn(),
     };
     useCase = new GetValidationLogDetailUseCase(mockRepo);
   });

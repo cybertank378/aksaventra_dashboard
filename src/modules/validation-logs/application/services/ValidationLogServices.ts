@@ -9,7 +9,10 @@ import type {
   ValidationLogListResponseDTO,
   ValidationLogStatsDTO,
 } from "../../domain/dto/ValidationLogResponseDTO";
-import type { ValidationLogRepositoryInterface } from "../../domain/interfaces/ValidationLogInterfaces";
+import type {
+  PruneValidationLogsResult,
+  ValidationLogRepositoryInterface,
+} from "../../domain/interfaces/ValidationLogInterfaces";
 import {
   type ExportValidationLogsResult,
   ExportValidationLogsUseCase,
@@ -17,12 +20,14 @@ import {
 import { GetValidationLogDetailUseCase } from "../usecase/GetValidationLogDetailUseCase";
 import { GetValidationLogStatsUseCase } from "../usecase/GetValidationLogStatsUseCase";
 import { ListValidationLogsUseCase } from "../usecase/ListValidationLogsUseCase";
+import { PruneValidationLogsUseCase } from "../usecase/PruneValidationLogsUseCase";
 
 export class ValidationLogServices extends BaseService {
   private readonly listUseCase: ListValidationLogsUseCase;
   private readonly getStatsUseCase: GetValidationLogStatsUseCase;
   private readonly getDetailUseCase: GetValidationLogDetailUseCase;
   private readonly exportUseCase: ExportValidationLogsUseCase;
+  private readonly pruneUseCase: PruneValidationLogsUseCase;
 
   constructor(repo: ValidationLogRepositoryInterface) {
     super("ValidationLogServices");
@@ -30,6 +35,7 @@ export class ValidationLogServices extends BaseService {
     this.getStatsUseCase = new GetValidationLogStatsUseCase(repo);
     this.getDetailUseCase = new GetValidationLogDetailUseCase(repo);
     this.exportUseCase = new ExportValidationLogsUseCase(repo);
+    this.pruneUseCase = new PruneValidationLogsUseCase(repo);
   }
 
   public async listLogs(
@@ -50,5 +56,9 @@ export class ValidationLogServices extends BaseService {
     params: ExportValidationLogsQueryDTO,
   ): Promise<Result<ExportValidationLogsResult, string>> {
     return this.execute(() => this.exportUseCase.execute(params));
+  }
+
+  public async pruneLogs(days = 90): Promise<Result<PruneValidationLogsResult, string>> {
+    return this.execute(() => this.pruneUseCase.execute({ days }));
   }
 }

@@ -7,15 +7,21 @@ import type {
 import type { ValidationLogStatsDTO } from "../../domain/dto/ValidationLogResponseDTO";
 import { ValidationLogReadEntity } from "../../domain/entity/ValidationLogReadEntity";
 import type {
+  PruneValidationLogsResult,
   ValidationLogRepositoryInterface,
   ValidationLogWithLicenseDetail,
 } from "../../domain/interfaces/ValidationLogInterfaces";
 
 export class ValidationLogQueryRepository implements ValidationLogRepositoryInterface {
+  private static lastAutoPruneTimestamp = 0;
+
   public async findManyWithFilter(params: ListValidationLogsQueryDTO): Promise<{
     data: ValidationLogReadEntity[];
     total: number;
   }> {
+    // Jalankan pembersihan otonom secara berkala di latar belakang
+    this.triggerAutonomousPruneIfDue();
+
     const where = ValidationLogQueryBuilder.buildWhereClause(params);
     const page = Math.max(1, params.page ?? 1);
     const limit = Math.max(1, params.limit ?? 15);
@@ -203,5 +209,48 @@ export class ValidationLogQueryRepository implements ValidationLogRepositoryInte
         checkedAt: record.checkedAt,
       }),
     );
+  }
+
+  public async pruneLogsOlderThan(days: number): Promise<PruneValidationLogsResult> {
+    const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const deleteResult = await prisma.licenseValidationLog.deleteMany({
+      where: {
+        checkedAt: {
+          lt: cutoffDate,
+        },
+      },
+    });
+
+    return {
+      deletedCount: deleteResult.count,
+      cutoffDate,
+    };
+  }
+
+  /**
+   * Pembersihan otonom di latar belakang (Background opportunistic pruning)
+   * Mengeksekusi pembersihan log > 90 hari (3 bulan) maksimal 1x setiap 24 jam tanpa memblokir request.
+   */
+  public triggerAutonomousPruneIfDue(): void {
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+    const now = Date.now();
+
+    if (now - ValidationLogQueryRepository.lastAutoPruneTimestamp >= ONE_DAY_MS) {
+      ValidationLogQueryRepository.lastAutoPruneTimestamp = now;
+
+      // Jalankan secara asynchronous tanpa memblokir pemanggil
+      this.pruneLogsOlderThan(90)
+        .then((res) => {
+          if (res.deletedCount > 0) {
+            console.log(
+              `[AutonomousPruner] Berhasil membersihkan ${res.deletedCount} log validasi lama (>90 hari)`,
+            );
+          }
+        })
+        .catch((err) => {
+          console.error("[AutonomousPruner] Gagal membersihkan log validasi lama:", err);
+        });
+    }
   }
 }
