@@ -1,6 +1,9 @@
 import { prisma } from "@/core/libs/prisma";
 import type { LicenseValidationLogEntity } from "@/modules/licenses/domain/entity/LicenseValidationLogEntity";
-import type { LicenseValidationLogRepositoryInterface } from "@/modules/licenses/domain/interfaces/LicenseInterfaces";
+import type {
+  LicenseValidationLogRepositoryInterface,
+  RawLicenseValidationLogRecord,
+} from "@/modules/licenses/domain/interfaces/LicenseInterfaces";
 
 /**
  * Prisma ORM implementation of LicenseValidationLogRepositoryInterface (FR-06).
@@ -22,5 +25,27 @@ export class LicenseValidationLogRepository implements LicenseValidationLogRepos
         checkedAt: log.checkedAt,
       },
     });
+  }
+
+  public async findRecentByLicenseId(
+    licenseId: string,
+    limit = 10,
+  ): Promise<RawLicenseValidationLogRecord[]> {
+    const raw = await prisma.licenseValidationLog.findMany({
+      where: { licenseId },
+      orderBy: { checkedAt: "desc" },
+      take: limit,
+    });
+
+    return raw.map((l) => ({
+      id: l.id,
+      result: l.result,
+      statusCode: l.statusCode,
+      hwidHash: l.hwidHash,
+      clientIp: l.clientIp,
+      engineVersion: l.engineVersion,
+      latencyMs: l.latencyMs,
+      checkedAt: l.checkedAt,
+    }));
   }
 }

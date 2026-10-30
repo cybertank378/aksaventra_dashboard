@@ -1,145 +1,198 @@
 "use client";
 
-import { Cpu, Filter, KeyRound, PlusCircle, ShieldAlert, ShieldCheck } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+  Cpu,
+  Filter,
+  KeyRound,
+  PlusCircle,
+  RefreshCw,
+  ShieldAlert,
+  ShieldCheck,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import type {
+  LicenseAdminItemDTO,
+  LicenseDetailResponseDTO,
+} from "@/modules/licenses/domain/dto/LicenseResponseDTO";
 import { useLicenseApi } from "@/modules/licenses/presentation/hooks/useLicenseApi";
 import LicenseMetricCard from "@/sections/license-management/atomic/LicenseMetricCard";
-import type { LicenseDisplayStatus } from "@/sections/license-management/atomic/LicenseStatusBadge";
 import DeviceResetModal from "@/sections/license-management/molecules/DeviceResetModal";
-import LicenseFilterModal from "@/sections/license-management/molecules/LicenseFilterModal";
-import LicenseTableView, {
-  type LicenseItemViewModel,
-  type LicenseTier,
-} from "@/sections/license-management/molecules/LicenseTableView";
+import LicenseDetailModal from "@/sections/license-management/molecules/LicenseDetailModal";
+import LicenseTableView from "@/sections/license-management/molecules/LicenseTableView";
 import Button from "@/shared-ui/component/Button";
 import Card from "@/shared-ui/component/Card";
-import FilterBar from "@/shared-ui/component/FilterBar";
 import LinkButton from "@/shared-ui/component/LinkButton";
 import SearchField from "@/shared-ui/component/SearchField";
 
-const INITIAL_LICENSES: LicenseItemViewModel[] = [
-  {
-    id: "lic-001",
-    serialKey: "AKSA-ENTERPRISE-2026-9F2A",
-    clientName: "Universitas Aksaventra Pusat",
-    tier: "ENTERPRISE",
-    hwid: "HWID-WIN11-AX98-7712",
-    engineVersion: "v1.4.2",
-    status: "ACTIVE",
-    expiresAt: "2027-10-28",
-    lastVerifiedAt: "Hari ini, 16:40 WIB",
-  },
-  {
-    id: "lic-002",
-    serialKey: "AKSA-PRO-2026-4C8B",
-    clientName: "Politeknik Negeri Nusantara",
-    tier: "PRO",
-    hwid: "HWID-SRV22-KL10-3321",
-    engineVersion: "v1.4.2",
-    status: "ACTIVE",
-    expiresAt: "2027-08-15",
-    lastVerifiedAt: "Hari ini, 14:12 WIB",
-  },
-  {
-    id: "lic-003",
-    serialKey: "AKSA-TRIAL-2026-1D5E",
-    clientName: "Laboratorium Riset Mandiri",
-    tier: "TRIAL",
-    hwid: null,
-    engineVersion: "v1.4.0",
-    status: "ACTIVE",
-    expiresAt: "2026-11-28",
-    lastVerifiedAt: "Belum diaktivasi",
-  },
-  {
-    id: "lic-004",
-    serialKey: "AKSA-PRO-2025-8A1C",
-    clientName: "Institut Teknologi Mitra",
-    tier: "PRO",
-    hwid: "HWID-LEGACY-9920-0011",
-    engineVersion: "v1.3.8",
-    status: "REVOKED",
-    expiresAt: "2026-05-01",
-    lastVerifiedAt: "Dicabut oleh Admin",
-  },
-];
+type StatusTab = "ALL" | "ACTIVE" | "EXPIRING_SOON" | "INACTIVE";
 
 export default function LicenseDirectoryOrganism() {
-  const { loading } = useLicenseApi();
+  const {
+    loading,
+    licensesData,
+    statsData,
+    fetchLicenses,
+    fetchStats,
+    fetchLicenseDetail,
+    resetDeviceHwid,
+    updateLicenseStatus,
+  } = useLicenseApi();
 
-  const [licenses, setLicenses] = useState<LicenseItemViewModel[]>(INITIAL_LICENSES);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<LicenseDisplayStatus | "ALL">("ALL");
-  const [tierFilter, setTierFilter] = useState<LicenseTier | "ALL">("ALL");
+  const [activeTab, setActiveTab] = useState<StatusTab>("ALL");
   const [hwidBoundOnly, setHwidBoundOnly] = useState(false);
-  const [filterModalOpen, setFilterModalOpen] = useState(false);
-  const [selectedForReset, setSelectedForReset] = useState<LicenseItemViewModel | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const filteredLicenses = useMemo(() => {
-    return licenses.filter((item) => {
-      const matchesQuery =
-        !searchQuery.trim() ||
-        item.serialKey.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (item.hwid?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
+  const [selectedForReset, setSelectedForReset] = useState<LicenseAdminItemDTO | null>(null);
+  const [selectedDetail, setSelectedDetail] = useState<LicenseDetailResponseDTO | null>(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
 
-      const matchesStatus = statusFilter === "ALL" || item.status === statusFilter;
-      const matchesTier = tierFilter === "ALL" || item.tier === tierFilter;
-      const matchesHwid = !hwidBoundOnly || Boolean(item.hwid);
+  // Load stats & licenses on mount and when filters change
+  const loadData = useCallback(() => {
+    fetchStats();
 
-      return matchesQuery && matchesStatus && matchesTier && matchesHwid;
+    let statusParam: "ALL" | "ACTIVE" | "EXPIRED" | "SUSPENDED" | undefined;
+    let expiringSoonParam: boolean | undefined;
+
+    if (activeTab === "ACTIVE") {
+      statusParam = "ACTIVE";
+    } else if (activeTab === "EXPIRING_SOON") {
+      expiringSoonParam = true;
+    } else if (activeTab === "INACTIVE") {
+      statusParam = "SUSPENDED";
+    }
+
+    fetchLicenses({
+      page: currentPage,
+      limit: 10,
+      search: searchQuery.trim() || undefined,
+      status: statusParam,
+      binding: hwidBoundOnly ? "BOUND" : "ALL",
+      expiringSoon: expiringSoonParam,
     });
-  }, [licenses, searchQuery, statusFilter, tierFilter, hwidBoundOnly]);
+  }, [fetchLicenses, fetchStats, currentPage, searchQuery, activeTab, hwidBoundOnly]);
 
-  const handleConfirmResetHwid = (target: LicenseItemViewModel) => {
-    setLicenses((prev) =>
-      prev.map((item) =>
-        item.id === target.id
-          ? {
-              ...item,
-              hwid: null,
-              lastVerifiedAt: "HWID direset oleh Admin",
-            }
-          : item,
-      ),
-    );
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Named event handlers
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    setCurrentPage(1);
+  };
+
+  const handleTabChange = (tab: StatusTab) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleRefreshData = () => {
+    loadData();
+  };
+
+  const handleOpenResetModal = (target: LicenseAdminItemDTO) => {
+    setSelectedForReset(target);
+  };
+
+  const handleCloseResetModal = () => {
     setSelectedForReset(null);
   };
 
-  const handleRevokeLicense = (target: LicenseItemViewModel) => {
-    setLicenses((prev) =>
-      prev.map((item) =>
-        item.id === target.id
-          ? {
-              ...item,
-              status: "REVOKED",
-              lastVerifiedAt: "Dicabut oleh Admin",
-            }
-          : item,
-      ),
-    );
+  const handleConfirmResetHwid = async (target: LicenseAdminItemDTO, reason?: string) => {
+    await resetDeviceHwid(target.id, reason);
+    setSelectedForReset(null);
+    loadData();
   };
 
-  const activeCount = licenses.filter((l) => l.status === "ACTIVE").length;
-  const boundCount = licenses.filter((l) => Boolean(l.hwid)).length;
-  const revokedCount = licenses.filter((l) => l.status === "REVOKED").length;
+  const handleInspectLicense = async (target: LicenseAdminItemDTO) => {
+    setDetailLoading(true);
+    setDetailModalOpen(true);
+    try {
+      const detail = await fetchLicenseDetail(target.id);
+      setSelectedDetail(detail);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const handleCloseDetailModal = () => {
+    setDetailModalOpen(false);
+    setSelectedDetail(null);
+  };
+
+  const handleRevokeLicense = async (target: LicenseAdminItemDTO) => {
+    if (confirm(`Apakah Anda yakin ingin membekukan lisensi untuk ${target.clientName}?`)) {
+      await updateLicenseStatus(target.id, {
+        status: "SUSPENDED",
+        reason: "Dibekukan manual oleh Admin via direktori",
+      });
+      loadData();
+    }
+  };
+
+  const licenses = licensesData?.licenses ?? [];
+  const pagination = licensesData?.pagination ?? {
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+  };
 
   return (
     <div className="space-y-6">
-      {/* METRIC CARDS */}
+      {/* HEADER & QUICK ACTIONS */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Direktori & Manajemen Lisensi
+          </h1>
+          <p className="text-sm text-slate-500">
+            Pemantauan kuota perangkat, masa berlaku paket, dan penerbitan serial key
+            aksaventra_engine.exe
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          <Button
+            variant="outline"
+            color="secondary"
+            leftIcon={RefreshCw}
+            onClick={handleRefreshData}
+            disabled={loading}
+          >
+            Segarkan
+          </Button>
+
+          <LinkButton
+            href="/dashboard/licenses/create"
+            variant="filled"
+            color="primary"
+            leftIcon={PlusCircle}
+          >
+            Terbitkan Lisensi Baru
+          </LinkButton>
+        </div>
+      </div>
+
+      {/* 4 METRIC CARDS */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <LicenseMetricCard
           title="Total Lisensi"
-          value={licenses.length}
-          subtitle="Terdaftar di database"
-          badgeText="Semua Tier"
+          value={statsData?.totalLicenses ?? 0}
+          subtitle="Terdaftar di database PostgreSQL"
+          badgeText="Semua Lisensi"
           badgeColor="primary"
           icon={KeyRound}
         />
         <LicenseMetricCard
           title="Lisensi Aktif"
-          value={activeCount}
+          value={statsData?.activeLicenses ?? 0}
           subtitle="Siap melayani aksaventra_engine"
           badgeText="Valid"
           badgeColor="success"
@@ -147,117 +200,129 @@ export default function LicenseDirectoryOrganism() {
         />
         <LicenseMetricCard
           title="Perangkat Terikat"
-          value={boundCount}
-          subtitle="Terkunci dengan HWID mesin"
-          badgeText="HWID Locked"
+          value={statsData?.boundDevicesCount ?? 0}
+          subtitle="Terkunci ke Hardware ID (HWID)"
+          badgeText="HWID Bound"
           badgeColor="info"
           icon={Cpu}
         />
         <LicenseMetricCard
-          title="Dicabut / Blacklist"
-          value={revokedCount}
-          subtitle="Akses engine diblokir"
-          badgeText="Revoked"
+          title="Kedaluwarsa / Dibekukan"
+          value={statsData?.expiredOrSuspendedLicenses ?? 0}
+          subtitle="Perlu perpanjangan atau aktivasi"
+          badgeText="Nonaktif"
           badgeColor="error"
           icon={ShieldAlert}
         />
       </div>
 
-      {/* FILTER & DIRECTORY TABLE */}
-      <Card className="space-y-5">
+      {/* MAIN TABLE CONTAINER */}
+      <Card className="space-y-5 border-slate-200/90 bg-white p-6 shadow-sm">
+        {/* TOOLBAR & STATUS TABS */}
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900">Direktori Semua Lisensi</h2>
-            <p className="text-sm text-slate-500">
-              Kelola status serial key, ikatan perangkat keras (HWID), dan masa berlaku lisensi
-            </p>
+          <div className="flex flex-wrap items-center gap-1.5 rounded-xl bg-slate-100 p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => handleTabChange("ALL")}
+              className={`rounded-lg px-3 py-1.5 font-medium transition-colors ${
+                activeTab === "ALL"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Semua Lisensi
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTabChange("ACTIVE")}
+              className={`rounded-lg px-3 py-1.5 font-medium transition-colors ${
+                activeTab === "ACTIVE"
+                  ? "bg-white text-emerald-700 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Aktif
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTabChange("EXPIRING_SOON")}
+              className={`rounded-lg px-3 py-1.5 font-medium transition-colors ${
+                activeTab === "EXPIRING_SOON"
+                  ? "bg-white text-amber-700 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Segera Habis (&le;30H)
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTabChange("INACTIVE")}
+              className={`rounded-lg px-3 py-1.5 font-medium transition-colors ${
+                activeTab === "INACTIVE"
+                  ? "bg-white text-rose-700 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Kedaluwarsa / Dibekukan
+            </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <LinkButton
-              href="/dashboard/licenses/revocations"
-              variant="outline"
-              color="error"
-              leftIcon={ShieldAlert}
-            >
-              Blacklist & Revokasi
-            </LinkButton>
+          <div className="flex items-center gap-2">
+            <SearchField
+              placeholder="Cari nama klien, serial key, atau HWID..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="w-72"
+            />
 
             <Button
-              variant="outline"
-              color="secondary"
+              variant={hwidBoundOnly ? "filled" : "outline"}
+              color={hwidBoundOnly ? "primary" : "secondary"}
               leftIcon={Filter}
-              onClick={() => setFilterModalOpen(true)}
+              onClick={() => setHwidBoundOnly((prev) => !prev)}
+              title="Filter hanya perangkat terikat HWID"
             >
-              Filter Lanjutan
+              {hwidBoundOnly ? "Terikat HWID" : "Semua Binding"}
             </Button>
-
-            <LinkButton
-              href="/dashboard/licenses/create"
-              variant="filled"
-              color="primary"
-              leftIcon={PlusCircle}
-            >
-              Terbitkan Lisensi
-            </LinkButton>
           </div>
         </div>
 
-        <FilterBar resultCount={filteredLicenses.length}>
-          <SearchField
-            value={searchQuery}
-            onChange={(value) => {
-              setSearchQuery(value);
-              setCurrentPage(1);
-            }}
-            placeholder="Cari Serial Key, Nama Instansi, atau HWID..."
-            className="w-full md:w-96"
-          />
-        </FilterBar>
-
+        {/* TABLE VIEW */}
         <LicenseTableView
-          items={filteredLicenses}
-          currentPage={currentPage}
-          itemsPerPage={5}
-          onPageChange={setCurrentPage}
-          onRequestResetHwid={(item) => setSelectedForReset(item)}
-          onRequestRevoke={loading ? undefined : handleRevokeLicense}
+          items={licenses}
+          currentPage={pagination.page}
+          totalItems={pagination.total}
+          itemsPerPage={pagination.limit}
+          loading={loading}
+          onPageChange={handlePageChange}
+          onRequestResetHwid={handleOpenResetModal}
+          onRequestRevoke={handleRevokeLicense}
+          onInspectLicense={handleInspectLicense}
         />
       </Card>
 
-      {/* FILTER MODAL */}
-      <LicenseFilterModal
-        open={filterModalOpen}
-        statusFilter={statusFilter}
-        tierFilter={tierFilter}
-        hwidBoundOnly={hwidBoundOnly}
-        onChangeStatus={(status) => {
-          setStatusFilter(status);
-          setCurrentPage(1);
-        }}
-        onChangeTier={(tier) => {
-          setTierFilter(tier);
-          setCurrentPage(1);
-        }}
-        onChangeHwidBound={(bound) => {
-          setHwidBoundOnly(bound);
-          setCurrentPage(1);
-        }}
-        onReset={() => {
-          setStatusFilter("ALL");
-          setTierFilter("ALL");
-          setHwidBoundOnly(false);
-          setCurrentPage(1);
-        }}
-        onClose={() => setFilterModalOpen(false)}
-      />
-
-      {/* DEVICE RESET MODAL */}
+      {/* RESET HWID MODAL */}
       <DeviceResetModal
         open={Boolean(selectedForReset)}
         license={selectedForReset}
-        onClose={() => setSelectedForReset(null)}
+        loading={loading}
+        onClose={handleCloseResetModal}
         onConfirmReset={handleConfirmResetHwid}
+      />
+
+      {/* DETAIL INSPECTION MODAL */}
+      <LicenseDetailModal
+        open={detailModalOpen}
+        license={selectedDetail}
+        loading={detailLoading}
+        onClose={handleCloseDetailModal}
+        onRequestResetHwid={(id) => {
+          const target = licenses.find((l) => l.id === id);
+          if (target) {
+            setDetailModalOpen(false);
+            setSelectedForReset(target);
+          }
+        }}
       />
     </div>
   );

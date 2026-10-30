@@ -186,6 +186,78 @@ describe("policyEngine (Triple A Pattern)", () => {
         auth: auditorAuth,
       }),
     ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses",
+        method: "GET",
+        auth: auditorAuth,
+      }),
+    ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses",
+        method: "POST",
+        auth: auditorAuth,
+      }),
+    ).toBe(false);
+  });
+
+  it("should evaluate license API permissions according to RBAC matrix", () => {
+    // Arrange
+    const operatorAuth: AuthContext = {
+      userId: "usr-operator-1",
+      role: "OPERATOR",
+    };
+    const adminAuth: AuthContext = {
+      userId: "usr-admin-1",
+      role: "ADMIN",
+    };
+
+    // Act & Assert
+    // Operator can view, create, and reset-hwid
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses",
+        method: "GET",
+        auth: operatorAuth,
+      }),
+    ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses",
+        method: "POST",
+        auth: operatorAuth,
+      }),
+    ).toBe(true);
+
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses/lic-123/reset-hwid",
+        method: "PATCH",
+        auth: operatorAuth,
+      }),
+    ).toBe(true);
+
+    // Operator cannot revoke/suspend license status
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses/lic-123/status",
+        method: "PATCH",
+        auth: operatorAuth,
+      }),
+    ).toBe(false);
+
+    // Admin can revoke/suspend license status
+    expect(
+      evaluatePolicy({
+        path: "/api/v1/licenses/lic-123/status",
+        method: "PATCH",
+        auth: adminAuth,
+      }),
+    ).toBe(true);
   });
 
   it("should allow only ADMIN to access /api/v1/logs/validations/prune", () => {

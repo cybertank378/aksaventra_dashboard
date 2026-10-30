@@ -19,8 +19,29 @@ export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationP
 
   const normalizedMethod = method.toUpperCase();
 
-  // API pembuatan dan pengelolaan lisensi engine HANYA boleh dilakukan oleh ADMIN
+  // API pembuatan dan pengelolaan lisensi engine berdasarkan matriks RBAC
   if (path.startsWith("/api/v1/licenses")) {
+    if (normalizedMethod === "GET") {
+      return canAccess(auth.role, "LICENSES_VIEW");
+    }
+
+    // Legacy direct route guard /api/v1/licenses/create HANYA untuk ADMIN
+    if (path.startsWith("/api/v1/licenses/create")) {
+      return auth.role === "ADMIN";
+    }
+
+    if (path.includes("/reset-hwid")) {
+      return canAccess(auth.role, "LICENSES_MANAGE");
+    }
+
+    if (path.includes("/status")) {
+      return canAccess(auth.role, "LICENSES_REVOKE");
+    }
+
+    if (path === "/api/v1/licenses" && normalizedMethod === "POST") {
+      return canAccess(auth.role, "LICENSES_CREATE");
+    }
+
     return auth.role === "ADMIN";
   }
 
