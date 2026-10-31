@@ -50,6 +50,12 @@
     "vite": "^8.3.5",
     "vitest": "^5.0.5"
   },
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "overrides": {
+    "sharp": "^0.35.5"
+  },
   "allowScripts": {
     "@prisma/engines@7.10.1": true,
     "prisma@7.10.1": true,
