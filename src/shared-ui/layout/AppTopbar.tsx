@@ -1,13 +1,13 @@
 "use client";
 
 import { Bell, LogOut, Menu, Search } from "lucide-react";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { UserRole } from "@/libs/enums";
 import { useAuthApi } from "@/modules/auth/presentation/hooks/useAuthApi";
 import { type AvatarMenuItem, getAvatarMenuByRole } from "@/security/AvatarMenu";
 import { roleConfig } from "@/security/rbacConfig";
+import Avatar from "@/shared-ui/component/Avatar";
 import Button from "@/shared-ui/component/Button";
 import { DropdownItem } from "@/shared-ui/component/DropdownItem";
 
@@ -180,28 +180,21 @@ export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Pro
             <button
               type="button"
               onClick={handleToggleDropdown}
-              className="flex h-9 w-9 items-center justify-center rounded-full overflow-hidden border border-slate-200 shadow-sm transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex items-center justify-center rounded-full border border-slate-200 shadow-xs transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Menu Profil Pengguna"
             >
-              <Image
-                src="/assets/images/avatar.png"
-                alt="User Avatar"
-                width={36}
-                height={36}
-                className="h-full w-full rounded-full object-cover"
-              />
+              <Avatar name={username || "Admin"} size="sm" className="bg-blue-600 text-white" />
             </button>
 
             {isOpen && (
               <div className="absolute right-0 mt-3 w-64 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xl">
                 {/* ===== USER HEADER ===== */}
                 <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3.5">
-                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-slate-200">
-                    <Image
-                      src="/assets/images/no_avatar.png"
-                      alt="User"
-                      fill
-                      className="object-cover"
+                  <div className="relative shrink-0">
+                    <Avatar
+                      name={username || "Admin"}
+                      size="md"
+                      className="bg-blue-600 text-white"
                     />
                     <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-green-500" />
                   </div>
