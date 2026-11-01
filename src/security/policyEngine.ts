@@ -128,6 +128,20 @@ export function evaluatePolicy({ path, method = "GET", auth }: PolicyEvaluationP
     return false;
   }
 
+  // Rute Profil Pengguna & Manajemen Sesi Pribadi (Seluruh role terautentikasi)
+  if (
+    path.startsWith("/dashboard/profile") ||
+    path.startsWith("/api/v1/auth/profile") ||
+    path.startsWith("/api/v1/auth/sessions")
+  ) {
+    return canAccess(auth.role, "DASHBOARD_VIEW");
+  }
+
+  // Rute Audit & Security Trail (ADMIN, OPERATOR, AUDITOR via LOGS_VIEW)
+  if (path.startsWith("/dashboard/security") || path.startsWith("/api/v1/security")) {
+    return canAccess(auth.role, "LOGS_VIEW");
+  }
+
   // Rute Audit & Logs
   if (path.startsWith("/dashboard/logs/audit")) {
     return auth.role === "AUDITOR" && canAccess(auth.role, "LOGS_VIEW");
