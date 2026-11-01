@@ -62,9 +62,9 @@ export function DashboardKpiGrid({
         subtext="Perlu pembaruan atau dicabut"
       />
 
-      {/* 4. Utilisasi HWID */}
+      {/* 4. Utilisasi Perangkat */}
       <DashboardKpiCard
-        title="Utilisasi HWID"
+        title="Utilisasi Perangkat"
         value={`${kpis.hwidUtilization.rate.toFixed(1)}%`}
         icon={<Cpu className="h-5 w-5" />}
         iconBgClass="bg-emerald-50"

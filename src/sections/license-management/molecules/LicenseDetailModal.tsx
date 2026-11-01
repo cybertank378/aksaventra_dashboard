@@ -74,7 +74,7 @@ export default function LicenseDetailModal({
     <Modal
       open={open}
       title="Detail Lisensi & Jejak Validasi Mesin"
-      subtitle="Inspeksi metadata lisensi, status penguncian perangkat (HWID), dan 10 riwayat validasi mesin terakhir"
+      subtitle="Inspeksi metadata lisensi, riwayat perangkat aktif portabel, dan 10 riwayat validasi mesin terakhir"
       onClose={onClose}
       size="xl"
       cancelText="Tutup"
@@ -162,7 +162,9 @@ export default function LicenseDetailModal({
               <div className="rounded-lg border border-slate-200 bg-white p-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] text-slate-400">HARDWARE ID AKTIF TERAKHIR</span>
+                    <span className="text-[11px] text-slate-400">
+                      IDENTITAS PERANGKAT AKTIF TERAKHIR
+                    </span>
                     <p className="font-mono text-xs font-bold text-slate-800">
                       {license.hwid ?? "Menunggu aktivasi pertama dari mesin klien"}
                     </p>
@@ -210,7 +212,7 @@ export default function LicenseDetailModal({
                     leftIcon={RotateCcw}
                     onClick={handleTriggerResetHwid}
                   >
-                    Reset Riwayat Perangkat (Clear HWID)
+                    Reset Riwayat Perangkat
                   </Button>
                 </div>
               )}

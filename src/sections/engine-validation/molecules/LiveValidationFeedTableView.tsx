@@ -119,7 +119,7 @@ export default function LiveValidationFeedTableView({
               <TableHeaderCell>Waktu (Live)</TableHeaderCell>
               <TableHeaderCell>Klien & Key Hint</TableHeaderCell>
               <TableHeaderCell>Status Validasi</TableHeaderCell>
-              <TableHeaderCell>Hardware Hash (HWID)</TableHeaderCell>
+              <TableHeaderCell>Hash Perangkat</TableHeaderCell>
               <TableHeaderCell>Versi Engine</TableHeaderCell>
               <TableHeaderCell>Client IP & Latensi</TableHeaderCell>
               <TableHeaderCell className="text-right">Aksi</TableHeaderCell>
@@ -192,7 +192,7 @@ export default function LiveValidationFeedTableView({
                             iconOnly
                             leftIcon={Copy}
                             onClick={() => handleCopyText(log.hwidHash || "", "HWID Hash")}
-                            title="Salin Hash HWID Penuh"
+                            title="Salin Hash Perangkat"
                           />
                         </div>
                       ) : (
@@ -309,7 +309,7 @@ export default function LiveValidationFeedTableView({
             </div>
 
             <div className="space-y-1">
-              <p className="text-xs font-semibold text-slate-700">Hash HWID Penuh (SHA-256):</p>
+              <p className="text-xs font-semibold text-slate-700">Hash Perangkat (SHA-256):</p>
               <p className="rounded-lg border border-slate-200 bg-slate-50 p-2 font-mono text-[11px] text-slate-700 break-all select-all">
                 {selectedLog.hwidHash ?? "Tidak tercatat"}
               </p>

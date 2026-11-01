@@ -57,7 +57,7 @@ export const ValidationLogsTableView: React.FC<Props> = ({ logs, loading, onInsp
           <TableHeaderCell>Waktu (WIB)</TableHeaderCell>
           <TableHeaderCell>Klien & Key Hint</TableHeaderCell>
           <TableHeaderCell>Hasil & HTTP</TableHeaderCell>
-          <TableHeaderCell>Hash HWID</TableHeaderCell>
+          <TableHeaderCell>Hash Perangkat</TableHeaderCell>
           <TableHeaderCell>Versi Engine</TableHeaderCell>
           <TableHeaderCell>Alamat IP</TableHeaderCell>
           <TableHeaderCell>Latensi</TableHeaderCell>

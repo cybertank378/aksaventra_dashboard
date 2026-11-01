@@ -71,7 +71,7 @@ export const SecurityAuditKpiGrid: FC<SecurityAuditKpiGridProps> = ({ summary })
             {summary.criticalMutationsCount}{" "}
             <span className="text-xs font-semibold text-slate-500">Kejadian</span>
           </p>
-          <p className="text-[10px] text-slate-400 mt-0.5">Reset HWID & Suspend Lisensi</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">Reset Perangkat & Suspend Lisensi</p>
         </div>
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600 border border-rose-100">
           <AlertOctagon size={20} />
