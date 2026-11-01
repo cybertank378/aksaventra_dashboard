@@ -99,13 +99,13 @@ export const UserProfileOrganism: FC = () => {
           isLoading={isUpdatingProfile}
         />
 
+        <ProfilePasswordCard userId={profile.id} />
+
         <ProfileActiveSessionsCard
           sessions={profile.sessions}
           onRevokeSession={handleRevokeSession}
           revokingSessionId={revokingSessionId}
         />
-
-        <ProfilePasswordCard userId={profile.id} />
       </div>
     </div>
   );

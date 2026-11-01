@@ -16,10 +16,10 @@ export const ProfilePasswordCard: FC<ProfilePasswordCardProps> = ({ userId }) =>
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-            3. Keamanan Kata Sandi (Argon2id)
+            2. Keamanan Kata Sandi
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">
-            Perbarui kata sandi akun Anda menggunakan algoritma hashing Argon2id standar OWASP
+            Perbarui kata sandi akun Anda menggunakan algoritma standar OWASP
           </p>
         </div>
 

@@ -48,7 +48,7 @@ export const ProfileBasicInfoForm: FC<ProfileBasicInfoFormProps> = ({
   return (
     <Card className="p-6 border border-slate-200/90 shadow-xs bg-white rounded-2xl">
       <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 mb-1">
-        1. Informasi Profil Dasar (PATCH /api/v1/profile)
+        1. Informasi Profil Dasar
       </h3>
       <p className="text-xs text-slate-500 mb-5">
         Perbarui nama tampilan identitas Anda yang akan tercatat di log audit administratif
@@ -93,7 +93,7 @@ export const ProfileBasicInfoForm: FC<ProfileBasicInfoFormProps> = ({
             loading={isLoading}
             disabled={!hasChanged || isLoading}
           >
-            Simpan Profil (PATCH)
+            Simpan Profil
           </Button>
         </div>
       </form>
