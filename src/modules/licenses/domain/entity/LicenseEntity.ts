@@ -172,12 +172,16 @@ export class LicenseEntity extends BaseEntity<string> {
     this._updatedAt = now;
   }
 
-  public markVerified(engineVersion?: string): void {
-    this.props.lastVerifiedAt = new Date();
+  public markVerified(engineVersion?: string, hwid?: string): void {
+    const now = new Date();
+    this.props.lastVerifiedAt = now;
+    if (hwid) {
+      this.props.hwid = hwid.trim();
+    }
     if (engineVersion) {
       this.props.engineVersion = engineVersion;
     }
-    this._updatedAt = new Date();
+    this._updatedAt = now;
   }
 
   public toResponseContract(

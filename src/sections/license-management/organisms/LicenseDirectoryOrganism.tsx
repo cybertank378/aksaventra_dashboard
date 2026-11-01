@@ -199,10 +199,10 @@ export default function LicenseDirectoryOrganism() {
           icon={ShieldCheck}
         />
         <LicenseMetricCard
-          title="Perangkat Terikat"
+          title="Perangkat Terdata"
           value={statsData?.boundDevicesCount ?? 0}
-          subtitle="Terkunci ke Hardware ID (HWID)"
-          badgeText="HWID Bound"
+          subtitle="Identitas HWID aktif (Portable)"
+          badgeText="Portable"
           badgeColor="info"
           icon={Cpu}
         />

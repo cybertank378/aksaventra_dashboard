@@ -129,8 +129,9 @@ export default function BoundDevicesTableView({
                           color="warning"
                           leftIcon={RotateCcw}
                           onClick={() => onRequestResetHwid(item)}
+                          title="Reset riwayat HWID perangkat terakhir"
                         >
-                          Lepas HWID
+                          Reset HWID
                         </Button>
                       )}
                     </div>

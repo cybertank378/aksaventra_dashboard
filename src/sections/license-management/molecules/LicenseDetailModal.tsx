@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, KeyRound, Lock, RotateCcw } from "lucide-react";
+import { Check, Copy, KeyRound, Laptop, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import type { LicenseDetailResponseDTO } from "@/modules/licenses/domain/dto/LicenseResponseDTO";
 import LicenseStatusBadge from "@/sections/license-management/atomic/LicenseStatusBadge";
@@ -141,20 +141,20 @@ export default function LicenseDetailModal({
               </div>
             </Card>
 
-            {/* KARTU 2: HARDWARE LOCK BOX */}
+            {/* KARTU 2: IDENTITAS PERANGKAT PORTABLE */}
             <Card className="space-y-3 border-slate-200 bg-slate-50/70 p-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-500">
-                  STATUS PENGUNCIAN MESIN
+                  STATUS PERANGKAT (PORTABLE)
                 </span>
                 {license.isBound ? (
-                  <Badge color="success" variant="soft">
-                    <Lock size={12} className="mr-1 inline text-emerald-600" />
-                    Terikat HWID
+                  <Badge color="info" variant="soft">
+                    <Laptop size={12} className="mr-1 inline text-sky-600" />
+                    Multi-Device Portable
                   </Badge>
                 ) : (
                   <Badge color="secondary" variant="soft">
-                    Belum Terikat
+                    Belum Digunakan
                   </Badge>
                 )}
               </div>
@@ -162,7 +162,7 @@ export default function LicenseDetailModal({
               <div className="rounded-lg border border-slate-200 bg-white p-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] text-slate-400">HARDWARE ID (HWID)</span>
+                    <span className="text-[11px] text-slate-400">HARDWARE ID AKTIF TERAKHIR</span>
                     <p className="font-mono text-xs font-bold text-slate-800">
                       {license.hwid ?? "Menunggu aktivasi pertama dari mesin klien"}
                     </p>
@@ -210,7 +210,7 @@ export default function LicenseDetailModal({
                     leftIcon={RotateCcw}
                     onClick={handleTriggerResetHwid}
                   >
-                    Lepas Ikatan HWID (Reset Binding)
+                    Reset Riwayat Perangkat (Clear HWID)
                   </Button>
                 </div>
               )}
