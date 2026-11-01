@@ -72,6 +72,30 @@ function resolvePageHeader(pathname: string): PageHeaderMeta {
     };
   }
 
+  if (pathname === "/dashboard/profile") {
+    return {
+      title: "Profil Akun & Pengaturan Keamanan Pribadi",
+      subtitle:
+        "Kelola identitas akun personel, pembaruan kata sandi Argon2id, dan perangkat yang sedang login",
+    };
+  }
+
+  if (pathname === "/dashboard/security") {
+    return {
+      title: "Security Audit & Riwayat Tindakan Administrator",
+      subtitle:
+        "Pemantauan terpusat perubahan konfigurasi, pencabutan lisensi, reset HWID, dan deteksi percobaan login mencurigakan",
+    };
+  }
+
+  if (pathname === "/dashboard/settings") {
+    return {
+      title: "Pengaturan Sistem & Kebijakan Keamanan",
+      subtitle:
+        "Konfigurasi parameter operasional lisensi, validasi engine, autentikasi, dan retensi log",
+    };
+  }
+
   return {
     title: "Ringkasan Eksekutif & Aktivitas Lisensi",
     subtitle: "Pemantauan kuota perangkat, masa berlaku paket, dan validasi lisensi pelanggan",
