@@ -38,11 +38,11 @@ export default function DeviceResetModal({
   return (
     <Modal
       open={open}
-      title="Konfirmasi Lepas Ikatan Perangkat (HWID)"
-      subtitle="Melepaskan ikatan Hardware ID agar binary aksaventra_engine.exe dapat mengaktivasi mesin baru"
+      title="Konfirmasi Reset Riwayat Perangkat (HWID)"
+      subtitle="Membersihkan data identitas perangkat terakhir pada lisensi tanpa membatasi portabilitas engine"
       onClose={handleClose}
       onSubmit={handleConfirm}
-      submitText={loading ? "Memproses..." : "Lepas Ikatan HWID Sekarang"}
+      submitText={loading ? "Memproses..." : "Reset Riwayat Perangkat"}
       cancelText="Batal"
       submitColor="warning"
       submitLoading={loading}
@@ -52,9 +52,10 @@ export default function DeviceResetModal({
       {license && (
         <div className="space-y-4">
           <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-xs text-amber-900">
-            ⚠️ <strong>Perhatian:</strong> Tindakan ini akan mengosongkan nilai HWID pada database
-            dan mencatat riwayat ke <strong>AuditLog</strong>. Klien dapat mengikatkan mesin baru
-            pada request validasi berikutnya.
+            ⚠️ <strong>Perhatian:</strong> Tindakan ini akan mengosongkan riwayat perangkat terakhir
+            (lastHwid) pada database dan mencatat riwayat ke <strong>AuditLog</strong>. Klien engine
+            pada media eksternal (Flashdisk/SSD) tetap dapat terverifikasi secara portabel dan
+            memperbarui identitas perangkat pada request validasi berikutnya.
           </div>
 
           <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
@@ -71,19 +72,19 @@ export default function DeviceResetModal({
             </div>
 
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-medium text-slate-500">HWID Terikat Saat Ini</span>
+              <span className="text-xs font-medium text-slate-500">HWID Aktif Terakhir</span>
               <Badge color="warning" variant="soft" className="font-mono text-[11px]">
-                {license.hwid ?? "Tidak Terikat"}
+                {license.hwid ?? "Belum Digunakan"}
               </Badge>
             </div>
           </div>
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-slate-700">
-              Alasan Pelepasan HWID (Audit Trail)
+              Alasan Reset Perangkat (Audit Trail)
             </label>
             <TextField
-              placeholder="Contoh: Penggantian motherboard atau migrasi server..."
+              placeholder="Contoh: Pembersihan data audit atau pergantian unit flashdisk..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

@@ -53,7 +53,7 @@ describe("Profile Use Cases (Triple A Pattern)", () => {
         isActive: true,
         createdAt: now,
         lastLoginAt: now,
-      } as any);
+      } as unknown as never);
 
       vi.mocked(prisma.session.findMany).mockResolvedValue([
         {
@@ -65,7 +65,7 @@ describe("Profile Use Cases (Triple A Pattern)", () => {
           userAgent: "Windows 11 • Chrome 130",
           createdAt: now,
         },
-      ] as any);
+      ] as unknown as never);
 
       const useCase = new GetUserProfileUseCase();
 
@@ -108,13 +108,13 @@ describe("Profile Use Cases (Triple A Pattern)", () => {
         id: "usr-1",
         name: "Old Name",
         email: "admin@aksaventra.co.id",
-      } as any);
+      } as unknown as never);
 
       vi.mocked(prisma.user.update).mockResolvedValue({
         id: "usr-1",
         name: "Updated Name",
         email: "admin@aksaventra.co.id",
-      } as any);
+      } as unknown as never);
 
       const useCase = new UpdateProfileUseCase();
 
@@ -160,7 +160,7 @@ describe("Profile Use Cases (Triple A Pattern)", () => {
         token: "tok-2",
         ipAddress: "192.168.1.1",
         userAgent: "Safari",
-      } as any);
+      } as unknown as never);
 
       const useCase = new RevokeSessionUseCase();
 

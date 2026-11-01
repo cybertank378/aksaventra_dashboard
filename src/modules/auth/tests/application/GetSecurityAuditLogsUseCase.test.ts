@@ -41,7 +41,7 @@ describe("GetSecurityAuditLogsUseCase (Triple A Pattern)", () => {
           role: "ADMIN",
         },
       },
-    ] as any);
+    ] as unknown as never);
 
     const useCase = new GetSecurityAuditLogsUseCase();
 

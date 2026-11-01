@@ -116,11 +116,11 @@ export default function BoundDevicesOrganism() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Perangkat Terikat (HWID Locking)
+            Riwayat Perangkat & Portabilitas Klien
           </h1>
           <p className="text-sm text-slate-500">
-            Manajemen penguncian mesin klien aksaventra_engine.exe dan pelepasan ikatan hardware
-            saat terjadi migrasi perangkat keras
+            Pemantauan telemetri perangkat aktif mesin klien aksaventra_engine.exe dengan dukungan
+            penuh portabilitas media eksternal (Flashdisk / SSD)
           </p>
         </div>
 
@@ -144,18 +144,18 @@ export default function BoundDevicesOrganism() {
       {/* 4 KPI CARDS FOR DEVICES */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <LicenseMetricCard
-          title="Perangkat Terikat (HWID)"
+          title="Perangkat Aktif (Portable)"
           value={statsData?.boundDevicesCount ?? 0}
-          subtitle="Mesin aktif terkunci ke lisensi"
-          badgeText="Terkunci"
+          subtitle="Mesin terakhir yang terverifikasi"
+          badgeText="Terdata"
           badgeColor="info"
           icon={Cpu}
         />
         <LicenseMetricCard
-          title="Menunggu Aktivasi Pertama"
+          title="Menunggu Validasi Perdana"
           value={statsData?.unboundActiveCount ?? 0}
-          subtitle="Lisensi aktif belum mengikat mesin"
-          badgeText="Slot Tersedia"
+          subtitle="Lisensi aktif siap pakai di perangkat"
+          badgeText="Siap Pakai"
           badgeColor="primary"
           icon={Server}
         />
@@ -168,10 +168,10 @@ export default function BoundDevicesOrganism() {
           icon={Activity}
         />
         <LicenseMetricCard
-          title="Anomali HWID Mismatch"
+          title="Anomali Validasi 24 Jam"
           value={statsData?.hwidMismatchLast24hCount ?? 0}
-          subtitle="Percobaan 403 Forbidden 24 Jam"
-          badgeText="Peringatan"
+          subtitle="Percobaan validasi bermasalah"
+          badgeText="Log Keamanan"
           badgeColor={statsData?.hwidMismatchLast24hCount ? "error" : "secondary"}
           icon={AlertTriangle}
         />
@@ -190,7 +190,7 @@ export default function BoundDevicesOrganism() {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Hanya Perangkat Terikat
+              Perangkat Terdata
             </button>
             <button
               type="button"
@@ -201,7 +201,7 @@ export default function BoundDevicesOrganism() {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Menunggu Aktivasi (Unbound)
+              Belum Digunakan (Siap Pakai)
             </button>
             <button
               type="button"

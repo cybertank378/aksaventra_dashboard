@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, Lock } from "lucide-react";
+import { Check, Copy, Laptop } from "lucide-react";
 import { useState } from "react";
 import Badge from "@/shared-ui/component/Badge";
 
@@ -27,7 +27,7 @@ export default function HwidBindingBadge({ hwid, className }: Props) {
       <Badge color="secondary" variant="soft" className={className}>
         <span className="flex items-center gap-1.5 text-xs text-slate-500">
           <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-          Belum Terikat
+          Belum Digunakan
         </span>
       </Badge>
     );
@@ -36,9 +36,12 @@ export default function HwidBindingBadge({ hwid, className }: Props) {
   const truncated = hwid.length > 16 ? `${hwid.slice(0, 8)}...${hwid.slice(-6)}` : hwid;
 
   return (
-    <div className={`inline-flex items-center gap-1.5 ${className ?? ""}`}>
-      <Badge color="success" variant="soft" className="font-mono text-[11px]">
-        <Lock size={12} className="mr-1 text-emerald-600" />
+    <div
+      className={`inline-flex items-center gap-1.5 ${className ?? ""}`}
+      title="Perangkat Terakhir Aktif (Portable Multi-Device)"
+    >
+      <Badge color="info" variant="soft" className="font-mono text-[11px]">
+        <Laptop size={12} className="mr-1 text-sky-600" />
         {truncated}
       </Badge>
 
