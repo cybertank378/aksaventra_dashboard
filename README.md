@@ -226,3 +226,4 @@ npm run build
 
 Hak Cipta © 2026 **Aksaventra Technology**. Seluruh hak dilindungi undang-undang.
 Dilisensikan di bawah lisensi kepemilikan komersial proprietary untuk penggunaan internal dan mitra resmi Aksaventra.
+
