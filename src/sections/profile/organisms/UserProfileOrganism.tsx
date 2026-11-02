@@ -22,11 +22,11 @@ export const UserProfileOrganism: FC = () => {
     });
   }, [getProfile]);
 
-  const handleSaveName = async (name: string) => {
+  const handleSaveProfile = async (name: string, image?: string | null) => {
     try {
       setIsUpdatingProfile(true);
-      await updateProfile(name);
-      showSuccessToast("Profil berhasil diperbarui");
+      await updateProfile(name, image);
+      showSuccessToast("Profil dan foto avatar berhasil diperbarui");
     } catch (err: unknown) {
       showErrorToast(err instanceof Error ? err.message : "Gagal memperbarui profil");
       throw err;
@@ -95,7 +95,8 @@ export const UserProfileOrganism: FC = () => {
         <ProfileBasicInfoForm
           initialName={profile.name || ""}
           email={profile.email}
-          onSaveName={handleSaveName}
+          initialImage={profile.image}
+          onSaveProfile={handleSaveProfile}
           isLoading={isUpdatingProfile}
         />
 

@@ -61,6 +61,7 @@ model User {
   id          String    @id @default(uuid())
   email       String    @unique
   name        String?
+  image       String?
   password    String // Password hash (e.g. bcrypt/argon2)
   role        UserRole  @default(ADMIN)
   isActive    Boolean   @default(true)

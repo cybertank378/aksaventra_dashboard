@@ -14,6 +14,7 @@ import { DropdownItem } from "@/shared-ui/component/DropdownItem";
 interface Props {
   role?: UserRole;
   username?: string;
+  userImage?: string | null;
   onMenuClick?: () => void;
 }
 
@@ -102,7 +103,7 @@ function resolvePageHeader(pathname: string): PageHeaderMeta {
   };
 }
 
-export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Props) {
+export default function AppTopbar({ role = "ADMIN", username, userImage, onMenuClick }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const { logout } = useAuthApi();
@@ -207,7 +208,12 @@ export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Pro
               className="flex items-center justify-center rounded-full border border-slate-200 shadow-xs transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Menu Profil Pengguna"
             >
-              <Avatar name={username || "Admin"} size="sm" className="bg-blue-600 text-white" />
+              <Avatar
+                name={username || "Admin"}
+                image={userImage}
+                size="sm"
+                className="bg-blue-600 text-white"
+              />
             </button>
 
             {isOpen && (
@@ -217,6 +223,7 @@ export default function AppTopbar({ role = "ADMIN", username, onMenuClick }: Pro
                   <div className="relative shrink-0">
                     <Avatar
                       name={username || "Admin"}
+                      image={userImage}
                       size="md"
                       className="bg-blue-600 text-white"
                     />

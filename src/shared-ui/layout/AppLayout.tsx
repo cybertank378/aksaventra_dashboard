@@ -38,6 +38,7 @@ export default function AppLayout({ children, role = "ADMIN", user }: Props) {
         <AppTopbar
           role={role}
           username={user?.name ?? undefined}
+          userImage={user?.image}
           onMenuClick={handleOpenMobileSidebar}
         />
 

@@ -10,10 +10,10 @@ export interface UpdateProfileParams {
 export class UpdateProfileUseCase {
   public async execute(
     params: UpdateProfileParams,
-  ): Promise<{ id: string; name: string | null; email: string }> {
+  ): Promise<{ id: string; name: string | null; email: string; image: string | null }> {
     const existing = await prisma.user.findUnique({
       where: { id: params.userId },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, image: true },
     });
 
     if (!existing) {
@@ -21,10 +21,18 @@ export class UpdateProfileUseCase {
     }
 
     const updated = await prisma.$transaction(async (tx) => {
+      const updateData: { name: string; image?: string | null } = {
+        name: params.dto.name.trim(),
+      };
+
+      if (params.dto.image !== undefined) {
+        updateData.image = params.dto.image;
+      }
+
       const user = await tx.user.update({
         where: { id: params.userId },
-        data: { name: params.dto.name.trim() },
-        select: { id: true, name: true, email: true },
+        data: updateData,
+        select: { id: true, name: true, email: true, image: true },
       });
 
       await tx.auditLog.create({
@@ -35,6 +43,7 @@ export class UpdateProfileUseCase {
           details: JSON.stringify({
             previousName: existing.name,
             newName: user.name,
+            avatarUpdated: params.dto.image !== undefined,
           }),
           ipAddress: params.ipAddress ?? null,
         },
