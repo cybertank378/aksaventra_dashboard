@@ -55,3 +55,6 @@ prisma/seed/logs/*.log
 # markdown files (except README.md)
 /*.md
 !/README.md
+
+# root screenshots (preserve public assets)
+/*.png
