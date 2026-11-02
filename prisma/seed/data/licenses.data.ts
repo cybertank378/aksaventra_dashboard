@@ -18,7 +18,7 @@ export interface LicenseSeedData {
  */
 export const LICENSE_SEED_ITEMS: readonly LicenseSeedData[] = [
   {
-    serialKey: "AKSA-TRIAL-2026-24DY",
+    serialKey: "AKSA-TRIAL-2026-365DY",
     clientName: "PT Graha Finansial Mandiri",
     vaultSecret: "AKSA_VAULT_SECRET_365DY",
     status: "ACTIVE",
