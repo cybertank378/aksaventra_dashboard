@@ -32,7 +32,7 @@ export default function LicenseFilterModal({
     <Modal
       open={open}
       title="Filter Direktori Lisensi"
-      subtitle="Saring daftar serial key berdasarkan status aktif, tier, dan ikatan perangkat HWID"
+      subtitle="Saring daftar serial key berdasarkan status aktif, tier, dan status aktivasi perangkat"
       onClose={onClose}
       onSubmit={onClose}
       submitText="Terapkan Filter"

@@ -152,7 +152,7 @@ export default function EngineValidationSimulatorModal({
                 Simulator &amp; Uji Diagnostik Engine
               </h3>
               <p className="text-xs text-slate-500">
-                Pengujian langsung otentikasi kunci HWID dan kepatuhan SHA-256 (Isu #39)
+                Pengujian langsung otentikasi lisensi portable dan kepatuhan SHA-256 (Isu #39)
               </p>
             </div>
           </div>

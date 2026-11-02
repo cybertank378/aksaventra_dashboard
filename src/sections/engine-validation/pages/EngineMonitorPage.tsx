@@ -13,7 +13,7 @@ export default function EngineMonitorPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Live Engine Validation Monitor</h1>
           <p className="text-sm text-slate-500">
-            Pemantauan telemetri real-time otentikasi HWID dan latensi API aksaventra_engine.exe
+            Pemantauan telemetri real-time validasi lisensi dan latensi API aksaventra_engine.exe
           </p>
         </div>
 

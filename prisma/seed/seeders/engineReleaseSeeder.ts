@@ -33,14 +33,14 @@ export async function seedEngineReleases(prisma: PrismaClient): Promise<number> 
       await prisma.engineUpdateLog.create({
         data: {
           releaseId: release.id,
-          clientVersion: "v2.2.1",
-          hwid: "1caee749-5928-4c89-a052-ca4f27af8c41",
-          serialKey: "AKSA-ENTERPRISE-2026-9F2A",
+          clientVersion: "v2.2.3",
+          hwid: null,
+          serialKey: "AKSA-TRIAL-2026-24DY",
           channel: item.channel.toLowerCase(),
           action: "CHECK",
           status: "SUCCESS",
           clientIp: "127.0.0.1",
-          userAgent: "aksaventra_engine/2.2.1",
+          userAgent: "aksaventra_engine/2.2.3",
         },
       });
 

@@ -74,7 +74,7 @@ export default function LicenseCreateOrganism() {
             </div>
 
             <Badge color="success" variant="filled">
-              Siap Aktivasi HWID
+              Siap Digunakan
             </Badge>
           </div>
         </Card>
