@@ -9,7 +9,6 @@ import type {
 import { useLicenseApi } from "@/modules/licenses/presentation/hooks/useLicenseApi";
 import LicenseMetricCard from "@/sections/license-management/atomic/LicenseMetricCard";
 import BoundDevicesTableView from "@/sections/license-management/molecules/BoundDevicesTableView";
-import DeviceResetModal from "@/sections/license-management/molecules/DeviceResetModal";
 import LicenseDetailModal from "@/sections/license-management/molecules/LicenseDetailModal";
 import Button from "@/shared-ui/component/Button";
 import Card from "@/shared-ui/component/Card";
@@ -19,21 +18,13 @@ import SearchField from "@/shared-ui/component/SearchField";
 type DeviceFilterTab = "BOUND" | "UNBOUND" | "ALL";
 
 export default function BoundDevicesOrganism() {
-  const {
-    loading,
-    licensesData,
-    statsData,
-    fetchLicenses,
-    fetchStats,
-    fetchLicenseDetail,
-    resetDeviceHwid,
-  } = useLicenseApi();
+  const { loading, licensesData, statsData, fetchLicenses, fetchStats, fetchLicenseDetail } =
+    useLicenseApi();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<DeviceFilterTab>("BOUND");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const [selectedForReset, setSelectedForReset] = useState<LicenseAdminItemDTO | null>(null);
   const [selectedDetail, setSelectedDetail] = useState<LicenseDetailResponseDTO | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -69,20 +60,6 @@ export default function BoundDevicesOrganism() {
   };
 
   const handleRefreshData = () => {
-    loadData();
-  };
-
-  const handleOpenResetModal = (target: LicenseAdminItemDTO) => {
-    setSelectedForReset(target);
-  };
-
-  const handleCloseResetModal = () => {
-    setSelectedForReset(null);
-  };
-
-  const handleConfirmResetHwid = async (target: LicenseAdminItemDTO, reason?: string) => {
-    await resetDeviceHwid(target.id, reason);
-    setSelectedForReset(null);
     loadData();
   };
 
@@ -231,19 +208,9 @@ export default function BoundDevicesOrganism() {
           itemsPerPage={pagination.limit}
           loading={loading}
           onPageChange={handlePageChange}
-          onRequestResetHwid={handleOpenResetModal}
           onInspectLicense={handleInspectLicense}
         />
       </Card>
-
-      {/* DEVICE RESET MODAL */}
-      <DeviceResetModal
-        open={Boolean(selectedForReset)}
-        license={selectedForReset}
-        loading={loading}
-        onClose={handleCloseResetModal}
-        onConfirmReset={handleConfirmResetHwid}
-      />
 
       {/* DETAIL MODAL */}
       <LicenseDetailModal
@@ -251,13 +218,6 @@ export default function BoundDevicesOrganism() {
         license={selectedDetail}
         loading={detailLoading}
         onClose={handleCloseDetailModal}
-        onRequestResetHwid={(id) => {
-          const target = items.find((l) => l.id === id);
-          if (target) {
-            setDetailModalOpen(false);
-            setSelectedForReset(target);
-          }
-        }}
       />
     </div>
   );

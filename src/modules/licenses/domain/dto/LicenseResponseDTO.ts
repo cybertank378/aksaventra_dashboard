@@ -32,8 +32,6 @@ export interface LicenseAdminItemDTO {
   clientName: string;
   npsn: string | null;
   userId: string | null;
-  hwid: string | null;
-  isBound: boolean;
   status: LicenseStatus;
   isExpiringSoon: boolean;
   engineVersion: string | null;
