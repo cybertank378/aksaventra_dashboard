@@ -33,8 +33,8 @@ function resolvePageHeader(pathname: string): PageHeaderMeta {
 
   if (pathname === "/dashboard/licenses/devices") {
     return {
-      title: "Perangkat Terikat & Penguncian HWID",
-      subtitle: "Kelola mesin pelanggan yang terikat pada lisensi aktif dan reset HWID",
+      title: "Perangkat & Aktivitas Lisensi",
+      subtitle: "Pemantauan lisensi aktif dan versi engine yang digunakan perangkat klien",
     };
   }
 
@@ -85,7 +85,7 @@ function resolvePageHeader(pathname: string): PageHeaderMeta {
     return {
       title: "Security Audit & Riwayat Tindakan Administrator",
       subtitle:
-        "Pemantauan terpusat perubahan konfigurasi, pencabutan lisensi, reset HWID, dan deteksi percobaan login mencurigakan",
+        "Pemantauan terpusat perubahan konfigurasi, pembaruan lisensi, dan deteksi percobaan login mencurigakan",
     };
   }
 

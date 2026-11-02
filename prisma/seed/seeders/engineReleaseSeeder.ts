@@ -35,7 +35,7 @@ export async function seedEngineReleases(prisma: PrismaClient): Promise<number> 
           releaseId: release.id,
           clientVersion: "v2.2.3",
           hwid: null,
-          serialKey: "AKSA-TRIAL-2026-9F2A",
+          serialKey: "AKSA-TRIAL-2026-24DY",
           channel: item.channel.toLowerCase(),
           action: "CHECK",
           status: "SUCCESS",

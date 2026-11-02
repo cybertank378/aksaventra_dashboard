@@ -29,7 +29,7 @@ export async function seedLicenses(prisma: PrismaClient): Promise<LicenseSeedRes
       where: { serialKey: item.serialKey },
       update: {
         clientName: item.clientName,
-        hwid: item.hwid,
+        hwid: item.hwid ?? null,
         vaultSecret: item.vaultSecret,
         status: item.status,
         engineVersion: item.engineVersion,
@@ -41,7 +41,7 @@ export async function seedLicenses(prisma: PrismaClient): Promise<LicenseSeedRes
       create: {
         serialKey: item.serialKey,
         clientName: item.clientName,
-        hwid: item.hwid,
+        hwid: item.hwid ?? null,
         vaultSecret: item.vaultSecret,
         status: item.status,
         engineVersion: item.engineVersion,
