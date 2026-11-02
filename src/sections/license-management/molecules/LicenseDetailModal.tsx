@@ -1,11 +1,10 @@
 "use client";
 
-import { Check, Copy, KeyRound, Laptop, RotateCcw } from "lucide-react";
+import { Check, Copy, KeyRound, Laptop } from "lucide-react";
 import { useState } from "react";
 import type { LicenseDetailResponseDTO } from "@/modules/licenses/domain/dto/LicenseResponseDTO";
 import LicenseStatusBadge from "@/sections/license-management/atomic/LicenseStatusBadge";
 import Badge from "@/shared-ui/component/Badge";
-import Button from "@/shared-ui/component/Button";
 import Card from "@/shared-ui/component/Card";
 import { Modal } from "@/shared-ui/component/Modal";
 import {
@@ -22,37 +21,16 @@ interface Props {
   license: LicenseDetailResponseDTO | null;
   loading?: boolean;
   onClose: () => void;
-  onRequestResetHwid?: (licenseId: string) => void;
 }
 
-export default function LicenseDetailModal({
-  open,
-  license,
-  loading = false,
-  onClose,
-  onRequestResetHwid,
-}: Props) {
+export default function LicenseDetailModal({ open, license, loading = false, onClose }: Props) {
   const [copiedKey, setCopiedKey] = useState(false);
-  const [copiedHwid, setCopiedHwid] = useState(false);
 
   const handleCopySerialKey = () => {
     if (!license) return;
     navigator.clipboard.writeText(license.serialKey);
     setCopiedKey(true);
     setTimeout(() => setCopiedKey(false), 2000);
-  };
-
-  const handleCopyHwid = () => {
-    if (!license?.hwid) return;
-    navigator.clipboard.writeText(license.hwid);
-    setCopiedHwid(true);
-    setTimeout(() => setCopiedHwid(false), 2000);
-  };
-
-  const handleTriggerResetHwid = () => {
-    if (license && onRequestResetHwid) {
-      onRequestResetHwid(license.id);
-    }
   };
 
   const formatDate = (dateStr?: string | null) => {
@@ -141,57 +119,26 @@ export default function LicenseDetailModal({
               </div>
             </Card>
 
-            {/* KARTU 2: IDENTITAS PERANGKAT PORTABLE */}
+            {/* KARTU 2: INFORMASI ENGINE PORTABLE */}
             <Card className="space-y-3 border-slate-200 bg-slate-50/70 p-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-500">
-                  STATUS PERANGKAT (PORTABLE)
+                  INFORMASI ENGINE PORTABLE
                 </span>
-                {license.isBound ? (
-                  <Badge color="info" variant="soft">
-                    <Laptop size={12} className="mr-1 inline text-sky-600" />
-                    Multi-Device Portable
-                  </Badge>
-                ) : (
-                  <Badge color="secondary" variant="soft">
-                    Belum Digunakan
-                  </Badge>
-                )}
+                <Badge color="info" variant="soft">
+                  <Laptop size={12} className="mr-1 inline text-sky-600" />
+                  Portable Multi-Device
+                </Badge>
               </div>
 
               <div className="rounded-lg border border-slate-200 bg-white p-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[11px] text-slate-400">
-                      IDENTITAS PERANGKAT AKTIF TERAKHIR
-                    </span>
-                    <p className="font-mono text-xs font-bold text-slate-800">
-                      {license.hwid ?? "Menunggu aktivasi pertama dari mesin klien"}
-                    </p>
-                  </div>
-                  {license.hwid && (
-                    <button
-                      type="button"
-                      onClick={handleCopyHwid}
-                      className="flex items-center gap-1 rounded px-2 py-1 text-xs text-slate-600 hover:bg-slate-100"
-                    >
-                      {copiedHwid ? (
-                        <Check size={14} className="text-emerald-600" />
-                      ) : (
-                        <Copy size={14} />
-                      )}
-                    </button>
-                  )}
-                </div>
+                <span className="text-[11px] text-slate-400">VERSI ENGINE TERAKHIR AKTIF</span>
+                <p className="font-mono text-xs font-bold text-slate-800 mt-0.5">
+                  {license.engineVersion ?? "Belum terdeteksi dari mesin klien"}
+                </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 text-xs">
-                <div>
-                  <span className="text-slate-500">Versi Engine:</span>
-                  <p className="font-mono font-medium text-slate-700">
-                    {license.engineVersion ?? "-"}
-                  </p>
-                </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <span className="text-slate-500">Aktivasi Awal:</span>
                   <p className="font-medium text-slate-700">{formatDate(license.activatedAt)}</p>
@@ -201,21 +148,6 @@ export default function LicenseDetailModal({
                   <p className="font-medium text-slate-700">{formatDate(license.lastVerifiedAt)}</p>
                 </div>
               </div>
-
-              {license.isBound && onRequestResetHwid && (
-                <div className="pt-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    color="warning"
-                    leftIcon={RotateCcw}
-                    onClick={handleTriggerResetHwid}
-                  >
-                    Reset Riwayat Perangkat
-                  </Button>
-                </div>
-              )}
             </Card>
           </div>
 

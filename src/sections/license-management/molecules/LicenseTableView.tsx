@@ -1,8 +1,7 @@
 "use client";
 
-import { Eye, RotateCcw, ShieldBan } from "lucide-react";
+import { Eye, ShieldBan } from "lucide-react";
 import type { LicenseAdminItemDTO } from "@/modules/licenses/domain/dto/LicenseResponseDTO";
-import HwidBindingBadge from "@/sections/license-management/atomic/HwidBindingBadge";
 import LicenseStatusBadge from "@/sections/license-management/atomic/LicenseStatusBadge";
 import SerialKeyBadge from "@/sections/license-management/atomic/SerialKeyBadge";
 import Badge from "@/shared-ui/component/Badge";
@@ -26,7 +25,6 @@ interface Props {
   itemsPerPage: number;
   loading?: boolean;
   onPageChange: (page: number) => void;
-  onRequestResetHwid?: (item: LicenseAdminItemDTO) => void;
   onRequestRevoke?: (item: LicenseAdminItemDTO) => void;
   onInspectLicense?: (item: LicenseAdminItemDTO) => void;
 }
@@ -38,7 +36,6 @@ export default function LicenseTableView({
   itemsPerPage,
   loading = false,
   onPageChange,
-  onRequestResetHwid,
   onRequestRevoke,
   onInspectLicense,
 }: Props) {
@@ -63,7 +60,6 @@ export default function LicenseTableView({
             <TableRow>
               <TableHeaderCell>Serial Key</TableHeaderCell>
               <TableHeaderCell>Instansi / Klien</TableHeaderCell>
-              <TableHeaderCell>Perangkat Aktif</TableHeaderCell>
               <TableHeaderCell>Versi Engine</TableHeaderCell>
               <TableHeaderCell>Status</TableHeaderCell>
               <TableHeaderCell>Kedaluwarsa</TableHeaderCell>
@@ -73,13 +69,13 @@ export default function LicenseTableView({
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} className="py-8 text-center text-sm text-slate-500">
+                <TableCell colSpan={6} className="py-8 text-center text-sm text-slate-500">
                   Memuat data lisensi dari database...
                 </TableCell>
               </TableRow>
             ) : items.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="py-12 text-center text-sm text-slate-400">
+                <TableCell colSpan={6} className="py-12 text-center text-sm text-slate-400">
                   Tidak ada lisensi yang cocok dengan kriteria pencarian.
                 </TableCell>
               </TableRow>
@@ -99,9 +95,6 @@ export default function LicenseTableView({
                     <div className="text-xs text-slate-500">
                       Verifikasi: {formatDate(item.lastVerifiedAt)}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <HwidBindingBadge hwid={item.hwid} />
                   </TableCell>
                   <TableCell>
                     <span className="font-mono text-xs text-slate-700">
@@ -135,18 +128,6 @@ export default function LicenseTableView({
                           title="Inspeksi detail dan log validasi"
                         >
                           Detail
-                        </Button>
-                      )}
-                      {onRequestResetHwid && item.isBound && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          color="secondary"
-                          leftIcon={RotateCcw}
-                          onClick={() => onRequestResetHwid(item)}
-                          title="Reset riwayat perangkat terakhir"
-                        >
-                          Reset Perangkat
                         </Button>
                       )}
                       {onRequestRevoke && item.status === "ACTIVE" && (

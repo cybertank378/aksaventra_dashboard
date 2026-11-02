@@ -1,8 +1,7 @@
 "use client";
 
-import { Eye, RotateCcw } from "lucide-react";
+import { Eye } from "lucide-react";
 import type { LicenseAdminItemDTO } from "@/modules/licenses/domain/dto/LicenseResponseDTO";
-import HwidBindingBadge from "@/sections/license-management/atomic/HwidBindingBadge";
 import LicenseStatusBadge from "@/sections/license-management/atomic/LicenseStatusBadge";
 import SerialKeyBadge from "@/sections/license-management/atomic/SerialKeyBadge";
 import Button from "@/shared-ui/component/Button";
@@ -23,7 +22,6 @@ interface Props {
   itemsPerPage: number;
   loading?: boolean;
   onPageChange: (page: number) => void;
-  onRequestResetHwid?: (item: LicenseAdminItemDTO) => void;
   onInspectLicense?: (item: LicenseAdminItemDTO) => void;
 }
 
@@ -34,7 +32,6 @@ export default function BoundDevicesTableView({
   itemsPerPage,
   loading = false,
   onPageChange,
-  onRequestResetHwid,
   onInspectLicense,
 }: Props) {
   const formatDate = (dateStr?: string | null) => {
@@ -59,7 +56,6 @@ export default function BoundDevicesTableView({
           <TableHead>
             <TableRow>
               <TableHeaderCell>Klien & Serial Key</TableHeaderCell>
-              <TableHeaderCell>Perangkat Aktif</TableHeaderCell>
               <TableHeaderCell>Status</TableHeaderCell>
               <TableHeaderCell>Versi Engine</TableHeaderCell>
               <TableHeaderCell>Aktivasi Awal</TableHeaderCell>
@@ -70,13 +66,13 @@ export default function BoundDevicesTableView({
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} className="py-8 text-center text-sm text-slate-500">
+                <TableCell colSpan={6} className="py-8 text-center text-sm text-slate-500">
                   Memuat data perangkat terikat...
                 </TableCell>
               </TableRow>
             ) : items.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="py-12 text-center text-sm text-slate-400">
+                <TableCell colSpan={6} className="py-12 text-center text-sm text-slate-400">
                   Tidak ada perangkat terikat yang cocok dengan kriteria pencarian.
                 </TableCell>
               </TableRow>
@@ -88,9 +84,6 @@ export default function BoundDevicesTableView({
                       <span className="font-semibold text-slate-900">{item.clientName}</span>
                       <SerialKeyBadge serialKey={item.serialKey} />
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <HwidBindingBadge hwid={item.hwid} />
                   </TableCell>
                   <TableCell>
                     <LicenseStatusBadge status={item.status} />
@@ -120,18 +113,6 @@ export default function BoundDevicesTableView({
                           title="Inspeksi detail dan log"
                         >
                           Detail
-                        </Button>
-                      )}
-                      {onRequestResetHwid && item.isBound && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          color="warning"
-                          leftIcon={RotateCcw}
-                          onClick={() => onRequestResetHwid(item)}
-                          title="Reset riwayat HWID perangkat terakhir"
-                        >
-                          Reset Perangkat
                         </Button>
                       )}
                     </div>

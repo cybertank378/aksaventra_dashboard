@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Cpu,
-  Filter,
-  KeyRound,
-  PlusCircle,
-  RefreshCw,
-  ShieldAlert,
-  ShieldCheck,
-} from "lucide-react";
+import { Cpu, KeyRound, PlusCircle, RefreshCw, ShieldAlert, ShieldCheck } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import type {
   LicenseAdminItemDTO,
@@ -16,7 +8,6 @@ import type {
 } from "@/modules/licenses/domain/dto/LicenseResponseDTO";
 import { useLicenseApi } from "@/modules/licenses/presentation/hooks/useLicenseApi";
 import LicenseMetricCard from "@/sections/license-management/atomic/LicenseMetricCard";
-import DeviceResetModal from "@/sections/license-management/molecules/DeviceResetModal";
 import LicenseDetailModal from "@/sections/license-management/molecules/LicenseDetailModal";
 import LicenseTableView from "@/sections/license-management/molecules/LicenseTableView";
 import Button from "@/shared-ui/component/Button";
@@ -34,16 +25,13 @@ export default function LicenseDirectoryOrganism() {
     fetchLicenses,
     fetchStats,
     fetchLicenseDetail,
-    resetDeviceHwid,
     updateLicenseStatus,
   } = useLicenseApi();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<StatusTab>("ALL");
-  const [hwidBoundOnly, setHwidBoundOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const [selectedForReset, setSelectedForReset] = useState<LicenseAdminItemDTO | null>(null);
   const [selectedDetail, setSelectedDetail] = useState<LicenseDetailResponseDTO | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -68,10 +56,9 @@ export default function LicenseDirectoryOrganism() {
       limit: 10,
       search: searchQuery.trim() || undefined,
       status: statusParam,
-      binding: hwidBoundOnly ? "BOUND" : "ALL",
       expiringSoon: expiringSoonParam,
     });
-  }, [fetchLicenses, fetchStats, currentPage, searchQuery, activeTab, hwidBoundOnly]);
+  }, [fetchLicenses, fetchStats, currentPage, searchQuery, activeTab]);
 
   useEffect(() => {
     loadData();
@@ -93,20 +80,6 @@ export default function LicenseDirectoryOrganism() {
   };
 
   const handleRefreshData = () => {
-    loadData();
-  };
-
-  const handleOpenResetModal = (target: LicenseAdminItemDTO) => {
-    setSelectedForReset(target);
-  };
-
-  const handleCloseResetModal = () => {
-    setSelectedForReset(null);
-  };
-
-  const handleConfirmResetHwid = async (target: LicenseAdminItemDTO, reason?: string) => {
-    await resetDeviceHwid(target.id, reason);
-    setSelectedForReset(null);
     loadData();
   };
 
@@ -269,21 +242,11 @@ export default function LicenseDirectoryOrganism() {
 
           <div className="flex items-center gap-2">
             <SearchField
-              placeholder="Cari nama klien, serial key, atau perangkat..."
+              placeholder="Cari nama klien atau serial key..."
               value={searchQuery}
               onChange={handleSearchChange}
               className="w-72"
             />
-
-            <Button
-              variant={hwidBoundOnly ? "filled" : "outline"}
-              color={hwidBoundOnly ? "primary" : "secondary"}
-              leftIcon={Filter}
-              onClick={() => setHwidBoundOnly((prev) => !prev)}
-              title="Filter hanya perangkat aktif (portable)"
-            >
-              {hwidBoundOnly ? "Perangkat Aktif" : "Semua Status"}
-            </Button>
           </div>
         </div>
 
@@ -295,20 +258,10 @@ export default function LicenseDirectoryOrganism() {
           itemsPerPage={pagination.limit}
           loading={loading}
           onPageChange={handlePageChange}
-          onRequestResetHwid={handleOpenResetModal}
           onRequestRevoke={handleRevokeLicense}
           onInspectLicense={handleInspectLicense}
         />
       </Card>
-
-      {/* RESET HWID MODAL */}
-      <DeviceResetModal
-        open={Boolean(selectedForReset)}
-        license={selectedForReset}
-        loading={loading}
-        onClose={handleCloseResetModal}
-        onConfirmReset={handleConfirmResetHwid}
-      />
 
       {/* DETAIL INSPECTION MODAL */}
       <LicenseDetailModal
@@ -316,13 +269,6 @@ export default function LicenseDirectoryOrganism() {
         license={selectedDetail}
         loading={detailLoading}
         onClose={handleCloseDetailModal}
-        onRequestResetHwid={(id) => {
-          const target = licenses.find((l) => l.id === id);
-          if (target) {
-            setDetailModalOpen(false);
-            setSelectedForReset(target);
-          }
-        }}
       />
     </div>
   );

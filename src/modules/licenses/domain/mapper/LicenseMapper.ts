@@ -87,7 +87,6 @@ export class LicenseMapper {
     // AUDITOR hanya melihat masked key untuk serialKey
     const visibleSerialKey = role === "AUDITOR" ? masked : props.serialKey;
 
-    const isBound = Boolean(props.hwid && props.hwid.trim().length > 0);
     const isExpiringSoon = entity.isExpiringSoon(now);
 
     return {
@@ -97,8 +96,6 @@ export class LicenseMapper {
       clientName: props.clientName,
       npsn: props.npsn ?? null,
       userId: props.userId ?? null,
-      hwid: props.hwid ?? null,
-      isBound,
       status: props.status,
       isExpiringSoon,
       engineVersion: props.engineVersion ?? null,

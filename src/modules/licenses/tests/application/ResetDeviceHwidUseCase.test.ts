@@ -47,9 +47,6 @@ describe("ResetDeviceHwidUseCase (Triple A)", () => {
 
     // Assert
     expect(result.isSuccess).toBe(true);
-    const updated = result.getValue();
-    expect(updated.hwid).toBeNull();
-    expect(updated.isBound).toBe(false);
     expect(mockRepo.update).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
