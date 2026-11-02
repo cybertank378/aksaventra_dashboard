@@ -25,18 +25,33 @@ export function useProfileApi() {
   );
 
   const updateProfile = useCallback(
-    (name: string) =>
+    (name: string, image?: string | null) =>
       execute(async () => {
-        const response = await apiRequest<{ id: string; name: string | null; email: string }>(
-          "/api/v1/auth/profile",
-          {
-            method: "PATCH",
-            payload: { name },
-          },
-        );
+        const payload: { name: string; image?: string | null } = { name };
+        if (image !== undefined) {
+          payload.image = image;
+        }
+
+        const response = await apiRequest<{
+          id: string;
+          name: string | null;
+          email: string;
+          image?: string | null;
+        }>("/api/v1/auth/profile", {
+          method: "PATCH",
+          payload,
+        });
 
         const data = unwrapApiResponse(response);
-        setProfile((prev) => (prev ? { ...prev, name: data.name } : null));
+        setProfile((prev) =>
+          prev
+            ? {
+                ...prev,
+                name: data.name,
+                image: data.image !== undefined ? data.image : prev.image,
+              }
+            : null,
+        );
         return data;
       }),
     [execute],

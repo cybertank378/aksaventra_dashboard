@@ -18,11 +18,11 @@ export const RolePermissionSummaryBox = ({ role, className }: RolePermissionSumm
           badgeColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
           icon: <ShieldCheck className="w-5 h-5 text-emerald-600" />,
           description:
-            "Akses kontrol penuh ke modul User Management, License Generation & HWID Reset, Engine Registry & Release, serta Audit Log Keamanan.",
+            "Akses kontrol penuh ke modul User Management, License Generation & Device Reset, Engine Registry & Release, serta Audit Log Keamanan.",
           permissions: [
             "Kelola akun & hak akses semua pengguna",
             "Generate & suspend lisensi mesin",
-            "Reset HWID mesin klien",
+            "Reset riwayat perangkat klien",
             "Publish rilis update aksaventra_engine.exe",
           ],
         };
@@ -36,7 +36,7 @@ export const RolePermissionSummaryBox = ({ role, className }: RolePermissionSumm
           permissions: [
             "Lihat direktori lisensi (Read-Only)",
             "Pantau log validasi & uptime mesin",
-            "Dilarang membuat lisensi & mereset HWID",
+            "Dilarang membuat lisensi & mereset perangkat",
             "Dilarang mengelola akun pengguna",
           ],
         };
@@ -46,7 +46,7 @@ export const RolePermissionSummaryBox = ({ role, className }: RolePermissionSumm
           badgeColor: "text-amber-700 bg-amber-50 border-amber-200",
           icon: <Eye className="w-5 h-5 text-amber-600" />,
           description:
-            "Akses read-only khusus audit kepatuhan, histori jejak mutasi lisensi, investigasi anomali HWID mismatch, dan verifikasi checksum SHA-256.",
+            "Akses read-only khusus audit kepatuhan, histori jejak mutasi lisensi, investigasi anomali validasi, dan verifikasi checksum SHA-256.",
           permissions: [
             "Audit seluruh log aktivitas pengguna & sistem",
             "Investigasi kegagalan validasi mesin klien",

@@ -8,6 +8,7 @@ export interface ServerUser {
   id: string;
   email: string;
   name?: string | null;
+  image?: string | null;
   role: UserRole;
   isActive: boolean;
 }
@@ -35,6 +36,7 @@ async function getCachedSessionUser(token: string): Promise<ServerUser | null> {
     id: session.user.id,
     email: session.user.email,
     name: session.user.name,
+    image: session.user.image,
     role: session.user.role as UserRole,
     isActive: session.user.isActive,
   };

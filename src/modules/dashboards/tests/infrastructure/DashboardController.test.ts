@@ -77,4 +77,36 @@ describe("DashboardController (Triple A Pattern)", () => {
     const body = await res.json();
     expect(body.message).toBeDefined();
   });
+
+  it("should return HTTP 200 on sendRenewalReminders", async () => {
+    // Arrange
+    const req = new NextRequest("http://localhost:3000/api/v1/dashboard/reminders/send", {
+      method: "POST",
+      body: JSON.stringify({ licenseIds: ["lic-1"] }),
+    });
+
+    // Act
+    const res = await controller.sendRenewalReminders(req);
+
+    // Assert
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+  });
+
+  it("should return HTTP 400 on sendRenewalReminders with invalid licenseIds", async () => {
+    // Arrange
+    const req = new NextRequest("http://localhost:3000/api/v1/dashboard/reminders/send", {
+      method: "POST",
+      body: JSON.stringify({ licenseIds: "invalid-string-not-array" }),
+    });
+
+    // Act
+    const res = await controller.sendRenewalReminders(req);
+
+    // Assert
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.message).toContain("licenseIds");
+  });
 });

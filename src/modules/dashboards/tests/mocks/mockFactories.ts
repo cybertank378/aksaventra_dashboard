@@ -37,5 +37,7 @@ export function createMockDashboardRepository(): DashboardRepositoryInterface {
     aggregateLicensesIssued: vi.fn().mockResolvedValue([]),
     aggregateLicensesActivated: vi.fn().mockResolvedValue([]),
     aggregateLicensesExpiring: vi.fn().mockResolvedValue([]),
+    findExpiringLicensesForReminder: vi.fn().mockResolvedValue([]),
+    createAuditLog: vi.fn().mockResolvedValue(undefined),
   };
 }

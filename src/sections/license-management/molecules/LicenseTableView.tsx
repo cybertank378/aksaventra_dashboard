@@ -63,7 +63,7 @@ export default function LicenseTableView({
             <TableRow>
               <TableHeaderCell>Serial Key</TableHeaderCell>
               <TableHeaderCell>Instansi / Klien</TableHeaderCell>
-              <TableHeaderCell>Ikatan HWID</TableHeaderCell>
+              <TableHeaderCell>Perangkat Aktif</TableHeaderCell>
               <TableHeaderCell>Versi Engine</TableHeaderCell>
               <TableHeaderCell>Status</TableHeaderCell>
               <TableHeaderCell>Kedaluwarsa</TableHeaderCell>
@@ -144,8 +144,9 @@ export default function LicenseTableView({
                           color="secondary"
                           leftIcon={RotateCcw}
                           onClick={() => onRequestResetHwid(item)}
+                          title="Reset riwayat perangkat terakhir"
                         >
-                          Reset HWID
+                          Reset Perangkat
                         </Button>
                       )}
                       {onRequestRevoke && item.status === "ACTIVE" && (

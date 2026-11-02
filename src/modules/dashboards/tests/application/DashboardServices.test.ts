@@ -50,4 +50,9 @@ describe("DashboardServices (Triple A Pattern)", () => {
     const result = await services.getExpiryForecast();
     expect(result.isSuccess).toBe(true);
   });
+
+  it("should delegate sendRenewalReminders through BaseService.execute", async () => {
+    const result = await services.sendRenewalReminders();
+    expect(result.isSuccess).toBe(true);
+  });
 });

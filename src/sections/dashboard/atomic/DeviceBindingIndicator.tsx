@@ -15,7 +15,7 @@ export function DeviceBindingIndicator({ status }: DeviceBindingIndicatorProps):
         }`}
       />
       <span className={isBound ? "text-slate-700" : "text-amber-700"}>
-        {isBound ? "Terikat (HWID)" : "Belum Aktivasi"}
+        {isBound ? "Aktif (Portable)" : "Belum Digunakan"}
       </span>
     </div>
   );

@@ -217,7 +217,7 @@ export default function BoundDevicesOrganism() {
           </div>
 
           <SearchField
-            placeholder="Cari berdasarkan HWID, nama klien, atau serial key..."
+            placeholder="Cari berdasarkan perangkat, nama klien, atau serial key..."
             value={searchQuery}
             onChange={handleSearchChange}
             className="w-80"

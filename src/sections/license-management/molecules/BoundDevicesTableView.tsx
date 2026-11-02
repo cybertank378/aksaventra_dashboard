@@ -59,7 +59,7 @@ export default function BoundDevicesTableView({
           <TableHead>
             <TableRow>
               <TableHeaderCell>Klien & Serial Key</TableHeaderCell>
-              <TableHeaderCell>Fingerprint HWID</TableHeaderCell>
+              <TableHeaderCell>Perangkat Aktif</TableHeaderCell>
               <TableHeaderCell>Status</TableHeaderCell>
               <TableHeaderCell>Versi Engine</TableHeaderCell>
               <TableHeaderCell>Aktivasi Awal</TableHeaderCell>
@@ -131,7 +131,7 @@ export default function BoundDevicesTableView({
                           onClick={() => onRequestResetHwid(item)}
                           title="Reset riwayat HWID perangkat terakhir"
                         >
-                          Reset HWID
+                          Reset Perangkat
                         </Button>
                       )}
                     </div>

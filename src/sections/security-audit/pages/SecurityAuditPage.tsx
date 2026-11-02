@@ -20,8 +20,8 @@ export const SecurityAuditPage: FC = () => {
           Security Audit & Riwayat Tindakan Administrator
         </h1>
         <p className="text-xs text-slate-500 mt-1">
-          Pemantauan terpusat perubahan konfigurasi, pencabutan lisensi, reset HWID, dan deteksi
-          percobaan login mencurigakan
+          Pemantauan terpusat perubahan konfigurasi, pencabutan lisensi, reset perangkat, dan
+          deteksi percobaan login mencurigakan
         </p>
       </div>
 

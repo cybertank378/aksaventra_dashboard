@@ -37,9 +37,16 @@ export class ProfileValidator {
       };
     }
 
+    let image: string | null | undefined;
+    if (payload.image === null) {
+      image = null;
+    } else if (typeof payload.image === "string") {
+      image = payload.image.trim();
+    }
+
     return {
       isValid: true,
-      data: { name },
+      data: { name, ...(image !== undefined ? { image } : {}) },
     };
   }
 }

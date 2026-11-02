@@ -201,7 +201,7 @@ export default function LicenseDirectoryOrganism() {
         <LicenseMetricCard
           title="Perangkat Terdata"
           value={statsData?.boundDevicesCount ?? 0}
-          subtitle="Identitas HWID aktif (Portable)"
+          subtitle="Identitas perangkat aktif (Portable)"
           badgeText="Portable"
           badgeColor="info"
           icon={Cpu}
@@ -269,7 +269,7 @@ export default function LicenseDirectoryOrganism() {
 
           <div className="flex items-center gap-2">
             <SearchField
-              placeholder="Cari nama klien, serial key, atau HWID..."
+              placeholder="Cari nama klien, serial key, atau perangkat..."
               value={searchQuery}
               onChange={handleSearchChange}
               className="w-72"
@@ -280,9 +280,9 @@ export default function LicenseDirectoryOrganism() {
               color={hwidBoundOnly ? "primary" : "secondary"}
               leftIcon={Filter}
               onClick={() => setHwidBoundOnly((prev) => !prev)}
-              title="Filter hanya perangkat terikat HWID"
+              title="Filter hanya perangkat aktif (portable)"
             >
-              {hwidBoundOnly ? "Terikat HWID" : "Semua Binding"}
+              {hwidBoundOnly ? "Perangkat Aktif" : "Semua Status"}
             </Button>
           </div>
         </div>

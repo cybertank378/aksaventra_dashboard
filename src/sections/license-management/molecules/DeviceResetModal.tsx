@@ -38,7 +38,7 @@ export default function DeviceResetModal({
   return (
     <Modal
       open={open}
-      title="Konfirmasi Reset Riwayat Perangkat (HWID)"
+      title="Konfirmasi Reset Riwayat Perangkat"
       subtitle="Membersihkan data identitas perangkat terakhir pada lisensi tanpa membatasi portabilitas engine"
       onClose={handleClose}
       onSubmit={handleConfirm}
@@ -72,7 +72,7 @@ export default function DeviceResetModal({
             </div>
 
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-medium text-slate-500">HWID Aktif Terakhir</span>
+              <span className="text-xs font-medium text-slate-500">Perangkat Aktif Terakhir</span>
               <Badge color="warning" variant="soft" className="font-mono text-[11px]">
                 {license.hwid ?? "Belum Digunakan"}
               </Badge>

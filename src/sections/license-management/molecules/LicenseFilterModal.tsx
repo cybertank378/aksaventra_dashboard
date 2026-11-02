@@ -64,12 +64,12 @@ export default function LicenseFilterModal({
         </SelectField>
 
         <SelectField
-          label="Status Penguncian Perangkat (HWID)"
+          label="Status Perangkat Klien"
           value={hwidBoundOnly ? "BOUND" : "ALL"}
           onChange={(e) => onChangeHwidBound(e.target.value === "BOUND")}
         >
-          <option value="ALL">Semua Perangkat</option>
-          <option value="BOUND">Hanya Perangkat Terikat HWID</option>
+          <option value="ALL">Semua Status Perangkat</option>
+          <option value="BOUND">Hanya Perangkat Aktif (Portable)</option>
         </SelectField>
 
         <div className="pt-2 text-right">

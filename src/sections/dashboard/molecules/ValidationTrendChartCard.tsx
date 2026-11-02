@@ -89,7 +89,7 @@ export function ValidationTrendChartCard({
         <div>
           <h3 className="text-base font-bold text-slate-900">Tren Validasi Engine</h3>
           <p className="mt-0.5 text-xs text-slate-500">
-            Aktivitas verifikasi dan autentikasi HWID dari mesin klien
+            Aktivitas verifikasi dan autentikasi lisensi dari mesin klien
           </p>
         </div>
         <ChartRangeToggle value={selectedRange} onChange={handleRangeChange} />

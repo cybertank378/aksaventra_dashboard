@@ -98,3 +98,21 @@ export interface DistributionChartResponseDTO {
   total: number;
   slices: DistributionSliceDTO[];
 }
+
+export interface RenewalReminderItemDTO {
+  id: string;
+  clientName: string;
+  serialKey: string;
+  daysRemaining: number;
+  expiresAt: string;
+  recipientEmail: string | null;
+  status: "SENT" | "QUEUED" | "FAILED";
+}
+
+export interface RenewalReminderResponseDTO {
+  success: boolean;
+  totalProcessed: number;
+  sentCount: number;
+  message: string;
+  reminders: RenewalReminderItemDTO[];
+}

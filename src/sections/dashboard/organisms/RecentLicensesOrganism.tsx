@@ -62,7 +62,7 @@ export function RecentLicensesOrganism({
           Daftar Lisensi & Alokasi Perangkat Terbaru
         </h3>
         <p className="mt-0.5 text-xs text-slate-500">
-          Pemantauan binding HWID mesin klien dan siklus kedaluwarsa lisensi
+          Pemantauan alokasi perangkat mesin klien dan siklus kedaluwarsa lisensi
         </p>
       </div>
 

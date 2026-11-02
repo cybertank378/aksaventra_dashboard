@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/core/libs/prisma";
 import type {
   DashboardRepositoryInterface,
+  ExpiringLicenseDetailRecord,
   ExpiringLicenseRecord,
   LicenseStateCounts,
   MonthlyCountRecord,
@@ -108,6 +109,62 @@ export class DashboardRepository implements DashboardRepositoryInterface {
       serialKey: r.serialKey,
       expiresAt: r.expiresAt as Date,
     }));
+  }
+
+  public async findExpiringLicensesForReminder(
+    now: Date,
+    expiringUntil: Date,
+    licenseIds?: string[],
+  ): Promise<ExpiringLicenseDetailRecord[]> {
+    const whereClause: Prisma.LicenseWhereInput = {};
+
+    if (licenseIds && licenseIds.length > 0) {
+      whereClause.id = { in: licenseIds };
+    } else {
+      whereClause.status = "ACTIVE";
+      whereClause.expiresAt = {
+        gt: now,
+        lte: expiringUntil,
+      };
+    }
+
+    const records = await prisma.license.findMany({
+      where: whereClause,
+      include: {
+        user: {
+          select: {
+            email: true,
+          },
+        },
+      },
+      orderBy: { expiresAt: "asc" },
+    });
+
+    return records.map((r) => ({
+      id: r.id,
+      clientName: r.clientName,
+      serialKey: r.serialKey,
+      expiresAt: (r.expiresAt as Date) || now,
+      recipientEmail: r.user?.email || null,
+    }));
+  }
+
+  public async createAuditLog(data: {
+    userId?: string;
+    action: string;
+    target?: string;
+    details?: string;
+    ipAddress?: string;
+  }): Promise<void> {
+    await prisma.auditLog.create({
+      data: {
+        userId: data.userId || null,
+        action: data.action,
+        target: data.target || null,
+        details: data.details || null,
+        ipAddress: data.ipAddress || null,
+      },
+    });
   }
 
   public async findRecentLicenses(

@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { BaseController } from "@/core/http/BaseController";
+import { getCurrentAuth } from "@/modules/auth/infrastructure/decorator/getCurrentAuth";
 import type { DashboardServices } from "@/modules/dashboards/application/services/DashboardServices";
 import { DashboardValidator } from "@/modules/dashboards/infrastructure/validators/dashboard.validator";
+import { canAccess } from "@/security/fieldGuard";
 
 export class DashboardController extends BaseController {
   constructor(private readonly services: DashboardServices) {
@@ -173,6 +175,55 @@ export class DashboardController extends BaseController {
       }
       return NextResponse.json(
         { message: result.getError() || "Gagal memuat proyeksi kedaluwarsa lisensi" },
+        { status: 500 },
+      );
+    } catch (_error) {
+      return NextResponse.json(
+        { message: "Terjadi kesalahan internal pada server" },
+        { status: 500 },
+      );
+    }
+  }
+
+  public async sendRenewalReminders(req: NextRequest): Promise<NextResponse> {
+    try {
+      const auth = await getCurrentAuth(req);
+      if (
+        auth &&
+        !canAccess(auth.role, "LICENSES_MANAGE") &&
+        !canAccess(auth.role, "DASHBOARD_VIEW")
+      ) {
+        return NextResponse.json(
+          { message: "Akses ditolak: Izin LICENSES_MANAGE atau DASHBOARD_VIEW diperlukan." },
+          { status: 403 },
+        );
+      }
+
+      const body = await req.json().catch(() => ({}));
+      const validation = DashboardValidator.validateSendReminder(body);
+      if (!validation.isValid || !validation.data) {
+        const firstErrorKey = Object.keys(validation.errors)[0];
+        return NextResponse.json(
+          { message: validation.errors[firstErrorKey] || "Payload tidak valid" },
+          { status: 400 },
+        );
+      }
+
+      const actorUserId = auth?.userId || req.headers.get("x-auth-user-id") || undefined;
+      const actorIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
+
+      const result = await this.services.sendRenewalReminders({
+        licenseIds: validation.data.licenseIds,
+        actorUserId,
+        actorIp,
+      });
+
+      if (result.isSuccess) {
+        return NextResponse.json(result.getValue(), { status: 200 });
+      }
+
+      return NextResponse.json(
+        { message: result.getError() || "Gagal mengirim pengingat perpanjangan" },
         { status: 500 },
       );
     } catch (_error) {

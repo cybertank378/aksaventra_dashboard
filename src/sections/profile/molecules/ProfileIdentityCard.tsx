@@ -40,6 +40,7 @@ export const ProfileIdentityCard: FC<ProfileIdentityCardProps> = ({
         <div className="flex items-start gap-4">
           <Avatar
             name={profile.name || profile.email}
+            image={profile.image}
             size="lg"
             className="bg-blue-600 text-white shrink-0 text-xl font-bold"
           />

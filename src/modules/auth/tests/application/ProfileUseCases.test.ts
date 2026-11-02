@@ -130,7 +130,42 @@ describe("Profile Use Cases (Triple A Pattern)", () => {
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: "usr-1" },
         data: { name: "Updated Name" },
-        select: { id: true, name: true, email: true },
+        select: { id: true, name: true, email: true, image: true },
+      });
+      expect(prisma.auditLog.create).toHaveBeenCalled();
+    });
+
+    it("should update user avatar image when provided in dto", async () => {
+      // Arrange
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        id: "usr-1",
+        name: "Admin User",
+        email: "admin@aksaventra.co.id",
+        image: null,
+      } as unknown as never);
+
+      vi.mocked(prisma.user.update).mockResolvedValue({
+        id: "usr-1",
+        name: "Admin User",
+        email: "admin@aksaventra.co.id",
+        image: "data:image/png;base64,samplebase64",
+      } as unknown as never);
+
+      const useCase = new UpdateProfileUseCase();
+
+      // Act
+      const result = await useCase.execute({
+        userId: "usr-1",
+        dto: { name: "Admin User", image: "data:image/png;base64,samplebase64" },
+        ipAddress: "127.0.0.1",
+      });
+
+      // Assert
+      expect(result.image).toBe("data:image/png;base64,samplebase64");
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: "usr-1" },
+        data: { name: "Admin User", image: "data:image/png;base64,samplebase64" },
+        select: { id: true, name: true, email: true, image: true },
       });
       expect(prisma.auditLog.create).toHaveBeenCalled();
     });

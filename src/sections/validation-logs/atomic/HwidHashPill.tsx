@@ -22,7 +22,7 @@ export const HwidHashPill = ({ hwidHash, className }: Props) => {
     try {
       await navigator.clipboard.writeText(hwidHash);
       setCopied(true);
-      showSuccessToast("Hash HWID berhasil disalin ke clipboard");
+      showSuccessToast("Hash perangkat berhasil disalin ke clipboard");
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback
@@ -32,13 +32,13 @@ export const HwidHashPill = ({ hwidHash, className }: Props) => {
   return (
     <div
       className={`inline-flex items-center gap-1.5 rounded-lg border border-slate-200/90 bg-slate-50/70 px-2.5 py-1 text-xs font-mono text-slate-600 ${className ?? ""}`}
-      title={`HWID Hash SHA-256: ${hwidHash}`}
+      title={`Hash Perangkat SHA-256: ${hwidHash}`}
     >
       <span className="truncate">{truncateHash(hwidHash, 8, 6)}</span>
       <button
         type="button"
         onClick={handleCopy}
-        aria-label="Salin Hash HWID"
+        aria-label="Salin Hash Perangkat"
         className="rounded p-0.5 text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition-colors"
       >
         {copied ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}

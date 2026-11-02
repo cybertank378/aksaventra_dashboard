@@ -63,7 +63,7 @@ export const ReleaseUpdateLogsView: React.FC<ReleaseUpdateLogsViewProps> = ({ lo
           <TableHeaderCell>Aksi</TableHeaderCell>
           <TableHeaderCell>Versi Klien</TableHeaderCell>
           <TableHeaderCell>Channel</TableHeaderCell>
-          <TableHeaderCell>Hardware ID (HWID)</TableHeaderCell>
+          <TableHeaderCell>Identitas Perangkat</TableHeaderCell>
           <TableHeaderCell>Serial Key</TableHeaderCell>
           <TableHeaderCell>IP Address</TableHeaderCell>
         </TableRow>
