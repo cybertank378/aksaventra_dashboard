@@ -41,9 +41,9 @@ export function generateValidationLogSeedData(): ValidationLogSeedItem[] {
         hwidHash: dummyHwidHash,
         result: "VERIFIED",
         statusCode: 200,
-        engineVersion: "v2.2.1",
+        engineVersion: "v2.2.3",
         clientIp: "192.168.1.100",
-        userAgent: "AksaventraEngine/2.2.1 (Windows)",
+        userAgent: "AksaventraEngine/2.2.3 (Windows)",
         latencyMs: 12 + ((day + i) % 15),
         checkedAt: new Date(dayTimestamp + minuteOffset),
       });
@@ -57,9 +57,9 @@ export function generateValidationLogSeedData(): ValidationLogSeedItem[] {
         hwidHash: dummyHwidHash,
         result: "ACTIVATED",
         statusCode: 200,
-        engineVersion: "v2.2.1",
+        engineVersion: "v2.2.3",
         clientIp: "10.0.0.12",
-        userAgent: "AksaventraEngine/2.2.1 (Windows)",
+        userAgent: "AksaventraEngine/2.2.3 (Windows)",
         latencyMs: 25 + (day % 10),
         checkedAt: new Date(dayTimestamp + 30 * 60 * 1000),
       });

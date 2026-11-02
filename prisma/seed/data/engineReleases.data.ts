@@ -16,7 +16,7 @@ export interface EngineReleaseSeedItem {
 
 export const INITIAL_ENGINE_RELEASES: EngineReleaseSeedItem[] = [
   {
-    version: "v2.2.2",
+    version: "v2.2.3",
     channel: "STABLE",
     minSupportedVersion: "v2.0.0",
     mandatory: false,
@@ -24,13 +24,13 @@ export const INITIAL_ENGINE_RELEASES: EngineReleaseSeedItem[] = [
     checksumSha256: "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     fileSize: BigInt(13841200),
     releaseNotes:
-      "Pembaruan penanganan lisensi otomatis, perbaikan handshake HWID, dan optimasi performa Rust engine.",
+      "Pembaruan penanganan lisensi portable otomatis dan optimasi performa Rust engine.",
     isActive: true,
     downloadCount: 154,
-    publishedAt: new Date("2026-10-25T08:00:00Z"),
+    publishedAt: new Date("2026-10-31T08:00:00Z"),
   },
   {
-    version: "v2.2.1",
+    version: "v2.2.2",
     channel: "STABLE",
     minSupportedVersion: "v2.0.0",
     mandatory: false,
