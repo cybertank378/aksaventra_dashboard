@@ -23,6 +23,7 @@ export interface SidebarUserSummary {
   id?: string;
   name?: string | null;
   email?: string | null;
+  image?: string | null;
   role?: UserRole;
 }
 
@@ -169,9 +170,10 @@ export default function AppSidebar({ role = "ADMIN", user, mobileOpen, onClose }
                 <Image
                   src="/assets/images/logo/logo.png"
                   alt="Aksaventra Logo"
-                  width={32}
-                  height={32}
-                  className="h-7 w-7 object-contain"
+                  width={28}
+                  height={28}
+                  style={{ width: "auto", height: "auto" }}
+                  className="max-h-7 max-w-7 object-contain"
                 />
               </div>
 
@@ -192,9 +194,10 @@ export default function AppSidebar({ role = "ADMIN", user, mobileOpen, onClose }
                   <Image
                     src="/assets/images/logo/logo.png"
                     alt="Aksaventra Logo"
-                    width={30}
-                    height={30}
-                    className="h-7 w-7 object-contain"
+                    width={28}
+                    height={28}
+                    style={{ width: "auto", height: "auto" }}
+                    className="max-h-7 max-w-7 object-contain"
                   />
                 </div>
 

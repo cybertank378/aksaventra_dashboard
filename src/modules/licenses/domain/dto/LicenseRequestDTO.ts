@@ -21,6 +21,8 @@ export interface LicenseQueryDTO {
   search?: string;
   status?: "ALL" | LicenseStatus;
   binding?: "ALL" | "BOUND" | "UNBOUND";
+  userId?: string;
+  npsn?: string;
   expiringSoon?: boolean;
   sortBy?: "createdAt" | "expiresAt" | "lastVerifiedAt" | "clientName";
   sortOrder?: "asc" | "desc";
@@ -31,6 +33,8 @@ export interface LicenseQueryDTO {
  */
 export interface CreateLicenseDTO {
   clientName: string;
+  npsn?: string;
+  userId?: string;
   tier?: "TRIAL" | "PRO" | "ENTERPRISE";
   durationMonths?: number;
   expiresAt?: string;

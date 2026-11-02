@@ -41,7 +41,6 @@ describe("CreateLicenseUseCase (Triple A)", () => {
     expect(created.clientName).toBe("PT Sumber Makmur");
     expect(created.serialKey).toMatch(/^AKSA-PRO-\d{4}-[A-Z0-9]+$/);
     expect(created.status).toBe("ACTIVE");
-    expect(created.isBound).toBe(false);
     expect(created.expiresAt).not.toBeNull();
     expect(mockRepo.save).toHaveBeenCalledWith(
       expect.anything(),

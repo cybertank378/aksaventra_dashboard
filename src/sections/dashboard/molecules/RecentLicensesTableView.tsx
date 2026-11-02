@@ -86,7 +86,7 @@ export function RecentLicensesTableView({
             <TableHeaderCell className="py-3.5 px-4 text-left">Nama Klien</TableHeaderCell>
             <TableHeaderCell className="py-3.5 px-4 text-left">Kunci Serial</TableHeaderCell>
             <TableHeaderCell className="py-3.5 px-4 text-left">Versi Engine</TableHeaderCell>
-            <TableHeaderCell className="py-3.5 px-4 text-left">Status HWID</TableHeaderCell>
+            <TableHeaderCell className="py-3.5 px-4 text-left">Status Perangkat</TableHeaderCell>
             <TableHeaderCell className="py-3.5 px-4 text-left">Kedaluwarsa</TableHeaderCell>
             <TableHeaderCell className="py-3.5 px-4 text-left">Status</TableHeaderCell>
             {canManage && (

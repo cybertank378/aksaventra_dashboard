@@ -54,6 +54,7 @@ export const UserFilterBar = ({
               <option value="ADMIN">ADMIN</option>
               <option value="OPERATOR">OPERATOR</option>
               <option value="AUDITOR">AUDITOR</option>
+              <option value="CLIENT">CLIENT</option>
             </SelectField>
           </div>
 

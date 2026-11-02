@@ -21,6 +21,7 @@ export interface UserStatsResult {
     ADMIN: number;
     OPERATOR: number;
     AUDITOR: number;
+    CLIENT: number;
   };
 }
 

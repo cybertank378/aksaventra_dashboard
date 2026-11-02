@@ -7,6 +7,8 @@ export interface LicenseProps {
   id: string;
   serialKey: string;
   hwid?: string | null;
+  npsn?: string | null;
+  userId?: string | null;
   clientName: string;
   vaultSecret: string;
   status: LicenseStatus;
@@ -36,6 +38,14 @@ export class LicenseEntity extends BaseEntity<string> {
 
   get hwid(): string | null | undefined {
     return this.props.hwid;
+  }
+
+  get npsn(): string | null | undefined {
+    return this.props.npsn;
+  }
+
+  get userId(): string | null | undefined {
+    return this.props.userId;
   }
 
   get clientName(): string {
@@ -162,12 +172,16 @@ export class LicenseEntity extends BaseEntity<string> {
     this._updatedAt = now;
   }
 
-  public markVerified(engineVersion?: string): void {
-    this.props.lastVerifiedAt = new Date();
+  public markVerified(engineVersion?: string, hwid?: string): void {
+    const now = new Date();
+    this.props.lastVerifiedAt = now;
+    if (hwid) {
+      this.props.hwid = hwid.trim();
+    }
     if (engineVersion) {
       this.props.engineVersion = engineVersion;
     }
-    this._updatedAt = new Date();
+    this._updatedAt = now;
   }
 
   public toResponseContract(
@@ -181,6 +195,7 @@ export class LicenseEntity extends BaseEntity<string> {
       valid: true,
       message,
       client_name: this.props.clientName,
+      npsn: this.props.npsn ?? null,
       vault_secret: this.props.vaultSecret,
       expires_at: expiresAtUnix,
     };

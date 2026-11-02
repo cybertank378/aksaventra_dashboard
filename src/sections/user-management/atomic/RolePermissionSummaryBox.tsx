@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Eye, ShieldAlert, ShieldCheck, UserCheck } from "lucide-react";
 import type { UserRole } from "@/libs/enums";
 import Card from "@/shared-ui/component/Card";
 
@@ -18,11 +18,11 @@ export const RolePermissionSummaryBox = ({ role, className }: RolePermissionSumm
           badgeColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
           icon: <ShieldCheck className="w-5 h-5 text-emerald-600" />,
           description:
-            "Akses kontrol penuh ke modul User Management, License Generation & HWID Reset, Engine Registry & Release, serta Audit Log Keamanan.",
+            "Akses kontrol penuh ke modul User Management, License Generation & Device Reset, Engine Registry & Release, serta Audit Log Keamanan.",
           permissions: [
             "Kelola akun & hak akses semua pengguna",
             "Generate & suspend lisensi mesin",
-            "Reset HWID mesin klien",
+            "Reset riwayat perangkat klien",
             "Publish rilis update aksaventra_engine.exe",
           ],
         };
@@ -36,7 +36,7 @@ export const RolePermissionSummaryBox = ({ role, className }: RolePermissionSumm
           permissions: [
             "Lihat direktori lisensi (Read-Only)",
             "Pantau log validasi & uptime mesin",
-            "Dilarang membuat lisensi & mereset HWID",
+            "Dilarang membuat lisensi & mereset perangkat",
             "Dilarang mengelola akun pengguna",
           ],
         };
@@ -46,12 +46,26 @@ export const RolePermissionSummaryBox = ({ role, className }: RolePermissionSumm
           badgeColor: "text-amber-700 bg-amber-50 border-amber-200",
           icon: <Eye className="w-5 h-5 text-amber-600" />,
           description:
-            "Akses read-only khusus audit kepatuhan, histori jejak mutasi lisensi, investigasi anomali HWID mismatch, dan verifikasi checksum SHA-256.",
+            "Akses read-only khusus audit kepatuhan, histori jejak mutasi lisensi, investigasi anomali validasi, dan verifikasi checksum SHA-256.",
           permissions: [
             "Audit seluruh log aktivitas pengguna & sistem",
             "Investigasi kegagalan validasi mesin klien",
             "Verifikasi integritas binary & signature",
             "Akses murni Read-Only tanpa hak mutasi",
+          ],
+        };
+      case "CLIENT":
+        return {
+          title: "Klien / Pemilik Lisensi",
+          badgeColor: "text-purple-700 bg-purple-50 border-purple-200",
+          icon: <UserCheck className="w-5 h-5 text-purple-600" />,
+          description:
+            "Akses portal pelanggan untuk memeriksa serial key, status aktivasi, dan masa berlaku lisensi yang dimiliki.",
+          permissions: [
+            "Lihat informasi lisensi yang dimiliki",
+            "Pantau masa kedaluwarsa lisensi",
+            "Dilarang mengakses log validasi sistem",
+            "Akses murni Read-Only terbatas pada portal klien",
           ],
         };
     }

@@ -18,6 +18,7 @@ export default function LicenseCreateOrganism() {
   const handleCreateLicense = async (values: CreateLicenseFormValues) => {
     const result = await createLicense({
       clientName: values.clientName,
+      npsn: values.npsn,
       customSerialKey: values.serialKey,
       tier: values.tier,
       durationMonths: values.durationMonths,
@@ -73,7 +74,7 @@ export default function LicenseCreateOrganism() {
             </div>
 
             <Badge color="success" variant="filled">
-              Siap Aktivasi HWID
+              Siap Digunakan
             </Badge>
           </div>
         </Card>

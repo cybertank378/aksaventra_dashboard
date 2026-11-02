@@ -210,6 +210,19 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     const pathname = request.nextUrl.pathname;
 
     ////////////////////////////////////////////////////////////
+    // MITIGASI CVE-2025-29927 (Subrequest Bypass Prevention)
+    ////////////////////////////////////////////////////////////
+    if (request.headers.has("x-middleware-subrequest")) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Forbidden internal subrequest header detected",
+        },
+        { status: 403 },
+      );
+    }
+
+    ////////////////////////////////////////////////////////////
     // STATIC BYPASS
     ////////////////////////////////////////////////////////////
     if (isStaticAsset(pathname)) {

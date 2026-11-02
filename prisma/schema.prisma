@@ -16,6 +16,7 @@ enum UserRole {
   ADMIN
   OPERATOR
   AUDITOR
+  CLIENT
 }
 
 enum EngineStatus {
@@ -46,6 +47,12 @@ enum ReleaseChannel {
   NIGHTLY
 }
 
+enum SettingCategory {
+  LICENSE_ENGINE
+  SECURITY_AUTH
+  RETENTION_AUDIT
+}
+
 // ----------------------------------------------------
 // USER & AUTHENTICATION MODELS
 // ----------------------------------------------------
@@ -54,6 +61,7 @@ model User {
   id          String    @id @default(uuid())
   email       String    @unique
   name        String?
+  image       String?
   password    String // Password hash (e.g. bcrypt/argon2)
   role        UserRole  @default(ADMIN)
   isActive    Boolean   @default(true)
@@ -61,8 +69,10 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  sessions  Session[]
-  auditLogs AuditLog[]
+  sessions        Session[]
+  auditLogs       AuditLog[]
+  licenses        License[]
+  updatedSettings SystemSetting[]
 
   @@map("users")
 }
@@ -144,6 +154,9 @@ model License {
   id             String        @id @default(uuid())
   serialKey      String        @unique @map("serial_key")
   hwid           String?       @map("hwid")
+  npsn           String?       @map("npsn")
+  userId         String?       @map("user_id")
+  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   clientName     String        @map("client_name")
   vaultSecret    String        @map("vault_secret")
   status         LicenseStatus @default(ACTIVE)
@@ -158,6 +171,8 @@ model License {
 
   @@index([serialKey])
   @@index([hwid])
+  @@index([npsn])
+  @@index([userId])
   @@map("licenses")
 }
 
@@ -231,4 +246,23 @@ model EngineUpdateLog {
   @@index([releaseId])
   @@index([action, createdAt])
   @@map("engine_update_logs")
+}
+
+// ----------------------------------------------------
+// SYSTEM SETTINGS & CONFIGURATION (Issue #37)
+// ----------------------------------------------------
+
+model SystemSetting {
+  key         String          @id @map("setting_key")
+  category    SettingCategory
+  value       String          @map("setting_value") // Serialized string / json
+  valueType   String          @default("string") @map("value_type") // "number" | "boolean" | "string"
+  description String?
+  updatedById String?         @map("updated_by_id")
+  updatedBy   User?           @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@map("system_settings")
 }

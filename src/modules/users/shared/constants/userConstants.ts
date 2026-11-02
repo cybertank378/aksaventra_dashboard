@@ -8,4 +8,5 @@ export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
   OPERATOR: "Operasional harian lisensi, pelepasan ikatan HWID perangkat, serta pemantauan engine.",
   AUDITOR:
     "Akses Read-Only untuk pemeriksaan kepatuhan lisensi, jejak audit forensik, dan analitik.",
+  CLIENT: "Akses portal klien untuk melihat status dan masa berlaku lisensi yang dimiliki.",
 };

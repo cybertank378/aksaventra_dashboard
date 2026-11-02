@@ -37,11 +37,11 @@ export default function SerialKeyBadge({ serialKey, hwid }: Props) {
 
       {hwid ? (
         <Badge color="info" variant="outline" className="w-fit font-mono text-[11px]">
-          HWID: {hwid}
+          Perangkat: {hwid}
         </Badge>
       ) : (
         <Badge color="secondary" variant="soft" className="w-fit text-[11px]">
-          Belum Terikat Perangkat
+          Belum Digunakan (Portable)
         </Badge>
       )}
     </div>

@@ -95,6 +95,14 @@ export function getPrismaPool(): pg.Pool {
  */
 export function getPrismaClient(): PrismaClient {
   const pool = getPrismaPool();
+  if (
+    state.prisma &&
+    process.env.NODE_ENV !== "production" &&
+    typeof (state.prisma as unknown as Record<string, unknown>).systemSetting === "undefined"
+  ) {
+    state.prisma = undefined;
+  }
+
   if (!state.prisma) {
     const adapter = new PrismaPg(pool);
     state.prisma = new PrismaClient({ adapter });

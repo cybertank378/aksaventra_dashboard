@@ -162,7 +162,7 @@ export class ValidateLicenseUseCase
       });
     }
 
-    // Kasus 1: Valid & HWID Kosong (Aktivasi Baru)
+    // Kasus 1: Valid & Belum Terdaftar HWID (Aktivasi Baru)
     if (!license.hasHardwareBinding()) {
       license.bindHardwareId(hwid);
       if (dto.engine_version) {
@@ -184,40 +184,21 @@ export class ValidateLicenseUseCase
       );
 
       return Result.ok(
-        license.toResponseContract("Lisensi berhasil diaktivasi dan dikunci pada perangkat ini."),
+        license.toResponseContract("Lisensi berhasil diaktivasi pada perangkat ini."),
       );
     }
 
-    // Kasus 2: Valid & HWID Cocok (Device Terdaftar)
-    if (license.matchesHardwareId(hwid)) {
-      license.markVerified(dto.engine_version);
-      await this.licenseRepo.update(license);
+    // Kasus 2: Valid & Multi-Device Portable (Device Terdaftar / Perangkat Baru pada Flashdisk Portable)
+    // Mendukung penuh portabilitas flashdisk / drive eksternal tanpa batasan penolakan HWID Mismatch
+    license.markVerified(dto.engine_version, hwid);
+    await this.licenseRepo.update(license);
 
-      const latencyMs = Date.now() - startedAt;
-      await this.safeRecordLog(
-        serialKey,
-        hwid,
-        "VERIFIED",
-        200,
-        license.id,
-        dto.engine_version,
-        dto.clientIp,
-        dto.userAgent,
-        latencyMs,
-      );
-
-      return Result.ok(
-        license.toResponseContract("Lisensi aktif dan terverifikasi untuk perangkat ini."),
-      );
-    }
-
-    // Kasus 3: Valid tapi HWID Berbeda (Hardware Mismatch)
     const latencyMs = Date.now() - startedAt;
     await this.safeRecordLog(
       serialKey,
       hwid,
-      "HWID_MISMATCH",
-      403,
+      "VERIFIED",
+      200,
       license.id,
       dto.engine_version,
       dto.clientIp,
@@ -225,10 +206,6 @@ export class ValidateLicenseUseCase
       latencyMs,
     );
 
-    return Result.fail({
-      statusCode: 403,
-      message:
-        "Hardware Mismatch: Serial key ini telah terkunci pada perangkat keras (HWID) lain. Silakan hubungi administrator di https://aksaventra.ai.id untuk mereset perangkat terdaftar.",
-    });
+    return Result.ok(license.toResponseContract("Lisensi aktif dan terverifikasi."));
   }
 }

@@ -354,4 +354,27 @@ describe("Aksaventra Proxy Gateway (Triple A Pattern)", () => {
       expect(data.message).toBe("Proxy internal error");
     });
   });
+
+  /* ==========================================================
+   * 8. CVE-2025-29927 SUBREQUEST BYPASS MITIGATION
+   * ======================================================== */
+  describe("CVE-2025-29927 Subrequest Bypass Mitigation", () => {
+    it("should reject requests containing x-middleware-subrequest header with HTTP 403", async () => {
+      // Arrange
+      const request = new NextRequest("http://localhost:3000/dashboard", {
+        headers: {
+          "x-middleware-subrequest": "1",
+        },
+      });
+
+      // Act
+      const response = await proxy(request);
+      const data = await response.json();
+
+      // Assert
+      expect(response.status).toBe(403);
+      expect(data.success).toBe(false);
+      expect(data.message).toContain("Forbidden internal subrequest header detected");
+    });
+  });
 });

@@ -19,7 +19,7 @@ export function createMockUserRepository(): UserRepositoryInterface {
       activeUsers: 0,
       lockedOrInactiveUsers: 0,
       activeSessionsCount: 0,
-      roleCounts: { ADMIN: 0, OPERATOR: 0, AUDITOR: 0 },
+      roleCounts: { ADMIN: 0, OPERATOR: 0, AUDITOR: 0, CLIENT: 0 },
     }),
     findUserWithDetails: vi.fn().mockResolvedValue(null),
     revokeAllSessions: vi.fn().mockResolvedValue(0),

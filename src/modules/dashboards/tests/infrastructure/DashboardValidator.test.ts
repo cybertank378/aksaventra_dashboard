@@ -70,4 +70,36 @@ describe("DashboardValidator (Triple A Pattern)", () => {
       expect(res.errors.limit).toContain("tidak boleh melebihi 20");
     });
   });
+
+  describe("validateSendReminder", () => {
+    it("should accept empty or undefined body and default to empty object", () => {
+      const res = DashboardValidator.validateSendReminder({});
+      expect(res.isValid).toBe(true);
+      expect(res.data?.licenseIds).toBeUndefined();
+    });
+
+    it("should accept valid string array of licenseIds", () => {
+      const res = DashboardValidator.validateSendReminder({
+        licenseIds: ["lic-1", "lic-2"],
+      });
+      expect(res.isValid).toBe(true);
+      expect(res.data?.licenseIds).toEqual(["lic-1", "lic-2"]);
+    });
+
+    it("should reject non-array licenseIds", () => {
+      const res = DashboardValidator.validateSendReminder({
+        licenseIds: "invalid-id",
+      });
+      expect(res.isValid).toBe(false);
+      expect(res.errors.licenseIds).toContain("harus berupa array string");
+    });
+
+    it("should reject non-string items within licenseIds", () => {
+      const res = DashboardValidator.validateSendReminder({
+        licenseIds: [123, null],
+      });
+      expect(res.isValid).toBe(false);
+      expect(res.errors.licenseIds).toContain("harus berupa string valid");
+    });
+  });
 });

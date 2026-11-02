@@ -11,6 +11,7 @@ import TextField from "@/shared-ui/component/TextField";
 
 export interface CreateLicenseFormValues {
   clientName: string;
+  npsn?: string;
   serialKey: string;
   tier: LicenseTier;
   durationMonths: number;
@@ -30,6 +31,7 @@ function generateSerialKey(tier: LicenseTier): string {
 
 export default function LicenseCreateFormView({ loading = false, onSubmitLicense }: Props) {
   const [clientName, setClientName] = useState("");
+  const [npsn, setNpsn] = useState("");
   const [tier, setTier] = useState<LicenseTier>("PRO");
   const [durationMonths, setDurationMonths] = useState(12);
   const [serialKey, setSerialKey] = useState(() => generateSerialKey("PRO"));
@@ -46,6 +48,7 @@ export default function LicenseCreateFormView({ loading = false, onSubmitLicense
 
     onSubmitLicense({
       clientName: clientName.trim(),
+      npsn: npsn.trim() || undefined,
       serialKey: serialKey.trim(),
       tier,
       durationMonths,
@@ -74,6 +77,14 @@ export default function LicenseCreateFormView({ loading = false, onSubmitLicense
           value={clientName}
           onChange={(e) => setClientName(e.target.value)}
           helperText="Nama resmi organisasi pemilik lisensi"
+        />
+
+        <TextField
+          label="NPSN (Nomor Pokok Sekolah Nasional)"
+          placeholder="Contoh: 20101234 (Opsional)"
+          value={npsn}
+          onChange={(e) => setNpsn(e.target.value)}
+          helperText="Identitas unik sekolah/madrasah untuk validasi engine"
         />
 
         <SelectField

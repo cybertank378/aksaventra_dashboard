@@ -30,7 +30,7 @@ export const ValidationLogDetailModal: React.FC<Props> = ({ open, onClose, detai
     try {
       await navigator.clipboard.writeText(log.hwidHash);
       setCopiedHwid(true);
-      showSuccessToast("Hash HWID SHA-256 berhasil disalin");
+      showSuccessToast("Hash perangkat SHA-256 berhasil disalin");
       setTimeout(() => setCopiedHwid(false), 2000);
     } catch {
       // Fallback
@@ -95,9 +95,9 @@ export const ValidationLogDetailModal: React.FC<Props> = ({ open, onClose, detai
               Telemetri Biner Mesin (Hardware & Jaringan)
             </h4>
 
-            {/* HWID Hash SHA-256 */}
+            {/* Hash Perangkat SHA-256 */}
             <div>
-              <p className="text-xs text-slate-500">Hardware ID Hash (SHA-256)</p>
+              <p className="text-xs text-slate-500">Hash Identitas Perangkat (SHA-256)</p>
               <div className="mt-1 flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700">
                 <span className="truncate">
                   {log.hwidHash ?? "Tidak terdeteksi / tidak dikirim"}

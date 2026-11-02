@@ -46,7 +46,6 @@ describe("ListLicensesUseCase (Triple A)", () => {
     expect(data.licenses).toHaveLength(1);
     expect(data.licenses[0].clientName).toBe("PT Nusantara");
     expect(data.licenses[0].serialKey).toBe("AKSA-PRO-2026-ABCD");
-    expect(data.licenses[0].isBound).toBe(true);
     expect(data.pagination.total).toBe(1);
     expect(data.pagination.totalPages).toBe(1);
   });

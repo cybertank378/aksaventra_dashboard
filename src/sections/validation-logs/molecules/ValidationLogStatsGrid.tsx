@@ -28,11 +28,11 @@ export const ValidationLogStatsGrid: React.FC<Props> = ({ stats, loading }) => {
       description: "Tingkat sukses otentikasi (200 OK)",
     },
     {
-      title: "Pelanggaran HWID",
+      title: "Anomali Validasi",
       value: `${(stats?.hwidMismatchCount24h ?? 0).toLocaleString("id-ID")} kasus`,
       icon: ShieldAlert,
       color: "text-rose-600 bg-rose-50 border-rose-100",
-      description: "Penolakan 403 Hardware Mismatch",
+      description: "Riwayat penolakan validasi",
     },
     {
       title: "Rata-rata Latensi API",

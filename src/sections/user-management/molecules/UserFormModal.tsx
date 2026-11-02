@@ -156,6 +156,7 @@ export const UserFormModal = ({
             <option value="ADMIN">ADMIN - Kontrol Penuh Lisensi & Pengguna</option>
             <option value="OPERATOR">OPERATOR - Pemantau Validasi & Telemetri</option>
             <option value="AUDITOR">AUDITOR - Auditor Log & Anomali Sistem</option>
+            <option value="CLIENT">CLIENT - Portal Pelanggan / Pemilik Lisensi</option>
           </SelectField>
         </div>
 

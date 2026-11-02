@@ -61,7 +61,7 @@ export class UserRepository implements UserRepositoryInterface {
           name: persistenceData.name,
           email: persistenceData.email,
           password: passwordHash,
-          role: persistenceData.role as "ADMIN" | "OPERATOR" | "AUDITOR",
+          role: persistenceData.role as "ADMIN" | "OPERATOR" | "AUDITOR" | "CLIENT",
           isActive: persistenceData.isActive,
           createdAt: persistenceData.createdAt,
           updatedAt: persistenceData.updatedAt,
@@ -91,7 +91,7 @@ export class UserRepository implements UserRepositoryInterface {
         data: {
           name: persistenceData.name,
           email: persistenceData.email,
-          role: persistenceData.role as "ADMIN" | "OPERATOR" | "AUDITOR",
+          role: persistenceData.role as "ADMIN" | "OPERATOR" | "AUDITOR" | "CLIENT",
           isActive: persistenceData.isActive,
           updatedAt: new Date(),
         },
@@ -219,6 +219,7 @@ export class UserRepository implements UserRepositoryInterface {
       ADMIN: 0,
       OPERATOR: 0,
       AUDITOR: 0,
+      CLIENT: 0,
     };
 
     for (const group of roleAggregations) {

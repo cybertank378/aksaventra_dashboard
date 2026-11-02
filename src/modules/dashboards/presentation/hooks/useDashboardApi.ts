@@ -11,6 +11,7 @@ import type {
   DashboardSummaryResponseDTO,
   DistributionChartResponseDTO,
   RecentLicensesResponseDTO,
+  RenewalReminderResponseDTO,
   TimeSeriesChartResponseDTO,
 } from "@/modules/dashboards/domain/dto/DashboardResponseDTO";
 import type { ValidationTrendSeriesKey } from "@/modules/dashboards/domain/types/ValidationTrendSeriesKey";
@@ -133,6 +134,21 @@ export const useDashboardApi = () => {
     [execute],
   );
 
+  const sendRenewalReminders = useCallback(
+    (licenseIds?: string[]) =>
+      execute(async () => {
+        const response = await apiRequest<RenewalReminderResponseDTO>(
+          "/api/v1/dashboard/reminders/send",
+          {
+            method: "POST",
+            payload: licenseIds && licenseIds.length > 0 ? { licenseIds } : {},
+          },
+        );
+        return unwrapApiResponse(response);
+      }),
+    [execute],
+  );
+
   return {
     loading,
     error,
@@ -144,5 +160,6 @@ export const useDashboardApi = () => {
     getLicenseStatusDistribution,
     getIssuanceTrend,
     getExpiryForecast,
+    sendRenewalReminders,
   };
 };

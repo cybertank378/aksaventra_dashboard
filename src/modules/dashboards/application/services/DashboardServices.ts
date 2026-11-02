@@ -1,5 +1,6 @@
 import { BaseService } from "@/core/application/BaseService";
 import type { Result } from "@/core/domain/Result";
+import type { MailProviderInterface } from "@/modules/auth/domain/interfaces/MailProviderInterface";
 import { GetDashboardSummaryUseCase } from "@/modules/dashboards/application/usecase/GetDashboardSummaryUseCase";
 import { GetExpiryForecastUseCase } from "@/modules/dashboards/application/usecase/GetExpiryForecastUseCase";
 import { GetIssuanceTrendUseCase } from "@/modules/dashboards/application/usecase/GetIssuanceTrendUseCase";
@@ -7,6 +8,10 @@ import { GetLicenseStatusDistributionUseCase } from "@/modules/dashboards/applic
 import { GetRecentActivitiesUseCase } from "@/modules/dashboards/application/usecase/GetRecentActivitiesUseCase";
 import { GetRecentLicensesUseCase } from "@/modules/dashboards/application/usecase/GetRecentLicensesUseCase";
 import { GetValidationTrendUseCase } from "@/modules/dashboards/application/usecase/GetValidationTrendUseCase";
+import {
+  type SendRenewalReminderInputDTO,
+  SendRenewalReminderUseCase,
+} from "@/modules/dashboards/application/usecase/SendRenewalReminderUseCase";
 import type {
   ActivitiesQueryDTO,
   ChartRangeQueryDTO,
@@ -17,6 +22,7 @@ import type {
   DashboardSummaryResponseDTO,
   DistributionChartResponseDTO,
   RecentLicensesResponseDTO,
+  RenewalReminderResponseDTO,
   TimeSeriesChartResponseDTO,
 } from "@/modules/dashboards/domain/dto/DashboardResponseDTO";
 import type { ClockInterface } from "@/modules/dashboards/domain/interfaces/ClockInterface";
@@ -53,12 +59,17 @@ export class DashboardServices extends BaseService {
   private readonly getLicenseStatusDistributionUseCase: GetLicenseStatusDistributionUseCase;
   private readonly getIssuanceTrendUseCase: GetIssuanceTrendUseCase;
   private readonly getExpiryForecastUseCase: GetExpiryForecastUseCase;
+  private readonly sendRenewalReminderUseCase: SendRenewalReminderUseCase;
 
   //////////////////////////////////////////////////////////////
   // CONSTRUCTOR
   //////////////////////////////////////////////////////////////
 
-  constructor(repository: DashboardRepositoryInterface, clock: ClockInterface) {
+  constructor(
+    repository: DashboardRepositoryInterface,
+    clock: ClockInterface,
+    mailProvider?: MailProviderInterface,
+  ) {
     super("DashboardService");
 
     ////////////////////////////////////////////////////////////
@@ -80,6 +91,11 @@ export class DashboardServices extends BaseService {
     );
     this.getIssuanceTrendUseCase = new GetIssuanceTrendUseCase(repository, clock);
     this.getExpiryForecastUseCase = new GetExpiryForecastUseCase(repository, clock);
+    this.sendRenewalReminderUseCase = new SendRenewalReminderUseCase(
+      repository,
+      clock,
+      mailProvider,
+    );
   }
 
   /* ==========================================================
@@ -142,6 +158,16 @@ export class DashboardServices extends BaseService {
 
   getExpiryForecast(): Promise<Result<TimeSeriesChartResponseDTO, string>> {
     return this.execute(() => this.getExpiryForecastUseCase.execute());
+  }
+
+  /* ==========================================================
+   * SEND RENEWAL REMINDERS
+   * ======================================================== */
+
+  sendRenewalReminders(
+    request?: SendRenewalReminderInputDTO,
+  ): Promise<Result<RenewalReminderResponseDTO, string>> {
+    return this.execute(() => this.sendRenewalReminderUseCase.execute(request));
   }
 }
 

@@ -38,6 +38,7 @@ export interface UserStatsResponseDTO {
     ADMIN: number;
     OPERATOR: number;
     AUDITOR: number;
+    CLIENT: number;
   };
 }
 

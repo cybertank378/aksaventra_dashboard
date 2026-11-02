@@ -14,7 +14,7 @@ export interface ValidationResult<T> {
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const VALID_ROLES = new Set<UserRole>(["ADMIN", "OPERATOR", "AUDITOR"]);
+const VALID_ROLES = new Set<UserRole>(["ADMIN", "OPERATOR", "AUDITOR", "CLIENT"]);
 const VALID_ACCOUNT_STATES = new Set<UserAccountState>(["ACTIVE", "LOCKED", "INACTIVE"]);
 
 export class UserValidator {
@@ -111,7 +111,7 @@ export class UserValidator {
     if (VALID_ROLES.has(roleRaw as UserRole)) {
       role = roleRaw as UserRole;
     } else {
-      errors.role = "Role tidak valid (pilihan: ADMIN, OPERATOR, AUDITOR)";
+      errors.role = "Role tidak valid (pilihan: ADMIN, OPERATOR, AUDITOR, CLIENT)";
     }
 
     const isValid = Object.keys(errors).length === 0;
@@ -164,7 +164,7 @@ export class UserValidator {
       if (VALID_ROLES.has(roleStr as UserRole)) {
         dto.role = roleStr as UserRole;
       } else {
-        errors.role = "Role tidak valid (pilihan: ADMIN, OPERATOR, AUDITOR)";
+        errors.role = "Role tidak valid (pilihan: ADMIN, OPERATOR, AUDITOR, CLIENT)";
       }
     }
 

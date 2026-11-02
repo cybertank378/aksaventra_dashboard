@@ -108,6 +108,8 @@ export class LicenseValidator {
 
     const page = pageStr && Number(pageStr) > 0 ? Number(pageStr) : 1;
     const limit = limitStr && Number(limitStr) > 0 ? Math.min(100, Number(limitStr)) : 10;
+    const npsn = searchParams.get("npsn")?.trim() || undefined;
+    const userId = searchParams.get("userId")?.trim() || undefined;
 
     const status =
       statusRaw === "ACTIVE" ||
@@ -138,6 +140,8 @@ export class LicenseValidator {
       search,
       status,
       binding,
+      npsn,
+      userId,
       expiringSoon,
       sortBy,
       sortOrder,
@@ -156,6 +160,8 @@ export class LicenseValidator {
 
     const body = input as Record<string, unknown>;
     const clientName = pickFirstString(body, ["clientName", "client_name", "name"]);
+    const npsn = pickFirstString(body, ["npsn"]);
+    const userId = pickFirstString(body, ["userId", "user_id"]);
     const customSerialKey = pickFirstString(body, ["customSerialKey", "serialKey", "serial_key"]);
     const tierRaw = pickFirstString(body, ["tier"]).toUpperCase();
     const durationMonthsNum =
@@ -176,6 +182,8 @@ export class LicenseValidator {
       errors,
       data: {
         clientName,
+        npsn: npsn || undefined,
+        userId: userId || undefined,
         customSerialKey: customSerialKey || undefined,
         tier,
         durationMonths: durationMonthsNum,

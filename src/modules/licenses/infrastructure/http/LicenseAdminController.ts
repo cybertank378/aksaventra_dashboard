@@ -32,6 +32,11 @@ export class LicenseAdminController extends BaseController {
       const url = new URL(req.url);
       const query = LicenseValidator.validateListQuery(url.searchParams);
 
+      // Jika role adalah CLIENT, batasi otomatis hanya lisensi miliknya
+      if (auth?.role === "CLIENT") {
+        query.userId = auth.userId;
+      }
+
       const result = await this.services.listLicenses(query, auth?.role);
 
       if (result.isSuccess) {
@@ -78,7 +83,15 @@ export class LicenseAdminController extends BaseController {
       const result = await this.services.getLicenseDetail(id, auth?.role);
 
       if (result.isSuccess) {
-        return NextResponse.json(result.getValue(), { status: 200 });
+        const detail = result.getValue();
+        // Client hanya boleh melihat detail lisensi miliknya sendiri
+        if (auth?.role === "CLIENT" && detail.userId && detail.userId !== auth.userId) {
+          return NextResponse.json(
+            { message: "Akses ditolak: Anda tidak memiliki lisensi ini." },
+            { status: 403 },
+          );
+        }
+        return NextResponse.json(detail, { status: 200 });
       }
 
       const errorMessage = result.getError().message;

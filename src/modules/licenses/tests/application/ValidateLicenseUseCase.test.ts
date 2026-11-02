@@ -48,7 +48,7 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
       expect(data.valid).toBe(true);
       expect(data.client_name).toBe("PT Enterprise Jaya");
       expect(data.vault_secret).toBe("VAULT_SECRET_NEW_123");
-      expect(data.message).toContain("diaktivasi dan dikunci");
+      expect(data.message).toContain("diaktivasi");
       expect(existingLicense.hwid).toBe(hwid);
       expect(mockRepo.update).toHaveBeenCalledWith(existingLicense);
 
@@ -105,17 +105,17 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
     });
   });
 
-  describe("Kondisi 3: Hardware Mismatch (Registered to another HWID)", () => {
-    it("should reject request with HTTP 403 Forbidden and record HWID_MISMATCH log", async () => {
+  describe("Kondisi 3: Portable Multi-Device (Moved to Another Device / HWID)", () => {
+    it("should accept request from a different HWID with HTTP 200 and update last active HWID", async () => {
       // Arrange
-      const serialKey = "AKSA-2026-LOCKED-KEY";
+      const serialKey = "AKSA-2026-PORTABLE-KEY";
       const originalHwid = "ORIGINAL-DEVICE-HWID-333";
-      const attackerHwid = "DIFFERENT-DEVICE-HWID-999";
+      const newDeviceHwid = "PORTABLE-SERVER-LAB-999";
 
       const existingLicense = LicenseEntity.create({
         id: "lic-3",
         serialKey,
-        clientName: "PT Korporat Aman",
+        clientName: "SMK Negeri 1 Surabaya",
         vaultSecret: "VAULT_SECRET_789",
         status: "ACTIVE",
         hwid: originalHwid,
@@ -126,23 +126,26 @@ describe("ValidateLicenseUseCase (Triple A Pattern)", () => {
       // Act
       const result = await useCase.execute({
         serial_key: serialKey,
-        hwid: attackerHwid,
+        hwid: newDeviceHwid,
         engine_version: "2.1.0",
       });
 
       // Assert
-      expect(result.isSuccess).toBe(false);
-      const error = result.getError();
-      expect(error.statusCode).toBe(403);
-      expect(error.message).toContain("Hardware Mismatch");
-      expect(mockRepo.update).not.toHaveBeenCalled();
+      expect(result.isSuccess).toBe(true);
+      const data = result.getValue();
+      expect(data.valid).toBe(true);
+      expect(data.client_name).toBe("SMK Negeri 1 Surabaya");
+      expect(data.vault_secret).toBe("VAULT_SECRET_789");
+      expect(mockRepo.update).toHaveBeenCalledWith(existingLicense);
+      expect(existingLicense.hwid).toBe(newDeviceHwid);
 
       // FR-06 Validation Audit Log
       expect(mockLogRepo.record).toHaveBeenCalledTimes(1);
       const recordedLog = vi.mocked(mockLogRepo.record).mock.calls[0][0];
-      expect(recordedLog.result).toBe("HWID_MISMATCH");
-      expect(recordedLog.statusCode).toBe(403);
+      expect(recordedLog.result).toBe("VERIFIED");
+      expect(recordedLog.statusCode).toBe(200);
       expect(recordedLog.licenseId).toBe("lic-3");
+      expect(recordedLog.hwidHash).toBeDefined();
     });
   });
 

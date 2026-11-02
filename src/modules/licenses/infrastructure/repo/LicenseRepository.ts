@@ -74,6 +74,8 @@ export class LicenseRepository implements LicenseRepositoryInterface {
       where: { id: license.id },
       data: {
         hwid: data.hwid,
+        npsn: data.npsn,
+        userId: data.userId,
         status: data.status,
         expiresAt: data.expiresAt,
         activatedAt: data.activatedAt,
