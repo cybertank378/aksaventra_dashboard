@@ -2,6 +2,7 @@ import type {
   ActivitiesQueryDTO,
   ChartRangeQueryDTO,
   RecentLicensesQueryDTO,
+  SendRenewalReminderRequestDTO,
 } from "@/modules/dashboards/domain/dto/DashboardRequestDTO";
 import type { ChartRange } from "@/modules/dashboards/domain/types/ChartRange";
 import type { DashboardLicenseState } from "@/modules/dashboards/domain/types/DashboardLicenseState";
@@ -130,5 +131,33 @@ export class DashboardValidator {
     }
 
     return { isValid: true, errors, data: { limit } };
+  }
+
+  public static validateSendReminder(
+    input: unknown,
+  ): ValidationOutput<SendRenewalReminderRequestDTO> {
+    const errors: Record<string, string> = {};
+    if (!input || typeof input !== "object") {
+      return { isValid: true, errors, data: {} };
+    }
+
+    const obj = input as Record<string, unknown>;
+    let licenseIds: string[] | undefined;
+
+    if (obj.licenseIds !== undefined && obj.licenseIds !== null) {
+      if (!Array.isArray(obj.licenseIds)) {
+        errors.licenseIds = "Parameter licenseIds harus berupa array string";
+      } else if (!obj.licenseIds.every((id) => typeof id === "string" && id.trim().length > 0)) {
+        errors.licenseIds = "Item dalam licenseIds harus berupa string valid";
+      } else {
+        licenseIds = obj.licenseIds.map((id) => String(id).trim());
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return { isValid: false, errors };
+    }
+
+    return { isValid: true, errors, data: { licenseIds } };
   }
 }

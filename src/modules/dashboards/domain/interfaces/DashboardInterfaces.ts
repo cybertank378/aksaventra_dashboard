@@ -21,6 +21,14 @@ export interface ExpiringLicenseRecord {
   expiresAt: Date;
 }
 
+export interface ExpiringLicenseDetailRecord {
+  id: string;
+  clientName: string;
+  serialKey: string;
+  expiresAt: Date;
+  recipientEmail?: string | null;
+}
+
 export interface RecentLicensesQuery {
   status: DashboardLicenseState | "ALL";
   offset: number;
@@ -59,6 +67,18 @@ export interface DashboardRepositoryInterface {
     expiringUntil: Date,
     limit: number,
   ): Promise<ExpiringLicenseRecord[]>;
+  findExpiringLicensesForReminder(
+    now: Date,
+    expiringUntil: Date,
+    licenseIds?: string[],
+  ): Promise<ExpiringLicenseDetailRecord[]>;
+  createAuditLog(data: {
+    userId?: string;
+    action: string;
+    target?: string;
+    details?: string;
+    ipAddress?: string;
+  }): Promise<void>;
 
   // Recent Tables & Activities
   findRecentLicenses(

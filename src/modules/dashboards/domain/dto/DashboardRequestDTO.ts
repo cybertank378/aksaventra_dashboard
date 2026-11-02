@@ -14,3 +14,7 @@ export interface ChartRangeQueryDTO {
 export interface ActivitiesQueryDTO {
   limit?: number;
 }
+
+export interface SendRenewalReminderRequestDTO {
+  licenseIds?: string[];
+}

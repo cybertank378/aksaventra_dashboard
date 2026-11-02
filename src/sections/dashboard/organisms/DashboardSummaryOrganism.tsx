@@ -7,11 +7,13 @@ import { useDashboardApi } from "@/modules/dashboards/presentation/hooks/useDash
 import { DashboardKpiGrid } from "@/sections/dashboard/molecules/DashboardKpiGrid";
 import { RenewalWarningBanner } from "@/sections/dashboard/molecules/RenewalWarningBanner";
 import Button from "@/shared-ui/component/Button";
+import { showErrorToast, showSuccessToast } from "@/shared-ui/component/Toast";
 
 export function DashboardSummaryOrganism(): React.JSX.Element {
   const router = useRouter();
-  const { getSummary, loading, error } = useDashboardApi();
+  const { getSummary, sendRenewalReminders, loading, error } = useDashboardApi();
   const [summary, setSummary] = useState<DashboardSummaryResponseDTO | undefined>(undefined);
+  const [isSendingReminder, setIsSendingReminder] = useState(false);
 
   const fetchSummary = useCallback(async () => {
     try {
@@ -36,6 +38,23 @@ export function DashboardSummaryOrganism(): React.JSX.Element {
     fetchSummary();
   };
 
+  const handleSendReminders = async (licenseIds: string[]) => {
+    setIsSendingReminder(true);
+    try {
+      const result = await sendRenewalReminders(licenseIds);
+      if (result) {
+        showSuccessToast(result.message || "Pengingat perpanjangan lisensi berhasil dikirim.");
+        await fetchSummary();
+      }
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Gagal memproses pengiriman pengingat perpanjangan";
+      showErrorToast(message);
+    } finally {
+      setIsSendingReminder(false);
+    }
+  };
+
   if (error && !summary) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-rose-200 bg-rose-50/50 p-6 text-center">
@@ -55,6 +74,8 @@ export function DashboardSummaryOrganism(): React.JSX.Element {
         <RenewalWarningBanner
           warnings={summary.renewalWarnings}
           onManageClick={handleManageClick}
+          onSendReminders={handleSendReminders}
+          isSending={isSendingReminder}
         />
       )}
     </div>
