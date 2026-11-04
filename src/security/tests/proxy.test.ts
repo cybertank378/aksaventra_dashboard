@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { JwtProvider } from "@/modules/auth/infrastructure/providers/JwtProvider";
 import { AUTH_COOKIE } from "@/modules/auth/shared/constants/authCookie";
 import { proxy } from "@/proxy";
 
@@ -182,6 +183,33 @@ describe("Aksaventra Proxy Gateway (Triple A Pattern)", () => {
    * 4. PROTECTED ROUTES & AUTHENTICATION
    * ======================================================== */
   describe("Protected Routes Guard", () => {
+    it("should authenticate using valid signed JWT without invoking global.fetch", async () => {
+      // Arrange
+      const jwtProvider = new JwtProvider();
+      const signedToken = await jwtProvider.signAccessToken({
+        sub: "usr-operator-1",
+        email: "operator@aksaventra.com",
+        role: "OPERATOR",
+      });
+
+      const fetchSpy = vi.fn();
+      vi.stubGlobal("fetch", fetchSpy);
+
+      const request = new NextRequest("http://localhost:3000/dashboard", {
+        headers: {
+          cookie: `${AUTH_COOKIE.ACCESS_TOKEN}=${signedToken}; ${AUTH_COOKIE.REFRESH_TOKEN}=refresh_123`,
+        },
+      });
+
+      // Act
+      const response = await proxy(request);
+
+      // Assert
+      expect(response.status).toBe(200);
+      expect(response.headers.get("x-middleware-next")).toBe("1");
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
     it("should redirect unauthenticated web request to /login?redirect=...", async () => {
       // Arrange
       const request = new NextRequest("http://localhost:3000/dashboard/engines");
