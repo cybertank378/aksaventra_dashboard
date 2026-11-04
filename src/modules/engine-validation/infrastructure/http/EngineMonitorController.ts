@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { BaseController } from "@/core/http/BaseController";
+import { isNextBailoutError } from "@/core/utils/isNextBailoutError";
 import { getCurrentAuth } from "@/modules/auth/infrastructure/decorator/getCurrentAuth";
 import type { EngineMonitorServices } from "@/modules/engine-validation/application/services/EngineMonitorServices";
 import { EngineMonitorValidator } from "@/modules/engine-validation/infrastructure/validators/engineMonitor.validator";
@@ -63,6 +64,7 @@ export class EngineMonitorController extends BaseController {
         { status: 400 },
       );
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[EngineMonitorController.getFeed] error:", error);
       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }

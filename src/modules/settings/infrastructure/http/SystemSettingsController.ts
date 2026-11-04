@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { BaseController } from "@/core/http/BaseController";
+import { isNextBailoutError } from "@/core/utils/isNextBailoutError";
 import { getCurrentAuth } from "@/modules/auth/infrastructure/decorator/getCurrentAuth";
 import { canAccess } from "@/security/fieldGuard";
 import type { SystemSettingsServices } from "../../application/services/SystemSettingsServices";
@@ -38,6 +39,7 @@ export class SystemSettingsController extends BaseController {
         { status: 500 },
       );
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[SystemSettingsController.getSettings] error:", error);
       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }

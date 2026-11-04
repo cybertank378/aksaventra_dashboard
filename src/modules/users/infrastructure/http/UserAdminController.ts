@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { BaseController } from "@/core/http/BaseController";
+import { isNextBailoutError } from "@/core/utils/isNextBailoutError";
 import { getCurrentAuth } from "@/modules/auth/infrastructure/decorator/getCurrentAuth";
 import type { UserServices } from "@/modules/users/application/services/UserServices";
 import { UserValidator } from "@/modules/users/infrastructure/validators/user.validator";
@@ -48,6 +49,7 @@ export class UserAdminController extends BaseController {
 
       return NextResponse.json({ message: result.getError().message }, { status: 400 });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[UserAdminController.list] error:", error);
       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
@@ -65,6 +67,7 @@ export class UserAdminController extends BaseController {
 
       return NextResponse.json({ message: result.getError().message }, { status: 400 });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[UserAdminController.getStats] error:", error);
       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
@@ -90,6 +93,7 @@ export class UserAdminController extends BaseController {
       const status = errorMessage.includes("tidak ditemukan") ? 404 : 400;
       return NextResponse.json({ message: errorMessage }, { status });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[UserAdminController.getDetail] error:", error);
       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }

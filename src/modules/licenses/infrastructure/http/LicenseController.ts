@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { BaseController } from "@/core/http/BaseController";
+import { isNextBailoutError } from "@/core/utils/isNextBailoutError";
 import type { LicenseServices } from "@/modules/licenses/application/services/LicenseServices";
 import { LicenseValidator } from "@/modules/licenses/infrastructure/validators/license.validator";
 
@@ -77,6 +78,7 @@ export class LicenseController extends BaseController {
         { status: error.statusCode },
       );
     } catch (_error) {
+      if (isNextBailoutError(_error)) throw _error;
       return NextResponse.json(
         {
           valid: false,

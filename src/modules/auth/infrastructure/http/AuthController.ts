@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { isNextBailoutError } from "@/core/utils/isNextBailoutError";
 import type { AuthServices } from "@/modules/auth/application/services/AuthServices";
 import { getCurrentAuth } from "@/modules/auth/infrastructure/decorator/getCurrentAuth";
 import { AuthValidator } from "@/modules/auth/infrastructure/validators/auth.validator";
@@ -176,6 +177,7 @@ export class AuthController {
 
       return NextResponse.json({ success: true, data: result.getValue() }, { status: 200 });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[AuthController.validateAccessToken]", error);
       return NextResponse.json(
         { success: false, message: "Internal server error" },

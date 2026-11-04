@@ -12,6 +12,7 @@ import { existsSync, statSync } from "node:fs";
 import { open } from "node:fs/promises";
 import { type NextRequest, NextResponse } from "next/server";
 import { BaseController } from "@/core/http/BaseController";
+import { isNextBailoutError } from "@/core/utils/isNextBailoutError";
 import type { ReleaseServices } from "@/modules/releases/application/services/ReleaseServices";
 import type { StorageProviderInterface } from "@/modules/releases/domain/interfaces/ReleaseInterfaces";
 import { ReleaseValidator } from "@/modules/releases/infrastructure/validators/release.validator";
@@ -83,6 +84,7 @@ export class UpdaterController extends BaseController {
         { status: 400 },
       );
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[UpdaterController] checkVersion error:", error);
       return NextResponse.json(
         {
@@ -264,6 +266,7 @@ export class UpdaterController extends BaseController {
         },
       });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[UpdaterController] downloadBinary error:", error);
       return new NextResponse("Internal Server Error saat unduh biner", { status: 500 });
     }

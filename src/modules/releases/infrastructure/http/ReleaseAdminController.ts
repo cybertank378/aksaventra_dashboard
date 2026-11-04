@@ -10,6 +10,7 @@
 
 import { type NextRequest, NextResponse } from "next/server";
 import { BaseController } from "@/core/http/BaseController";
+import { isNextBailoutError } from "@/core/utils/isNextBailoutError";
 import type { ReleaseServices } from "@/modules/releases/application/services/ReleaseServices";
 import type { StorageProviderInterface } from "@/modules/releases/domain/interfaces/ReleaseInterfaces";
 import { ReleaseValidator } from "@/modules/releases/infrastructure/validators/release.validator";
@@ -209,6 +210,7 @@ export class ReleaseAdminController extends BaseController {
 
       return NextResponse.json({ message: result.getError() }, { status: 400 });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[ReleaseAdminController] getLogs error:", error);
       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
