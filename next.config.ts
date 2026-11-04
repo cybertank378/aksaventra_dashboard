@@ -14,11 +14,11 @@ const cspDirectives = [
   // Mengizinkan style internal & Tailwind CSS
   "style-src 'self' 'unsafe-inline' https://aksaventra.ai.id https://*.cloudflare.com",
   // Mengizinkan gambar dari domain sendiri, blob/data URI (untuk chart/avatar), Cloudflare, dan AWS S3
-  "img-src 'self' blob: data: https://aksaventra.ai.id https://*.aksaventra.ai.id https://*.cloudflare.com https://*.s3.amazonaws.com https://*.s3.*.amazonaws.com",
+  "img-src 'self' blob: data: https://aksaventra.ai.id https://*.aksaventra.ai.id https://*.cloudflare.com https://*.amazonaws.com https://*.s3.amazonaws.com",
   // Mengizinkan font lokal dan data URI
   "font-src 'self' data: https://aksaventra.ai.id",
   // Mengizinkan koneksi API, Telemetry, S3/Storage, dan Cloudflare Insights/Turnstile
-  `connect-src 'self' https://aksaventra.ai.id https://*.aksaventra.ai.id https://*.cloudflare.com https://cloudflareinsights.com https://challenges.cloudflare.com https://*.s3.amazonaws.com https://*.s3.*.amazonaws.com ${isDev ? "ws://localhost:* http://localhost:*" : ""}`,
+  `connect-src 'self' https://aksaventra.ai.id https://*.aksaventra.ai.id https://*.cloudflare.com https://cloudflareinsights.com https://challenges.cloudflare.com https://*.amazonaws.com https://*.s3.amazonaws.com ${isDev ? "ws://localhost:* http://localhost:*" : ""}`,
   // Mengizinkan iframe khusus untuk widget Cloudflare Turnstile / Challenge
   "frame-src 'self' https://challenges.cloudflare.com https://*.cloudflare.com",
   // Mencegah website di-embed di iframe pihak ketiga (Anti-Clickjacking)
@@ -115,7 +115,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "*.s3.*.amazonaws.com",
+        hostname: "*.amazonaws.com",
       },
     ],
   },

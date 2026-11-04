@@ -40,6 +40,22 @@ describe("Aksaventra Proxy Gateway (Triple A Pattern)", () => {
       expect(response.status).toBe(200);
       expect(response.headers.get("x-middleware-next")).toBe("1");
     });
+
+    it("should immediately bypass manifest.json and robots.txt without authentication", async () => {
+      // Arrange
+      const requestManifest = new NextRequest("http://localhost:3000/manifest.json");
+      const requestRobots = new NextRequest("http://localhost:3000/robots.txt");
+
+      // Act
+      const responseManifest = await proxy(requestManifest);
+      const responseRobots = await proxy(requestRobots);
+
+      // Assert
+      expect(responseManifest.status).toBe(200);
+      expect(responseManifest.headers.get("x-middleware-next")).toBe("1");
+      expect(responseRobots.status).toBe(200);
+      expect(responseRobots.headers.get("x-middleware-next")).toBe("1");
+    });
   });
 
   /* ==========================================================
