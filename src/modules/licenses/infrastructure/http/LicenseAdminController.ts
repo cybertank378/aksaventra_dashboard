@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { BaseController } from "@/core/http/BaseController";
+import { isNextBailoutError } from "@/core/utils/isNextBailoutError";
 import { getCurrentAuth } from "@/modules/auth/infrastructure/decorator/getCurrentAuth";
 import type { LicenseServices } from "@/modules/licenses/application/services/LicenseServices";
 import { LicenseValidator } from "@/modules/licenses/infrastructure/validators/license.validator";
@@ -45,6 +46,7 @@ export class LicenseAdminController extends BaseController {
 
       return NextResponse.json({ message: result.getError().message }, { status: 400 });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[LicenseAdminController.list] error:", error);
       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
@@ -63,6 +65,7 @@ export class LicenseAdminController extends BaseController {
 
       return NextResponse.json({ message: result.getError().message }, { status: 400 });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[LicenseAdminController.getStats] error:", error);
       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
@@ -98,6 +101,7 @@ export class LicenseAdminController extends BaseController {
       const status = errorMessage.includes("tidak ditemukan") ? 404 : 400;
       return NextResponse.json({ message: errorMessage }, { status });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[LicenseAdminController.getDetail] error:", error);
       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }

@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { BaseController } from "@/core/http/BaseController";
+import { isNextBailoutError } from "@/core/utils/isNextBailoutError";
 import { getCurrentAuth } from "@/modules/auth/infrastructure/decorator/getCurrentAuth";
 import type { DashboardServices } from "@/modules/dashboards/application/services/DashboardServices";
 import { DashboardValidator } from "@/modules/dashboards/infrastructure/validators/dashboard.validator";
@@ -26,6 +27,7 @@ export class DashboardController extends BaseController {
         { status: 500 },
       );
     } catch (_error) {
+      if (isNextBailoutError(_error)) throw _error;
       return NextResponse.json(
         { message: "Terjadi kesalahan internal pada server" },
         { status: 500 },
@@ -60,6 +62,7 @@ export class DashboardController extends BaseController {
         { status: 500 },
       );
     } catch (_error) {
+      if (isNextBailoutError(_error)) throw _error;
       return NextResponse.json(
         { message: "Terjadi kesalahan internal pada server" },
         { status: 500 },
@@ -92,6 +95,7 @@ export class DashboardController extends BaseController {
         { status: 500 },
       );
     } catch (_error) {
+      if (isNextBailoutError(_error)) throw _error;
       return NextResponse.json(
         { message: "Terjadi kesalahan internal pada server" },
         { status: 500 },
@@ -124,6 +128,7 @@ export class DashboardController extends BaseController {
         { status: 500 },
       );
     } catch (_error) {
+      if (isNextBailoutError(_error)) throw _error;
       return NextResponse.json(
         { message: "Terjadi kesalahan internal pada server" },
         { status: 500 },
@@ -142,6 +147,7 @@ export class DashboardController extends BaseController {
         { status: 500 },
       );
     } catch (_error) {
+      if (isNextBailoutError(_error)) throw _error;
       return NextResponse.json(
         { message: "Terjadi kesalahan internal pada server" },
         { status: 500 },
@@ -160,6 +166,7 @@ export class DashboardController extends BaseController {
         { status: 500 },
       );
     } catch (_error) {
+      if (isNextBailoutError(_error)) throw _error;
       return NextResponse.json(
         { message: "Terjadi kesalahan internal pada server" },
         { status: 500 },
@@ -178,6 +185,7 @@ export class DashboardController extends BaseController {
         { status: 500 },
       );
     } catch (_error) {
+      if (isNextBailoutError(_error)) throw _error;
       return NextResponse.json(
         { message: "Terjadi kesalahan internal pada server" },
         { status: 500 },
@@ -227,6 +235,7 @@ export class DashboardController extends BaseController {
         { status: 500 },
       );
     } catch (_error) {
+      if (isNextBailoutError(_error)) throw _error;
       return NextResponse.json(
         { message: "Terjadi kesalahan internal pada server" },
         { status: 500 },

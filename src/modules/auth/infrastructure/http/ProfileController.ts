@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { isNextBailoutError } from "@/core/utils/isNextBailoutError";
 import { GetUserProfileUseCase } from "@/modules/auth/application/usecase/GetUserProfileUseCase";
 import { RevokeSessionUseCase } from "@/modules/auth/application/usecase/RevokeSessionUseCase";
 import { UpdateProfileUseCase } from "@/modules/auth/application/usecase/UpdateProfileUseCase";
@@ -39,6 +40,7 @@ export class ProfileController {
 
       return NextResponse.json({ success: true, data: profile }, { status: 200 });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[ProfileController.getProfile]", error);
       return NextResponse.json(
         { success: false, message: "Terjadi kesalahan internal" },

@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { BaseController } from "@/core/http/BaseController";
+import { isNextBailoutError } from "@/core/utils/isNextBailoutError";
 import type { ValidationLogServices } from "../../application/services/ValidationLogServices";
 import { ValidationLogValidator } from "../validators/validationLog.validator";
 
@@ -39,6 +40,7 @@ export class ValidationLogController extends BaseController {
 
       return NextResponse.json({ message: result.getError() }, { status: 400 });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[ValidationLogController.list] error:", error);
       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
@@ -129,6 +131,7 @@ export class ValidationLogController extends BaseController {
 
       return NextResponse.json({ message: result.getError() }, { status: 400 });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[ValidationLogController.export] error:", error);
       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }

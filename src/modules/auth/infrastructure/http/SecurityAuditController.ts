@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { isNextBailoutError } from "@/core/utils/isNextBailoutError";
 import { GetSecurityAuditLogsUseCase } from "@/modules/auth/application/usecase/GetSecurityAuditLogsUseCase";
 import { getCurrentAuth } from "@/modules/auth/infrastructure/decorator/getCurrentAuth";
 import { canAccess } from "@/security/fieldGuard";
@@ -41,6 +42,7 @@ export class SecurityAuditController {
 
       return NextResponse.json({ success: true, data }, { status: 200 });
     } catch (error) {
+      if (isNextBailoutError(error)) throw error;
       console.error("[SecurityAuditController.getAuditLogs]", error);
       return NextResponse.json(
         { success: false, message: "Terjadi kesalahan internal" },
