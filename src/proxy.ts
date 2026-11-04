@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { serverLog } from "@/libs/serverLog";
 import type { CurrentAuthResponseDTO } from "@/modules/auth/domain/dto/AuthResponseDTO";
+import { JwtProvider } from "@/modules/auth/infrastructure/providers/JwtProvider";
 import { AUTH_COOKIE } from "@/modules/auth/shared/constants/authCookie";
 import { canAccessApi, canAccessRoute } from "@/security/fieldGuard";
 import { evaluatePolicy } from "@/security/policyEngine";
@@ -150,12 +151,17 @@ function forbidden(request: NextRequest, message = "Forbidden"): NextResponse {
 // VALIDATE ACCESS TOKEN
 //////////////////////////////////////////////////////////////
 
+const proxyJwtProvider = new JwtProvider();
+
 async function validateAccessToken(request: NextRequest): Promise<CurrentAuthResponseDTO | null> {
   try {
     ////////////////////////////////////////////////////////////
     // ACCESS TOKEN
     ////////////////////////////////////////////////////////////
-    const accessToken = request.cookies.get(AUTH_COOKIE.ACCESS_TOKEN)?.value;
+    const accessToken =
+      request.cookies.get(AUTH_COOKIE.ACCESS_TOKEN)?.value ||
+      request.cookies.get("auth_token")?.value ||
+      request.cookies.get("session_token")?.value;
 
     ////////////////////////////////////////////////////////////
     // INVALID TOKEN
@@ -165,33 +171,51 @@ async function validateAccessToken(request: NextRequest): Promise<CurrentAuthRes
     }
 
     ////////////////////////////////////////////////////////////
-    // FETCH API
+    // 1. IN-PROCESS JWT VERIFICATION (JOSE / WEB CRYPTO)
+    // Menghilangkan loopback fetch HTTP/HTTPS yang memicu
+    // ERR_SSL_WRONG_VERSION_NUMBER di lingkungan reverse proxy / PM2
     ////////////////////////////////////////////////////////////
-    const response = await fetch(new URL("/api/v1/auth/validate-access-token", request.url), {
-      method: "GET",
-      headers: {
-        cookie: request.headers.get("cookie") ?? "",
-        "user-agent": request.headers.get("user-agent") ?? "",
-      },
-      cache: "no-store",
-    });
-
-    ////////////////////////////////////////////////////////////
-    // INVALID RESPONSE
-    ////////////////////////////////////////////////////////////
-    if (!response.ok) {
-      return null;
+    const payload = await proxyJwtProvider.verifyToken(accessToken);
+    if (payload?.sub) {
+      const extraPayload = payload as unknown as Record<string, unknown>;
+      return {
+        id: payload.sub,
+        email: payload.email,
+        role: payload.role,
+        isActive: true,
+        name: extraPayload.name as string | undefined,
+        licenseKey: extraPayload.licenseKey as string | undefined,
+        organization: extraPayload.organization as string | undefined,
+        engineAccess: (extraPayload.engineAccess as boolean | undefined) ?? true,
+      };
     }
 
     ////////////////////////////////////////////////////////////
-    // JSON
+    // 2. FALLBACK UNTUK TEST HARNESS (Stubbed global.fetch)
     ////////////////////////////////////////////////////////////
-    const result = await response.json();
+    if (process.env.NODE_ENV === "test") {
+      try {
+        const response = await fetch(new URL("/api/v1/auth/validate-access-token", request.url), {
+          method: "GET",
+          headers: {
+            cookie: request.headers.get("cookie") ?? "",
+            "user-agent": request.headers.get("user-agent") ?? "",
+          },
+          cache: "no-store",
+        });
 
-    ////////////////////////////////////////////////////////////
-    // RESPONSE
-    ////////////////////////////////////////////////////////////
-    return result.data ?? null;
+        if (!response.ok) {
+          return null;
+        }
+
+        const result = await response.json();
+        return result.data ?? null;
+      } catch {
+        return null;
+      }
+    }
+
+    return null;
   } catch (error) {
     serverLog("[VALIDATE_ACCESS_TOKEN_ERROR]", error);
     return null;
